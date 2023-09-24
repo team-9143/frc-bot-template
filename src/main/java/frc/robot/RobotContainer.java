@@ -8,26 +8,28 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 
 /** Robot structure declaration. Initializes trigger mappings, OI devices, and main stop mechanism. */
 public class RobotContainer {
-  private static RobotContainer m_instance;
+  private static boolean m_initialized = false;
 
-  /** @return the singleton instance */
-  public static RobotContainer getInstance() {
-    if (m_instance == null) {
-      m_instance = new RobotContainer();
+  /** Initialize robot container. */
+  public static void init() {
+    if (m_initialized == true) {
+      return;
     }
-    return m_instance;
-  }
+    m_initialized = true;
 
-  private RobotContainer() {
-    // Configure pigeon - make sure to update pitch and roll offsets
-    OI.PIGEON2.configMountPose(0, 0, 0); // TODO: Add pigeon pitch and roll offsets here
-    OI.PIGEON2.setYaw(0);
-
+    configureOI();
     configureBindings();
   }
 
-  /** Initialize button bindings. */
-  private void configureBindings() {
+  /** Initialize OI devices. */
+  private static void configureOI() {
+    // Configure pigeon - make sure to update pitch and roll offsets
+    OI.PIGEON2.configMountPose(0, 0, 0); // TODO: Add pigeon pitch and roll offsets here
+    OI.PIGEON2.setYaw(0);
+  }
+
+  /** Create button bindings. */
+  private static void configureBindings() {
     // Button 'B' (hold) will continuously stop all movement
     new Trigger(() -> OI.DRIVER_CONTROLLER.getButton(btn.B) || OI.OPERATOR_CONTROLLER.getButton(btn.B))
       .whileTrue(new RunCommand(
@@ -45,9 +47,9 @@ public class RobotContainer {
     configureOperator();
   }
 
-  private void configureDriver() {}
+  private static void configureDriver() {}
 
-  private void configureOperator() {}
+  private static void configureOperator() {}
 
   /** Stops all motors and disables controllers. Does not stop commands. */
   public static void stop() {
