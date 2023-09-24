@@ -18,7 +18,9 @@ public class Robot extends TimedRobot {
    * initialization code.
    */
   @Override
-  public void robotInit() {}
+  public void robotInit() {
+    RobotContainer.init();
+  }
 
   @Override
   public void robotPeriodic() {}
@@ -36,7 +38,9 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {}
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    RobotContainer.stop();
+  }
 
   @Override
   public void disabledPeriodic() {}
