@@ -8,6 +8,12 @@ import edu.wpi.first.wpilibj.TimedRobot;
 
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
+import frc.robot.util.TunableNumber;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -50,7 +56,25 @@ public class Robot extends TimedRobot {
   public void disabledPeriodic() {}
 
   @Override
-  public void testInit() {}
+  public void testInit() {
+    for (var elem : TunableNumber.getAllInstances()) {
+      // Make all tunables mutable and add them to shuffleboard
+      elem.setMutable(true);
+
+      if (!elem.visible) {
+        Shuffleboard.getTab("Tunables").add(elem.m_name, new Sendable() {
+          @Override
+          public void initSendable(SendableBuilder builder) {
+            builder.setSmartDashboardType("Motor Controller");
+            builder.addDoubleProperty("Value", elem::getAsDouble, elem::accept);
+          }
+        }).withWidget(BuiltInWidgets.kTextView)
+          .withSize(2, 1);
+
+        elem.visible = true;
+      }
+    }
+  }
 
   @Override
   public void testPeriodic() {}

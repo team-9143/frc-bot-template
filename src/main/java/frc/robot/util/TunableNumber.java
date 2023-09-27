@@ -12,6 +12,9 @@ public class TunableNumber implements DoubleSupplier, DoubleConsumer {
   /** Index of this instance for use with dashboards. Begins at zero. */
   public final int m_index;
 
+  /** Helper variable, should be set to true if the number is visible on the dashboard. */
+  public boolean visible = false;
+
   /** Descriptor of the TunableNumber for use with dashboards. */
   public final String m_name;
 
