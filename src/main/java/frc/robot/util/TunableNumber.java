@@ -9,9 +9,11 @@ import java.util.ArrayList;
 public class TunableNumber implements DoubleSupplier, DoubleConsumer {
   /** List of instances. */
   private static final ArrayList<TunableNumber> s_instances = new ArrayList<TunableNumber>();
-
   /** Index of this instance for use with dashboards. Begins at zero. */
   public final int m_index;
+
+  /** Descriptor of the TunableNumber for use with dashboards. */
+  public final String m_name;
 
   /** Value of the TunableNumber. */
   private double m_value;
@@ -25,9 +27,11 @@ public class TunableNumber implements DoubleSupplier, DoubleConsumer {
   /**
    * Create a new TunableNumber.
    *
+   * @param name descriptor for dashboards
    * @param val initial value
    */
-  public TunableNumber(double val) {
+  public TunableNumber(String name, double val) {
+    m_name = name;
     m_value = val;
     synchronized (TunableNumber.class) {
       m_index = s_instances.size();
