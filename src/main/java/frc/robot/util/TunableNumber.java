@@ -63,6 +63,23 @@ public class TunableNumber implements DoubleSupplier, DoubleConsumer {
     }
   }
 
+  /**
+   * Get all instances within a specified group.
+   *
+   * @param group group to look for (case sensitive)
+   * @return an array of all instances in the group
+   */
+  public static TunableNumber[] getFromGroup(String group) {
+    final ArrayList<TunableNumber> allInGroup = new ArrayList<TunableNumber>();
+
+    synchronized (TunableNumber.class) {
+      allInGroup.addAll(s_instances);
+    }
+
+    allInGroup.removeIf(e -> !e.m_group.equals(group));
+    return allInGroup.toArray(new TunableNumber[allInGroup.size()]);
+  }
+
   /** @return {@code true} if the number is mutable */
   public boolean getMutable() {
     return m_mutable;
