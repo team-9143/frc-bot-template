@@ -17,6 +17,8 @@ public class TunableNumber implements DoubleSupplier, DoubleConsumer {
 
   /** Descriptor of the TunableNumber for use with dashboards. */
   public final String m_name;
+  /** Descriptor of associated TunableNumbers for use with dashboards. */
+  public final String m_group;
 
   /** Value of the TunableNumber. */
   private double m_value;
@@ -32,14 +34,26 @@ public class TunableNumber implements DoubleSupplier, DoubleConsumer {
    *
    * @param name descriptor for dashboards
    * @param val initial value
+   * @param group descriptor for associated TunableNumbers
    */
-  public TunableNumber(String name, double val) {
+  public TunableNumber(String name, double val, String group) {
     m_name = name;
     m_value = val;
     synchronized (TunableNumber.class) {
       m_index = s_instances.size();
       s_instances.add(this);
     }
+    m_group = group;
+  }
+
+  /**
+   * Create a new TunableNumber in the {@code default} group.
+   *
+   * @param name descriptor for dashboards
+   * @param val initial value
+   */
+  public TunableNumber(String name, double val) {
+    this(name, val, "default");
   }
 
   /** @return an array of all instances for class-wide changes (e.g. making all numbers mutable) */
