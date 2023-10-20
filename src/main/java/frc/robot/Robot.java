@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.util.TunableNumber;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -58,13 +59,18 @@ public class Robot extends TimedRobot {
     // Enable command scheduling in test mode
     CommandScheduler.getInstance().enable();
 
-    for (var elem : TunableNumber.getAllInstances()) {
-      // Make all tunables mutable and add them to shuffleboard
+    var instances = TunableNumber.getAllInstances();
+
+    // Indexed loop keeps timer synchronous
+    for (var elem : instances) {
+      // Make all tunables mutable
       elem.setMutable(true);
 
+      // Add tunables to shuffleboard if applicable
       if (!elem.hasEntry()) {
         elem.setEntry(
-          Shuffleboard.getTab("Tunables").add(elem.m_group + "-" + elem.m_name, elem.getAsDouble())
+          Shuffleboard.getTab("Tunables").getLayout(elem.m_group, BuiltInLayouts.kList)
+            .add(elem.m_name, elem.getAsDouble())
             .withWidget(BuiltInWidgets.kTextView)
             .withSize(2, 2)
             .getEntry()
