@@ -65,7 +65,7 @@ public class Robot extends TimedRobot {
     // Indexed loop keeps timer synchronous
     for (var group : groups) {
       var instances = TunableNumber.getGroup(group);
-      var layout = Shuffleboard.getTab("Tunables").getLayout(group, BuiltInLayouts.kList);
+      var layout = Shuffleboard.getTab("Tunables").getLayout(group, BuiltInLayouts.kList).withSize(2, 6);
       boolean initialized = true;
 
       for (var elem : instances) {
