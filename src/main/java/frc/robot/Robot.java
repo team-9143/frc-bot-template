@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 import frc.robot.util.TunableNumber;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -59,22 +60,36 @@ public class Robot extends TimedRobot {
     // Enable command scheduling in test mode
     CommandScheduler.getInstance().enable();
 
-    var instances = TunableNumber.getAllInstances();
+    var groups = TunableNumber.getAllGroups();
 
     // Indexed loop keeps timer synchronous
-    for (var elem : instances) {
-      // Make all tunables mutable
-      elem.setMutable(true);
+    for (var group : groups) {
+      var instances = TunableNumber.getGroup(group);
+      var layout = Shuffleboard.getTab("Tunables").getLayout(group, BuiltInLayouts.kList);
+      boolean initialized = true;
 
-      // Add tunables to shuffleboard if applicable
-      if (!elem.hasEntry()) {
-        elem.setEntry(
-          Shuffleboard.getTab("Tunables").getLayout(elem.m_group, BuiltInLayouts.kList)
-            .add(elem.m_name, elem.getAsDouble())
-            .withWidget(BuiltInWidgets.kTextView)
-            .withSize(2, 2)
-            .getEntry()
-        );
+      for (var elem : instances) {
+        // Make all tunables mutable
+        elem.setMutable(true);
+
+        // Add tunables to shuffleboard if applicable
+        if (!elem.hasEntry()) {
+          initialized = false; // Layout has not been fully initialized
+          elem.setEntry(
+            layout.add(elem.m_name, elem.getAsDouble())
+              .withWidget(BuiltInWidgets.kTextView)
+              .withSize(2, 2)
+              .getEntry()
+          );
+        }
+      }
+
+      if (!initialized) {
+        layout.add("Reset", new InstantCommand(() -> {
+          for (var elem : instances) {
+            elem.reset();
+          }
+        }));
       }
     }
   }
