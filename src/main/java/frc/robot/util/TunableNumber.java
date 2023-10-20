@@ -154,6 +154,9 @@ public class TunableNumber implements DoubleSupplier, DoubleConsumer {
   public void accept(double val) {
     if (m_mutable && m_value != val) {
       m_value = val;
+      if (m_entry != null) {
+        m_entry.setDouble(val);
+      }
       if (m_bindOnChange != null) {
         m_bindOnChange.accept(m_value);
       }
