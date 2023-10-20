@@ -4,20 +4,23 @@ import java.util.function.DoubleSupplier;
 import java.util.function.DoubleConsumer;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import edu.wpi.first.networktables.GenericEntry;
 
 /** Represents a double that can be changed during runtime. */
 public class TunableNumber implements DoubleSupplier, DoubleConsumer {
   /** List of instances. */
   private static final ArrayList<TunableNumber> s_instances = new ArrayList<TunableNumber>();
-  /** Index of this instance for use with dashboards. Begins at zero. */
-  public final int m_index;
+  /** List of groups. */
+  private static final HashSet<String> s_groups = new HashSet<String>();
 
   /** Descriptor of the TunableNumber for use with dashboards. */
   public final String m_name;
   /** Descriptor of associated TunableNumbers for use with dashboards. */
   public final String m_group;
 
+  /** Value of the TunableNumber at startup. */
+  public final double m_default;
   /** Value of the TunableNumber. */
   private double m_value;
 
@@ -39,12 +42,13 @@ public class TunableNumber implements DoubleSupplier, DoubleConsumer {
    */
   public TunableNumber(String name, double val, String group) {
     m_name = name;
-    m_value = val;
-    synchronized (TunableNumber.class) {
-      m_index = s_instances.size();
-      s_instances.add(this);
-    }
+    m_default = val;
+    m_value = m_default;
+
+    s_instances.add(this);
+
     m_group = group;
+    s_groups.add(group);
   }
 
   /**
@@ -62,19 +66,24 @@ public class TunableNumber implements DoubleSupplier, DoubleConsumer {
     return s_instances.toArray(new TunableNumber[s_instances.size()]);
   }
 
+  /** @return an array of all TunableNumber groups */
+  public static String[] getAllGroups() {
+    return s_groups.toArray(new String[s_groups.size()]);
+  }
+
   /**
    * Get all instances within a specified group.
    *
    * @param group group of instances to return (case sensitive)
    * @return an array of all instances in the group
    */
-  public static TunableNumber[] getFromGroup(String group) {
-    final ArrayList<TunableNumber> allInGroup = new ArrayList<TunableNumber>();
+  public static TunableNumber[] getGroup(String group) {
+    final ArrayList<TunableNumber> fullGroup = new ArrayList<TunableNumber>();
 
-    allInGroup.addAll(s_instances);
+    fullGroup.addAll(s_instances);
 
-    allInGroup.removeIf(e -> !e.m_group.equals(group));
-    return allInGroup.toArray(new TunableNumber[allInGroup.size()]);
+    fullGroup.removeIf(e -> !e.m_group.equals(group));
+    return fullGroup.toArray(new TunableNumber[fullGroup.size()]);
   }
 
   /** Update all numbers with values from NetworkTables, if provided. */
@@ -120,6 +129,11 @@ public class TunableNumber implements DoubleSupplier, DoubleConsumer {
    */
   public void bindTo(DoubleConsumer bindOnChange) {
     m_bindOnChange = bindOnChange;
+  }
+
+  /** Resets value to initialized value. */
+  public void reset() {
+    accept(m_default);
   }
 
   /** @return the current value */
