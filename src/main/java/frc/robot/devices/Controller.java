@@ -53,7 +53,10 @@ public class Controller {
     m_port = port;
   }
 
-  // Retrieving raw data:
+
+  /*
+   * Retrieving raw data:
+   */
 
   public boolean getButton(btn btn) {
     return DriverStation.getStickButton(m_port, btn.val);
@@ -68,7 +71,9 @@ public class Controller {
     return DriverStation.getStickPOV(m_port, pov);
   }
 
-  // Shorthands for useful axes:
+  /*
+   * Shorthands for useful axes:
+   */
 
   /** Apply a 0.02 to 1.00 deadband to the passed value. */
   public static double deadband(double value) {
@@ -88,7 +93,9 @@ public class Controller {
   public double getRightX() {return deadband(getAxis(axis.rightX));}
   public double getRightY() {return deadband(getAxis(axis.rightY));}
 
-  // Setting rumble and other outputs:
+  /*
+   * Setting rumble and other outputs:
+   */
 
   /**
    * Set the outputs for the HID.
@@ -126,7 +133,9 @@ public class Controller {
     ).withTimeout(seconds);
   }
 
-  // Shorthands for button binding:
+  /*
+   * Shorthands for button binding:
+   */
 
   public void onTrue(btn btn, Runnable run) {
     onTrue(btn, run, CommandScheduler.getInstance().getDefaultButtonLoop());
