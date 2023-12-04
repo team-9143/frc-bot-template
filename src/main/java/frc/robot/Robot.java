@@ -60,12 +60,11 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
-    // Enable command scheduling in test mode
+    // Enable commands in test mode
     CommandScheduler.getInstance().enable();
 
     var groups = TunableNumber.getAllGroups();
 
-    // Indexed loop keeps timer synchronous
     for (var group : groups) {
       var instances = TunableNumber.getGroup(group);
       var layout = Shuffleboard.getTab("Tunables").getLayout(group, BuiltInLayouts.kList).withSize(2, 6);
@@ -77,7 +76,7 @@ public class Robot extends TimedRobot {
 
         // Add tunables to shuffleboard if applicable
         if (!elem.hasEntry()) {
-          initialized = false; // Layout has not been fully initialized
+          initialized = false; // If there are objects to add, layout has not been fully initialized
           elem.setEntry(
             layout.add(elem.m_name, elem.getAsDouble())
               .withWidget(BuiltInWidgets.kTextView)
@@ -87,6 +86,7 @@ public class Robot extends TimedRobot {
         }
       }
 
+      // Create reset button if layouts have not been fully initialized
       if (!initialized) {
         layout.add("Reset", new InstantCommand(() -> {
           for (var elem : instances) {
