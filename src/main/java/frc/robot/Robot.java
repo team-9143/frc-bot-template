@@ -7,13 +7,9 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 import frc.robot.autos.AutoSelector;
 import frc.robot.util.TunableNumber;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -63,38 +59,7 @@ public class Robot extends TimedRobot {
     // Enable commands in test mode
     CommandScheduler.getInstance().enable();
 
-    var groups = TunableNumber.getAllGroups();
-
-    for (var group : groups) {
-      var instances = TunableNumber.getGroup(group);
-      var layout = Shuffleboard.getTab("Tunables").getLayout(group, BuiltInLayouts.kList).withSize(2, 6);
-      boolean initialized = true;
-
-      for (var elem : instances) {
-        // Make all tunables mutable
-        elem.setMutable(true);
-
-        // Add tunables to shuffleboard if applicable
-        if (!elem.hasEntry()) {
-          initialized = false; // If there are objects to add, layout has not been fully initialized
-          elem.setEntry(
-            layout.add(elem.m_name, elem.getAsDouble())
-              .withWidget(BuiltInWidgets.kTextView)
-              .withSize(2, 2)
-              .getEntry()
-          );
-        }
-      }
-
-      // Create reset button if layouts have not been fully initialized
-      if (!initialized) {
-        layout.add("Reset", new InstantCommand(() -> {
-          for (var elem : instances) {
-            elem.reset();
-          }
-        }));
-      }
-    }
+    TunableNumber.initializeShuffleboard();
   }
 
   @Override

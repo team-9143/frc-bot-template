@@ -6,6 +6,9 @@ import java.util.function.DoubleConsumer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 
 /** Represents a double that can be changed during runtime. */
 public class TunableNumber implements DoubleSupplier, DoubleConsumer {
@@ -91,20 +94,6 @@ public class TunableNumber implements DoubleSupplier, DoubleConsumer {
     s_instances.forEach(e -> e.update());
   }
 
-  /**
-   * Sets NetworkTables entry to allow for updates through NetworkTables.
-   *
-   * @param entry new entry
-   */
-  public void setEntry(GenericEntry entry) {
-    m_entry = entry;
-  }
-
-  /** @return {@code true} if the number is bound to a NetworkTables entry */
-  public boolean hasEntry() {
-    return m_entry != null;
-  }
-
   /** Update number with value from NetworkTables entry, if provided. */
   public void update() {
     if (m_entry != null) {
@@ -159,6 +148,29 @@ public class TunableNumber implements DoubleSupplier, DoubleConsumer {
       }
       if (m_bindOnChange != null) {
         m_bindOnChange.accept(m_value);
+      }
+    }
+  }
+
+  /** Initalize unadded TunableNumbers to Shuffleboard and make them mutable. */
+  public static void initializeShuffleboard() {
+    var groups = getAllGroups();
+
+    for (var group : groups) {
+      var instances = TunableNumber.getGroup(group);
+      var layout = Shuffleboard.getTab("Tunables").getLayout(group, BuiltInLayouts.kList).withSize(2, 6);
+
+      for (var elem : instances) {
+        // Add tunables to shuffleboard if not already added
+        if (elem.m_entry != null) {
+          // Make unadded tunables mutable
+          elem.setMutable(true);
+
+          elem.m_entry = layout.add(elem.m_name, elem.getAsDouble())
+            .withWidget(BuiltInWidgets.kTextView)
+            .withSize(2, 2)
+            .getEntry();
+        }
       }
     }
   }
