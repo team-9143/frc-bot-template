@@ -31,7 +31,9 @@ public class ExampleStateSubsystem extends StateSubsystem<ExampleStateSubsystem.
   }
 
   @Override
-  public void stop() {}
+  public void stop() {
+    setState(States.STOP);
+  }
 
   public enum States {
     FAST,
