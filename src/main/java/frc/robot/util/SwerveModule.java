@@ -118,6 +118,7 @@ public class SwerveModule {
     speed_controller.reset();
   }
 
+  /** Basic constants for the construction of a {@link SwerveModule}. */
   public static class SwerveModuleConstants {
     public final byte drive_ID;
     public final byte angle_ID;
