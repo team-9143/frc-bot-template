@@ -63,8 +63,8 @@ public class SwerveModule {
    * @param angle module angle (UNIT: ccw degrees)
    */
   protected void drive(double speed, double angle) {
-    // Calculate, clamp, and set angle motor speed
-    angle_motor.set(Math.max(-DriveConsts.kMaxModuleRotateSpeedPercentage, Math.min(DriveConsts.kMaxModuleRotateSpeedPercentage,
+    // Calculate and set angle motor speed
+    angle_motor.set(Math.max(-DriveConsts.kMaxModuleRotateSpeedPercentage, Math.min(DriveConsts.kMaxModuleRotateSpeedPercentage, // Clamp to maximum speed
       angle_controller.calculate(getAngle(), angle)
     )));
 
@@ -72,7 +72,7 @@ public class SwerveModule {
     drive_motor.set(
       Math.max(-1, Math.min(1, // Clamp to maximum speed
         speed_controller.calculate(getVelocity(), speed) // Velocity adjustment feedback controller
-        + (speed/DriveConsts.kMaxLinearVelMetersPerSecond) // Simple velocity feedforward
+        + (speed/DriveConsts.kMaxWheelVelMetersPerSecond) // Simple velocity feedforward
       )) * Math.abs(Math.cos(getAngleError() * Math.PI/180)) // Scale down if not at proper angle
     );
   }

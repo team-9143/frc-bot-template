@@ -1,6 +1,10 @@
 package frc.robot.util;
 
-/** Subsystem with state-based control and a stop method for safety. */
+/**
+ * Subsystem with state-based control and a stop method for safety.
+ * 
+ * @param <T> Enum containing control states of the subsystem
+ */
 public abstract class StateSubsystem<T extends Enum<T>> extends SafeSubsystem {
   /** Current state of the subsystem. */
   private T currentState;

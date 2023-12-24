@@ -15,7 +15,7 @@ public class Constants {
 
   public static class DriveConsts {
     // Upper bound drivetrain constraints
-    public static final double kMaxLinearVelMetersPerSecond = 6 * 0.8; // 80% of theoretical max
+    public static final double kMaxWheelVelMetersPerSecond = 6 * 0.8; // 80% of theoretical max 6 m/s
     public static final double kMaxTurnVelRadiansPerSecond = 9.5; // 1.5 rotations/sec
     public static final double kMaxModuleRotateSpeedPercentage = 0.65; // Maximum rotational motor speed
   }
