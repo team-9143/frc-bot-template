@@ -4,6 +4,8 @@ import frc.robot.util.TunableNumber;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.util.SwerveModule.SwerveModuleConstants;
+import edu.wpi.first.math.controller.PIDController;
 
 /** Global constants. Should not include functional code. */
 public class Constants {
@@ -19,6 +21,10 @@ public class Constants {
   }
 
   public static class DriveConsts {
+    // Multipliers for all teleop driving
+    public static final double kTeleopSpeedMult = 1;
+    public static final double kTeleopTurnMult = 0.7;
+
     // Upper bound drivetrain constraints
     public static final double kMaxWheelVelMetersPerSecond = 6 * 0.8; // 80% of theoretical max 6 m/s
     public static final double kMaxTurnVelRadiansPerSecond = 9.5; // 1.5 rotations/sec
@@ -43,5 +49,61 @@ public class Constants {
       new Translation2d(0.0127, 0.0127), // UNIT: meters
       Rotation2d.fromDegrees(0.75)
     );
+  }
+
+  public static class SwerveConsts {
+    public static final TunableNumber
+      kDriveP = new TunableNumber("P", 1.5e-2, "Module Drive");
+    public static final TunableNumber
+      kAngleP = new TunableNumber("P", 0.0065, "Module Angle"),
+      kAngleD = new TunableNumber("D", 0.00005, "Module Angle");
+
+    public static final SwerveModuleConstants
+      kSwerve_fl = new SwerveModuleConstants(
+        41, 42, 43, 31.465,
+        new Translation2d(0.22225, 0.22225),
+        new PIDController(kDriveP.getAsDouble(), 0, 0),
+        new PIDController(kAngleP.getAsDouble(), 0, kAngleD.getAsDouble())
+      ),
+      kSwerve_fr = new SwerveModuleConstants(
+        11, 12, 13, 28.037,
+        new Translation2d(0.22225, -0.22225),
+        new PIDController(kDriveP.getAsDouble(), 0, 0),
+        new PIDController(kAngleP.getAsDouble(), 0, kAngleD.getAsDouble())
+      ),
+      kSwerve_bl = new SwerveModuleConstants(
+        31, 32, 33, 86.748,
+        new Translation2d(-0.22225, 0.22225),
+        new PIDController(kDriveP.getAsDouble(), 0, 0),
+        new PIDController(kAngleP.getAsDouble(), 0, kAngleD.getAsDouble())
+      ),
+      kSwerve_br = new SwerveModuleConstants(
+        21, 22, 23, -96.943,
+        new Translation2d(-0.22225, -0.22225),
+        new PIDController(kDriveP.getAsDouble(), 0, 0),
+        new PIDController(kAngleP.getAsDouble(), 0, kAngleD.getAsDouble())
+      );
+
+    // Bind Tunables
+    static {
+      kDriveP.bindTo(val -> {
+        kSwerve_fl.speed_controller.setP(val);
+        kSwerve_fr.speed_controller.setP(val);
+        kSwerve_bl.speed_controller.setP(val);
+        kSwerve_br.speed_controller.setP(val);
+      });
+      kAngleP.bindTo(val -> {
+        kSwerve_fl.angle_controller.setP(val);
+        kSwerve_fr.angle_controller.setP(val);
+        kSwerve_bl.angle_controller.setP(val);
+        kSwerve_br.angle_controller.setP(val);
+      });
+      kAngleD.bindTo(val -> {
+        kSwerve_fl.angle_controller.setD(val);
+        kSwerve_fr.angle_controller.setD(val);
+        kSwerve_bl.angle_controller.setD(val);
+        kSwerve_br.angle_controller.setD(val);
+      });
+    }
   }
 }
