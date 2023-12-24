@@ -4,6 +4,7 @@ import frc.robot.devices.OI;
 import frc.robot.devices.Controller.btn;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
+import frc.robot.util.SafeSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.ExampleStateSubsystem;
 
@@ -34,8 +35,7 @@ public class RobotContainer {
     new Trigger(() -> OI.DRIVER_CONTROLLER.getButton(btn.B) || OI.OPERATOR_CONTROLLER.getButton(btn.B))
       .whileTrue(new RunCommand(
         RobotContainer::stop,
-        ExampleSubsystem.getInstance(),
-        ExampleStateSubsystem.getInstance()
+        SafeSubsystem.getAll() // All subsystems are requirements
       ) {
         @Override
         public InterruptionBehavior getInterruptionBehavior() {
@@ -61,9 +61,10 @@ public class RobotContainer {
     OI.OPERATOR_CONTROLLER.onFalse(btn.A, cFast::cancel);
   }
 
-  /** Stops all motors and disables controllers. Does not stop commands. */
+  /** Calls all subsystem stop methods. Does not stop commands. */
   public static void stop() {
-    ExampleSubsystem.getInstance().stop();
-    ExampleStateSubsystem.getInstance().stop();
+   for (SafeSubsystem e : SafeSubsystem.getAll()) {
+    e.stop();
+   }
   }
 }
