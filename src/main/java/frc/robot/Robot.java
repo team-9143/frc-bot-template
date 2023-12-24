@@ -59,6 +59,7 @@ public class Robot extends TimedRobot {
     // Enable commands in test mode
     CommandScheduler.getInstance().enable();
 
+    // Initialize Tunables
     TunableNumber.initializeShuffleboard();
   }
 

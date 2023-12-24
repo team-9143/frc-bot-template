@@ -208,7 +208,7 @@ public class SwerveDrive extends MotorSafety {
    *
    * @param positionMetersCCW robot position (UNIT: meters, ccw native angle)
    */
-  public void resetPosition(Pose2d positionMetersCCW) {
+  public void resetOdometry(Pose2d positionMetersCCW) {
     odometry.resetPosition(
       Rotation2d.fromDegrees(OI.PIGEON2.getYaw()),
       new SwerveModulePosition[] {
@@ -221,7 +221,7 @@ public class SwerveDrive extends MotorSafety {
     );
   }
 
-  /** @return the robot's current estimated location relative to the odometry's origin */
+  /** @return the robot's estimated location */
   public Pose2d getPose() {return odometry.getEstimatedPosition();}
 
   /** @return {@code true} if trajectory following and near desired location */
@@ -236,7 +236,7 @@ public class SwerveDrive extends MotorSafety {
   /** @return individual desired module states */
   public SwerveModuleState[] getDesiredStates() {return desiredStates;}
 
-  /** @return measured module states */
+  /** @return individual measured module states */
   public SwerveModuleState[] getMeasuredStates() {
     return new SwerveModuleState[] {
       new SwerveModuleState(modules[0].getVelocity(), Rotation2d.fromDegrees(modules[0].getAngle())),

@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import frc.robot.util.StateSubsystem;
 
+/** And example state-based subsystem that serves no purpose whatsoever. */
 public class ExampleStateSubsystem extends StateSubsystem<ExampleStateSubsystem.States> {
   private static ExampleStateSubsystem m_instance;
 
