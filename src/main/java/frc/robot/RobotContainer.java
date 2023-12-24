@@ -26,11 +26,7 @@ public class RobotContainer {
   }
 
   /** Initialize OI devices. */
-  private static void configureOI() {
-    // Configure pigeon - make sure to update pitch and roll offsets
-    OI.PIGEON2.configMountPose(0, 0, 0); // TODO: Add pigeon pitch and roll offsets here
-    OI.PIGEON2.setYaw(0);
-  }
+  private static void configureOI() {}
 
   /** Create button bindings. */
   private static void configureBindings() {
