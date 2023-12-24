@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.TimedRobot;
 
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
-import frc.robot.subsystems.Drivetrain;
 import frc.robot.autos.AutoSelector;
 import frc.robot.util.TunableNumber;
 
@@ -31,7 +30,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    Drivetrain.getInstance().updateSwerve();
   }
 
   @Override

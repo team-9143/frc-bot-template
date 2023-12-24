@@ -55,8 +55,12 @@ public class Drivetrain extends SafeSubsystem {
     }));
   }
 
-  /** Updates the swerve speeds and odometry. Must be called every period. */
-  public void updateSwerve() {m_swerve.update();}
+
+  @Override
+  public void periodic() {
+    // Update swerve speeds and odometry
+    m_swerve.update();
+  }
 
   /**
    * Drive with field relative velocities. Must be continuously called.
