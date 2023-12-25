@@ -1,12 +1,13 @@
 package frc.robot;
 
+import frc.robot.util.Logger;
+
 import frc.robot.devices.OI;
 import frc.robot.devices.Controller.btn;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import frc.robot.util.SafeSubsystem;
-import frc.robot.subsystems.ExampleSubsystem;
-import frc.robot.subsystems.ExampleStateSubsystem;
+import frc.robot.subsystems.*;
 
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
@@ -22,8 +23,17 @@ public class RobotContainer {
     }
     m_initialized = true;
 
+    configureMetadata();
     configureOI();
     configureBindings();
+  }
+
+  /** Send metadata to logger, then start logger. */
+  private static void configureMetadata() {
+    Logger.recordMetadata("RoborioSerialNumber", System.getenv("serialnum"));
+
+    // Close metadata acceptance and open output logging
+    Logger.start();
   }
 
   /** Initialize OI devices. */
