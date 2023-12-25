@@ -103,6 +103,15 @@ public class Logger {
     DriverStation.startDataLog(log);
   }
 
+  /**
+   * Log a message to the "messages" entry. The message is also printed to standard output.
+   *
+   * @param msg message
+   */
+  public static void log(String msg) {
+    DataLogManager.log(msg);
+  }
+
   /** Set up the logger. Metadata is no longer accepted, and logged values are. */
   public static synchronized void start() {
     // Should only run once
