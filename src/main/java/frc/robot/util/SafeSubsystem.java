@@ -14,7 +14,7 @@ public abstract class SafeSubsystem extends SubsystemBase {
 
   /** @return a list of all initalized subsystems */
   public static SafeSubsystem[] getAll() {
-    return s_subsystems.toArray(new SafeSubsystem[0]);
+    return s_subsystems.toArray(SafeSubsystem[]::new);
   }
 
   /** Safe state method. Should be called in emergencies and when disabled. */
