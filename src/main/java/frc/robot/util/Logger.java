@@ -117,13 +117,158 @@ public class Logger {
     if (running) {
       int id = getId(key);
       booleanLogs
-        .computeIfAbsent(id, k -> new BooleanLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve or create log entry
+        .computeIfAbsent(id, k -> new BooleanLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
         .append(value); // Record value to log file
 
       if (Config.NTStream) {
         booleanPublishers
-          .computeIfAbsent(id, k -> outputTable.getBooleanTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve or create publisher
+          .computeIfAbsent(id, k -> outputTable.getBooleanTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
           .set(value); // Record value to network tables
+      }
+    }
+  }
+
+  public void recordOutput(String key, double value) {
+    if (running) {
+      int id = getId(key);
+      doubleLogs
+        .computeIfAbsent(id, k -> new DoubleLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
+        .append(value); // Record value to log file
+
+      if (Config.NTStream) {
+        doublePublishers
+          .computeIfAbsent(id, k -> outputTable.getDoubleTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+          .set(value); // Record value to network tables
+      }
+    }
+  }
+
+  public void recordOutput(String key, float value) {
+    if (running) {
+      int id = getId(key);
+      floatLogs
+        .computeIfAbsent(id, k -> new FloatLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
+        .append(value); // Record value to log file
+
+      if (Config.NTStream) {
+        floatPublishers
+          .computeIfAbsent(id, k -> outputTable.getFloatTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+          .set(value); // Record value to network tables
+      }
+    }
+  }
+
+  public void recordOutput(String key, int value) {
+    if (running) {
+      int id = getId(key);
+      integerLogs
+        .computeIfAbsent(id, k -> new IntegerLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
+        .append(value); // Record value to log file
+
+      if (Config.NTStream) {
+        integerPublishers
+          .computeIfAbsent(id, k -> outputTable.getIntegerTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+          .set(value); // Record value to network tables
+      }
+    }
+  }
+
+  public void recordOutput(String key, String value) {
+    if (running) {
+      int id = getId(key);
+      stringLogs
+        .computeIfAbsent(id, k -> new StringLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
+        .append(value); // Record value to log file
+
+      if (Config.NTStream) {
+        stringPublishers
+          .computeIfAbsent(id, k -> outputTable.getStringTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+          .set(value); // Record value to network tables
+      }
+    }
+  }
+
+  public void recordOutput(String key, boolean[] values) {
+    if (running) {
+      int id = getId(key);
+      booleanArrayLogs
+        .computeIfAbsent(id, k -> new BooleanArrayLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
+        .append(values); // Record value to log file
+
+      if (Config.NTStream) {
+        booleanArrayPublishers
+          .computeIfAbsent(id, k -> outputTable.getBooleanArrayTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+          .set(values); // Record value to network tables
+      }
+    }
+  }
+
+  public void recordOutput(String key, double[] values) {
+    if (running) {
+      int id = getId(key);
+      doubleArrayLogs
+        .computeIfAbsent(id, k -> new DoubleArrayLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
+        .append(values); // Record value to log file
+
+      if (Config.NTStream) {
+        doubleArrayPublishers
+          .computeIfAbsent(id, k -> outputTable.getDoubleArrayTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+          .set(values); // Record value to network tables
+      }
+    }
+  }
+
+  public void recordOutput(String key, float[] values) {
+    if (running) {
+      int id = getId(key);
+      floatArrayLogs
+        .computeIfAbsent(id, k -> new FloatArrayLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
+        .append(values); // Record value to log file
+
+      if (Config.NTStream) {
+        floatArrayPublishers
+          .computeIfAbsent(id, k -> outputTable.getFloatArrayTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+          .set(values); // Record value to network tables
+      }
+    }
+  }
+
+  public void recordOutput(String key, long[] values) {
+    if (running) {
+      int id = getId(key);
+      integerArrayLogs
+        .computeIfAbsent(id, k -> new IntegerArrayLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
+        .append(values); // Record value to log file
+
+      if (Config.NTStream) {
+        integerArrayPublishers
+          .computeIfAbsent(id, k -> outputTable.getIntegerArrayTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+          .set(values); // Record value to network tables
+      }
+    }
+  }
+
+  public void recordOutput(String key, int[] values) {
+    // Transform int[] into long[]
+    long[] longs = new long[values.length];
+    for (int i = 0; i < values.length; i++) {
+      longs[i] = values[i];
+    }
+
+    recordOutput(key, longs);
+  }
+
+  public void recordOutput(String key, String[] values) {
+    if (running) {
+      int id = getId(key);
+      stringArrayLogs
+        .computeIfAbsent(id, k -> new StringArrayLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
+        .append(values); // Record value to log file
+
+      if (Config.NTStream) {
+        stringArrayPublishers
+          .computeIfAbsent(id, k -> outputTable.getStringArrayTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+          .set(values); // Record value to network tables
       }
     }
   }
