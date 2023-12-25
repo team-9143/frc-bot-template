@@ -354,7 +354,7 @@ public class Logger {
   /** @return id of given key (newly created if necessary) to be used in log and entry maps */
   private static synchronized int getId(String key) {
     // Add key if new
-    if (indexedKeys.contains(key)) {
+    if (!indexedKeys.contains(key)) {
       indexedKeys.add(key);
     }
     return indexedKeys.indexOf(key);
