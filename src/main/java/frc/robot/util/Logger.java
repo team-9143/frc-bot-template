@@ -113,7 +113,7 @@ public class Logger {
     }
   }
 
-  public void recordOutput(String key, boolean value) {
+  public static void recordOutput(String key, boolean value) {
     if (running) {
       int id = getId(key);
       booleanLogs
@@ -128,7 +128,7 @@ public class Logger {
     }
   }
 
-  public void recordOutput(String key, double value) {
+  public static void recordOutput(String key, double value) {
     if (running) {
       int id = getId(key);
       doubleLogs
@@ -143,7 +143,7 @@ public class Logger {
     }
   }
 
-  public void recordOutput(String key, float value) {
+  public static void recordOutput(String key, float value) {
     if (running) {
       int id = getId(key);
       floatLogs
@@ -158,7 +158,7 @@ public class Logger {
     }
   }
 
-  public void recordOutput(String key, int value) {
+  public static void recordOutput(String key, int value) {
     if (running) {
       int id = getId(key);
       integerLogs
@@ -173,7 +173,7 @@ public class Logger {
     }
   }
 
-  public void recordOutput(String key, String value) {
+  public static void recordOutput(String key, String value) {
     if (running) {
       int id = getId(key);
       stringLogs
@@ -188,7 +188,7 @@ public class Logger {
     }
   }
 
-  public void recordOutput(String key, boolean[] values) {
+  public static void recordOutput(String key, boolean[] values) {
     if (running) {
       int id = getId(key);
       booleanArrayLogs
@@ -203,7 +203,7 @@ public class Logger {
     }
   }
 
-  public void recordOutput(String key, double[] values) {
+  public static void recordOutput(String key, double[] values) {
     if (running) {
       int id = getId(key);
       doubleArrayLogs
@@ -218,7 +218,7 @@ public class Logger {
     }
   }
 
-  public void recordOutput(String key, float[] values) {
+  public static void recordOutput(String key, float[] values) {
     if (running) {
       int id = getId(key);
       floatArrayLogs
@@ -233,7 +233,7 @@ public class Logger {
     }
   }
 
-  public void recordOutput(String key, long[] values) {
+  public static void recordOutput(String key, long[] values) {
     if (running) {
       int id = getId(key);
       integerArrayLogs
@@ -248,7 +248,7 @@ public class Logger {
     }
   }
 
-  public void recordOutput(String key, int[] values) {
+  public static void recordOutput(String key, int[] values) {
     // Transform int[] into long[]
     long[] longs = new long[values.length];
     for (int i = 0; i < values.length; i++) {
@@ -258,7 +258,7 @@ public class Logger {
     recordOutput(key, longs);
   }
 
-  public void recordOutput(String key, String[] values) {
+  public static void recordOutput(String key, String[] values) {
     if (running) {
       int id = getId(key);
       stringArrayLogs
@@ -273,7 +273,7 @@ public class Logger {
     }
   }
 
-  public void recordOutput(String key, Pose2d... value) {
+  public static void recordOutput(String key, Pose2d... value) {
     // Map Pose2d[] into double[]
     double[] data = new double[value.length * 3];
     for (int i = 0; i < value.length; i++) {
@@ -285,7 +285,7 @@ public class Logger {
     recordOutput(key, data);
   }
 
-  public void recordOutput(String key, Pose3d... value) {
+  public static void recordOutput(String key, Pose3d... value) {
     // Map Pose3d[] into double[]
     double[] data = new double[value.length * 7];
     for (int i = 0; i < value.length; i++) {
@@ -301,13 +301,13 @@ public class Logger {
     recordOutput(key, data);
   }
 
-  public void recordOutput(String key, Trajectory value) {
+  public static void recordOutput(String key, Trajectory value) {
     // Map trajectory into Pose2d[]
     recordOutput(key,
       value.getStates().stream().map(state -> state.poseMeters).toArray(Pose2d[]::new));
   }
 
-  public void recordOutput(String key, SwerveModuleState... values) {
+  public static void recordOutput(String key, SwerveModuleState... values) {
     // Map states into double[]
     double[] data = new double[values.length * 2];
     for (int i = 0; i < values.length; i++) {
