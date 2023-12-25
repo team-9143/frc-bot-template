@@ -273,6 +273,51 @@ public class Logger {
     }
   }
 
+  public void recordOutput(String key, Pose2d... value) {
+    // Map Pose2d[] into double[]
+    double[] data = new double[value.length * 3];
+    for (int i = 0; i < value.length; i++) {
+      data[i * 3] = value[i].getX();
+      data[i * 3 + 1] = value[i].getY();
+      data[i * 3 + 2] = value[i].getRotation().getRadians();
+    }
+
+    recordOutput(key, data);
+  }
+
+  public void recordOutput(String key, Pose3d... value) {
+    // Map Pose3d[] into double[]
+    double[] data = new double[value.length * 7];
+    for (int i = 0; i < value.length; i++) {
+      data[i * 7] = value[i].getX();
+      data[i * 7 + 1] = value[i].getY();
+      data[i * 7 + 2] = value[i].getZ();
+      data[i * 7 + 3] = value[i].getRotation().getQuaternion().getW();
+      data[i * 7 + 4] = value[i].getRotation().getQuaternion().getX();
+      data[i * 7 + 5] = value[i].getRotation().getQuaternion().getY();
+      data[i * 7 + 6] = value[i].getRotation().getQuaternion().getZ();
+    }
+
+    recordOutput(key, data);
+  }
+
+  public void recordOutput(String key, Trajectory value) {
+    // Map trajectory into Pose2d[]
+    recordOutput(key,
+      value.getStates().stream().map(state -> state.poseMeters).toArray(Pose2d[]::new));
+  }
+
+  public void recordOutput(String key, SwerveModuleState... values) {
+    // Map states into double[]
+    double[] data = new double[values.length * 2];
+    for (int i = 0; i < values.length; i++) {
+      data[i * 2] = values[i].angle.getRadians(); // Angle recorded in radians
+      data[i * 2 + 1] = values[i].speedMetersPerSecond;
+    }
+
+    recordOutput(key, data);
+  }
+
   public static void recordMetadata(String key, String value) {
     if (!running) {
       // Record metadata in log file
