@@ -42,7 +42,10 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 
 /**
- * <p> Huge credit to FRC Team 581: Littleton Robotics. </p>
+ * <p> Huge credit to FRC Team 581: Littleton Robotics for the basis of this implementation. </p>
+ *
+ * <p> For consistency, logging calls should be done by subsystems and the main robot class (after
+ * control logic), and be under a directory corresponding to the same. </p>
  *
  * A logger that is almost fully compatible with the AdvantageKit `Logger` class. It uses WPILib's
  * DataLog to log the data to a file, and streams the data using NetworkTables 4.
@@ -100,15 +103,6 @@ public class Logger {
     DataLogManager.logNetworkTables(false);
     // Log inputs from DriverStation
     DriverStation.startDataLog(log);
-  }
-
-  /** Set up the logger. Metadata is no longer accepted, and logged values are. */
-  public static synchronized void start() {
-    // Should only run once
-    if (running) {
-      return;
-    }
-    running = true;
 
     // Set up network tables for data stream
     if (Config.NTStream) {
@@ -116,6 +110,24 @@ public class Logger {
       outputTable = table.getSubTable("RealOutputs");
       metadataTable = table.getSubTable("RealMetadata");
     }
+  }
+
+  /**
+   * Log a message to the "messages" entry. The message is also printed to standard output.
+   *
+   * @param msg message
+   */
+  public static void log(String msg) {
+    DataLogManager.log(msg);
+  }
+
+  /** Start the logger. Metadata is no longer accepted, and logged values are. */
+  public static synchronized void start() {
+    // Should only run once
+    if (running) {
+      return;
+    }
+    running = true;
   }
 
   public static void recordOutput(String key, boolean value) {
@@ -342,7 +354,7 @@ public class Logger {
   /** @return id of given key (newly created if necessary) to be used in log and entry maps */
   private static synchronized int getId(String key) {
     // Add key if new
-    if (indexedKeys.contains(key)) {
+    if (!indexedKeys.contains(key)) {
       indexedKeys.add(key);
     }
     return indexedKeys.indexOf(key);
