@@ -10,6 +10,7 @@ import java.time.format.DateTimeFormatter;
 import frc.robot.devices.OI;
 import frc.robot.devices.Controller.btn;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 
 import frc.robot.util.SafeSubsystem;
 import frc.robot.subsystems.*;
@@ -54,14 +55,8 @@ public class RobotContainer {
     new Trigger(() -> OI.DRIVER_CONTROLLER.getButton(btn.B) || OI.OPERATOR_CONTROLLER.getButton(btn.B))
       .whileTrue(new RunCommand(
         RobotContainer::stop,
-        SafeSubsystem.getAll() // All subsystems are requirements
-      ) {
-        @Override
-        public InterruptionBehavior getInterruptionBehavior() {
-          // Interrupt incoming commands to ensure stop command takes precedence
-          return InterruptionBehavior.kCancelIncoming;
-        }
-      });
+        SafeSubsystem.getAll() // Requires all subsystems
+      ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming));// Interrupt incoming commands to ensure stop command takes precedence
 
     configureDriver();
     configureOperator();
