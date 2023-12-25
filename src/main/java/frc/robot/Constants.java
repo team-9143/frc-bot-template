@@ -9,6 +9,7 @@ import edu.wpi.first.math.controller.PIDController;
 
 /** Global constants. Should not include functional code. */
 public class Constants {
+  /** Non-functional information for software testing and metadata. */
   public static class Config {
     /** {@code true} to stream log file data to NetworkTables (takes up bandwith and processing time, but useful for concurrent running and visualization) */
     public static final boolean NTStream = false;
@@ -16,17 +17,20 @@ public class Constants {
     public static final String DATA_LOG_DIR = "/logs/";
   }
 
+  /** Ports and properties of non-motor devices. */
   public static class DeviceConsts {
     public static final byte kDriverPort = 0;
     public static final byte kOperatorPort = 1;
     public static final byte kPigeonID = 2;
   }
 
+  /** Physical parts of the robot, such as gearboxes or wheel diameters. */
   public static class PhysConsts {
     public static final double kSwerveWheelGearbox = 1/5.14; // SDS L4 modules
     public static final double kSwerveWheelCircumferenceMeters = 0.09779 * Math.PI; // Colson wheels
   }
 
+  /** Data relating to the entire drivetrain. */
   public static class DriveConsts {
     // Multipliers for all teleop driving
     public static final double kTeleopSpeedMult = 1;
@@ -58,6 +62,7 @@ public class Constants {
     );
   }
 
+  /** Data for each individual swerve module. */
   public static class SwerveConsts {
     public static final TunableNumber
       kDriveP = new TunableNumber("P", 1.5e-2, "Module Drive");
