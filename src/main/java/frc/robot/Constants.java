@@ -9,6 +9,13 @@ import edu.wpi.first.math.controller.PIDController;
 
 /** Global constants. Should not include functional code. */
 public class Constants {
+  public static class Config {
+    /** {@code true} to stream log file data to NetworkTables (takes up bandwith and processing time, but useful for concurrent running and visualization) */
+    public static final boolean NTStream = false;
+    /** Directory for log file. Leave blank to store in project directory. */
+    public static final String DATA_LOG_DIR = "/logs/";
+  }
+
   public static class DeviceConsts {
     public static final byte kDriverPort = 0;
     public static final byte kOperatorPort = 1;
