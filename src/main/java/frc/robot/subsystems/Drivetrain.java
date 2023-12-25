@@ -62,6 +62,7 @@ public class Drivetrain extends SafeSubsystem {
     m_swerve.update();
 
     Logger.recordOutput("/"+getName()+"/odometry", getPose());
+
     Logger.recordOutput("/"+getName()+"/measuredStates", getMeasuredStates());
     Logger.recordOutput("/"+getName()+"/desiredStates", getDesiredStates());
 

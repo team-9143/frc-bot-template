@@ -16,6 +16,7 @@ import frc.robot.subsystems.*;
 
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 /** Robot structure declaration. Initializes trigger mappings, OI devices, and main stop mechanism. */
 public class RobotContainer {
@@ -66,7 +67,21 @@ public class RobotContainer {
     configureOperator();
   }
 
-  private static void configureDriver() {}
+  private static void configureDriver() {
+    // Button 'X' (debounced 0.5s) will reset gyro
+    final var cRumble = OI.DRIVER_CONTROLLER.getRumbleCommand(0.5, 0.5, 0.25);
+    new Trigger(() -> OI.DRIVER_CONTROLLER.getButton(btn.X))
+    .debounce(0.3) // Wait 0.3s to avoid accidental press
+      .onTrue(new InstantCommand(() -> {
+        OI.PIGEON2.setYaw(0); // Reset gyro
+        cRumble.schedule(); // Rumble to indicate event
+      }));
+
+    // Button 'Y' (hold) will set drivetrain to x-stance (for stability)
+    final var cXStance = new RunCommand(Drivetrain.getInstance()::toXStance, Drivetrain.getInstance());
+    OI.DRIVER_CONTROLLER.onTrue(btn.Y, cXStance::schedule);
+    OI.DRIVER_CONTROLLER.onFalse(btn.Y, cXStance::cancel);
+  }
 
   private static void configureOperator() {
     // Button 'A' (hold) sets subsystem to fast
