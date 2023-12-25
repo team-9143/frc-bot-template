@@ -46,7 +46,8 @@ import edu.wpi.first.math.trajectory.Trajectory;
  *
  * A logger that is almost fully compatible with the AdvantageKit `Logger` class. It uses WPILib's
  * DataLog to log the data to a file, and streams the data using NetworkTables 4. For consistency,
- * logging calls should be done only by subsystems and the main Robot class.
+ * logging calls should be done by subsystems and the main robot class, and be under a directory
+ * corresponding to the same.
  *
  * @see https://github.com/team581/frc-2023-charged-up/pull/64
  */
