@@ -1,6 +1,10 @@
 package frc.robot;
 
 import frc.robot.util.Logger;
+import edu.wpi.first.wpilibj.RobotBase;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 import frc.robot.devices.OI;
 import frc.robot.devices.Controller.btn;
@@ -30,7 +34,8 @@ public class RobotContainer {
 
   /** Send metadata to logger, then start logger. */
   private static void configureMetadata() {
-    Logger.recordMetadata("RoborioSerialNumber", System.getenv("serialnum"));
+    Logger.recordMetadata("RoborioSerialNum", RobotBase.isReal() ? System.getenv("serialnum") : "Simulation");
+    Logger.recordMetadata("BuildDate", LocalDateTime.now(ZoneId.of("UTC-8")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
     // Close metadata acceptance and open output logging
     Logger.start();
