@@ -1,6 +1,7 @@
 package frc.robot;
 
 import frc.robot.util.Logger;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -42,7 +43,9 @@ public class RobotContainer {
   }
 
   /** Initialize OI devices. */
-  private static void configureOI() {}
+  private static void configureOI() {
+    DriverStation.silenceJoystickConnectionWarning(true); // Stop those ridiculously persistent messages
+  }
 
   /** Create button bindings. */
   private static void configureBindings() {
