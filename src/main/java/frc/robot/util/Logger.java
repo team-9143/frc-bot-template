@@ -103,6 +103,13 @@ public class Logger {
     DataLogManager.logNetworkTables(false);
     // Log inputs from DriverStation
     DriverStation.startDataLog(log);
+
+    // Set up network tables for data stream
+    if (Config.NTStream) {
+      var table = NetworkTableInstance.getDefault().getTable("/AdvantageKit");
+      outputTable = table.getSubTable("RealOutputs");
+      metadataTable = table.getSubTable("RealMetadata");
+    }
   }
 
   /**
@@ -114,20 +121,13 @@ public class Logger {
     DataLogManager.log(msg);
   }
 
-  /** Set up the logger. Metadata is no longer accepted, and logged values are. */
+  /** Start the logger. Metadata is no longer accepted, and logged values are. */
   public static synchronized void start() {
     // Should only run once
     if (running) {
       return;
     }
     running = true;
-
-    // Set up network tables for data stream
-    if (Config.NTStream) {
-      var table = NetworkTableInstance.getDefault().getTable("/AdvantageKit");
-      outputTable = table.getSubTable("RealOutputs");
-      metadataTable = table.getSubTable("RealMetadata");
-    }
   }
 
   public static void recordOutput(String key, boolean value) {
