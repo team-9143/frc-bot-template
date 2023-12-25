@@ -9,6 +9,7 @@ public abstract class SafeSubsystem extends SubsystemBase {
   private static final ArrayList<SafeSubsystem> s_subsystems = new ArrayList<>();
 
   public SafeSubsystem() {
+    Logger.log(getName() + " initialized");
     s_subsystems.add(this);
   }
 
