@@ -19,7 +19,7 @@ public class Pathing {
   }
 
   /**
-   * Get a trajectory built using Choreo, and send it to the Logger.
+   * Get a Choreo trajectory, and send it to the Logger.
    *
    * @param name corresponding trajectory file name under [deploy/choreo/], omitting ".traj"
    */
@@ -28,7 +28,7 @@ public class Pathing {
   }
 
   /**
-   * Create a follow command for a premade Choreo trajectory.
+   * Create a follow command for a Choreo trajectory.
    *
    * @param traj corresponding trajectory
    * @param matchAlliance {@code true} to mirror the path (useful for assymetric fields)
