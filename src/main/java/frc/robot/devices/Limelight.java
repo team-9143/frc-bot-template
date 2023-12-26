@@ -1,12 +1,14 @@
 package frc.robot.devices;
 
 import edu.wpi.first.networktables.NetworkTable;
+import frc.robot.logger.Loggable;
+import frc.robot.logger.Logger;
 
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.IntegerPublisher;
 
 /** Class for Limelight interfacing. */
-public class Limelight {
+public class Limelight implements Loggable {
   /** Limelight datatable */
   private final NetworkTable m_limelight;
 
@@ -24,7 +26,7 @@ public class Limelight {
 
   /**
    * Initialize a new limelight.
-   * 
+   *
    * @param limelight {@link NetworkTable} that points to the limelight data stream
    */
   protected Limelight(NetworkTable limelight) {
@@ -68,4 +70,15 @@ public class Limelight {
    * @param isDriverCam {@code true} for driver camera, {@code false} for vision processing
    */
   public void setDriverCam(boolean isDriverCam) {cam_pub.accept(isDriverCam ? 1 : 0);}
+
+  @Override
+  public String getDirectory() {
+    return "/"+m_limelight.getPath().substring(m_limelight.getPath().lastIndexOf('/'))+"/";
+  }
+
+  @Override
+  public void log() {
+    Logger.recordOutput(getDirectory()+"valid-target", getValid());
+    Logger.recordOutput(getDirectory()+"apriltag-id", getTid());
+  }
 }
