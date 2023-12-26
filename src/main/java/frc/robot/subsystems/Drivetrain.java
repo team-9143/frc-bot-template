@@ -1,8 +1,8 @@
 package frc.robot.subsystems;
 
 import frc.robot.util.SafeSubsystem;
+import frc.robot.logger.Logger;
 import frc.robot.util.SwerveDrive;
-import frc.robot.util.Logger;
 
 import frc.robot.devices.OI;
 import frc.robot.Constants.DriveConsts;
@@ -10,7 +10,9 @@ import frc.robot.Constants.SwerveConsts;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 
 /** Controls the robot drivetrain. */
 public class Drivetrain extends SafeSubsystem {
@@ -60,13 +62,6 @@ public class Drivetrain extends SafeSubsystem {
   public void periodic() {
     // Update swerve speeds and odometry
     m_swerve.update();
-
-    Logger.recordOutput("/"+getName()+"/odometry", getPose());
-
-    Logger.recordOutput("/"+getName()+"/measuredStates", getMeasuredStates());
-    Logger.recordOutput("/"+getName()+"/desiredStates", getDesiredStates());
-
-    Logger.recordOutput("/"+getName()+"/atReference", atReference());
   }
 
   /**
@@ -144,6 +139,20 @@ public class Drivetrain extends SafeSubsystem {
 
   /** @return individual measured module states */
   public SwerveModuleState[] getMeasuredStates() {return m_swerve.getMeasuredStates();}
+
+  @Override
+  public void log() {
+    Logger.recordOutput(getDirectory()+"odometry", getPose());
+
+    Logger.recordOutput(getDirectory()+"measuredStates", getMeasuredStates());
+    Logger.recordOutput(getDirectory()+"desiredStates", getDesiredStates());
+
+    Logger.recordOutput(getDirectory()+"atReference", atReference());
+
+    Logger.recordOutput(getDirectory()+"3dPosition",
+      new Pose3d(getPose().getX(), getPose().getY(), 0, // Height always set to 0
+      new Rotation3d(Math.toRadians(OI.PIGEON2.getRoll()), Math.toRadians(OI.PIGEON2.getPitch()), getPose().getRotation().getRadians())));
+  }
 
   @Override
   public void stop() {

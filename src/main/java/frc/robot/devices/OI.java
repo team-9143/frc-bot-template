@@ -10,7 +10,7 @@ public class OI {
   public final static Controller OPERATOR_CONTROLLER = new Controller(DeviceConsts.kOperatorPort);
 
   // In proper orientation, Pigeon is flat with the X-axis toward the front of the robot
-  /** Roll increases to the right, pitch to the front, and yaw counter-clockwise. */
+  /** Roll increases to robot-right, pitch to robot-front, and yaw counter-clockwise. */
   public final static Pigeon2 PIGEON2 = new Pigeon2(DeviceConsts.kPigeonID);
   static {
     // Remember to calibrate and update pitch and roll offsets

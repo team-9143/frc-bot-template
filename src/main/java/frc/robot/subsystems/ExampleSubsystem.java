@@ -23,5 +23,8 @@ public class ExampleSubsystem extends SafeSubsystem {
   public void periodic() {}
 
   @Override
+  public void log() {}
+
+  @Override
   public void stop() {}
 }

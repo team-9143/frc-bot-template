@@ -1,7 +1,7 @@
 package frc.robot.subsystems;
 
 import frc.robot.util.StateSubsystem;
-import frc.robot.util.Logger;
+import frc.robot.logger.Logger;
 
 /** And example state-based subsystem that serves no purpose whatsoever. */
 public class ExampleStateSubsystem extends StateSubsystem<ExampleStateSubsystem.States> {
@@ -25,14 +25,16 @@ public class ExampleStateSubsystem extends StateSubsystem<ExampleStateSubsystem.
     switch (getState()) {
       case FAST:
         System.out.println(getName() + " is fast");
-        Logger.recordOutput("/"+getName()+"/state", 2);
       case SLOW:
         System.out.println(getName() + " is slow");
-        Logger.recordOutput("/"+getName()+"/state", 1);
       default:
         stop();
-        Logger.recordOutput("/"+getName()+"/state", 0);
     }
+  }
+
+  @Override
+  public void log() {
+    Logger.recordOutput(getDirectory()+"state", getState().getClass().getSimpleName());
   }
 
   @Override
