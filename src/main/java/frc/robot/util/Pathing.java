@@ -23,7 +23,7 @@ public class Pathing {
    *
    * @param name corresponding trajectory file name under [deploy/choreo/], omitting ".traj"
    */
-  public static ChoreoTrajectory getTrajectory(String name) {
+  public static ChoreoTrajectory getChoreoTrajectory(String name) {
     return Choreo.getTrajectory(name);
   }
 
@@ -33,7 +33,7 @@ public class Pathing {
    * @param traj corresponding trajectory
    * @param matchAlliance {@code true} to mirror the path (useful for assymetric fields)
    */
-  public static Command followChoreoTrajectory(ChoreoTrajectory traj, boolean matchAlliance) {
+  public static Command getChoreoTrajectoryCommand(ChoreoTrajectory traj, boolean matchAlliance) {
     return Choreo.choreoSwerveCommand(
       traj,
       Drivetrain.getInstance()::getPose, // Pose supplier, needs to be field-relative
