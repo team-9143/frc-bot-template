@@ -45,7 +45,7 @@ public class Constants {
     public static final double kMaxLinearAccelMetersPerSecondSquared = kMaxWheelVelMetersPerSecond * 2; // UNIT: meters/s/s
     public static final double kMaxTurnAccelRadiansPerSecondSquared = kMaxTurnVelRadiansPerSecond * 2; // UNIT: radians/s/s
 
-    // Gains for drivetrain position error -> desired velocity
+    // Gains for drivetrain position error -> velocity
     public static final TunableNumber
       kTranslateP = new TunableNumber("P", 1, "Robot Translation"),
       kTranslateI = new TunableNumber("I", 0, "Robot Translation"),
