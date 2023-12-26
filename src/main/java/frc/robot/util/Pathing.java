@@ -31,7 +31,7 @@ public class Pathing {
    * Create a follow command for a premade Choreo trajectory.
    *
    * @param traj corresponding trajectory
-   * @param matchAlliance {@code true} to mirror the path if on the red alliance
+   * @param matchAlliance {@code true} to mirror the path (useful for assymetric fields)
    */
   public static Command followChoreoTrajectory(ChoreoTrajectory traj, boolean matchAlliance) {
     return Choreo.choreoSwerveCommand(
@@ -41,7 +41,7 @@ public class Pathing {
       new PIDController(DriveConsts.kTranslateP.getAsDouble(), DriveConsts.kTranslateI.getAsDouble(), DriveConsts.kTranslateD.getAsDouble()), // Translation controller for position error -> velocity
       new PIDController(DriveConsts.kRotateP.getAsDouble(), DriveConsts.kRotateI.getAsDouble(), DriveConsts.kRotateD.getAsDouble()), // Rotation controller for angle error -> angular velocity
       speeds -> Drivetrain.getInstance().driveRobotRelativeVelocity(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond), // Robot-relative velocities consumer
-      matchAlliance, // Whether to mirror path to match alliance
+      matchAlliance, // Whether to mirror the path
       Drivetrain.getInstance() // Subsystem requirements
     );
   }
