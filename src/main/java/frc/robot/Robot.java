@@ -7,8 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.logger.LoggedSparkMax;
-
+import frc.robot.logger.Logger;
 import frc.robot.autos.AutoSelector;
 import frc.robot.util.TunableNumber;
 
@@ -31,7 +30,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    LoggedSparkMax.updateAll();
+    Logger.updateLogs();
   }
 
   @Override

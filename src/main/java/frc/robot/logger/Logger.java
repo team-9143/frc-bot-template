@@ -5,7 +5,6 @@ import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
 import java.util.HashMap;
 import java.util.ArrayList;
-import java.util.Map;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -42,7 +41,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 
 /**
- * <p> Huge credit to FRC Team 581: Littleton Robotics for the basis for this implementation. </p>
+ * <p> Huge thanks to FRC Team 581: Littleton Robotics for the basis for this implementation. </p>
  *
  * <p> For consistency, logging calls should be done by subsystems and the main robot class (after control logic), and be under a directory corresponding to the same. </p>
  *
@@ -56,35 +55,42 @@ public class Logger {
 
   private static final DataLog log = DataLogManager.getLog();
 
-  private static NetworkTable outputTable;
-  private static NetworkTable metadataTable;
+  /** List of loggables to be updated each period. */
+  private static final ArrayList<Loggable> loggables = new ArrayList<>();
 
   /** If the logger has been started. Metadata is no longer accepted, and logged values are. */
   private static boolean running = false;
 
+  /** All used keys. The index of a key corresponds to its ID, which is used to find corresponding entries. */
   private static final ArrayList<String> indexedKeys = new ArrayList<>();
 
-  private static final Map<Integer, BooleanLogEntry> booleanLogs = new HashMap<>();
-  private static final Map<Integer, DoubleLogEntry> doubleLogs = new HashMap<>();
-  private static final Map<Integer, FloatLogEntry> floatLogs = new HashMap<>();
-  private static final Map<Integer, IntegerLogEntry> integerLogs = new HashMap<>();
-  private static final Map<Integer, StringLogEntry> stringLogs = new HashMap<>();
-  private static final Map<Integer, BooleanArrayLogEntry> booleanArrayLogs = new HashMap<>();
-  private static final Map<Integer, DoubleArrayLogEntry> doubleArrayLogs = new HashMap<>();
-  private static final Map<Integer, FloatArrayLogEntry> floatArrayLogs = new HashMap<>();
-  private static final Map<Integer, IntegerArrayLogEntry> integerArrayLogs = new HashMap<>();
-  private static final Map<Integer, StringArrayLogEntry> stringArrayLogs = new HashMap<>();
+  // Log entry maps for data logging to disk
+  private static final HashMap<Integer, BooleanLogEntry> booleanLogs = new HashMap<>();
+  private static final HashMap<Integer, DoubleLogEntry> doubleLogs = new HashMap<>();
+  private static final HashMap<Integer, FloatLogEntry> floatLogs = new HashMap<>();
+  private static final HashMap<Integer, IntegerLogEntry> integerLogs = new HashMap<>();
+  private static final HashMap<Integer, StringLogEntry> stringLogs = new HashMap<>();
+  private static final HashMap<Integer, BooleanArrayLogEntry> booleanArrayLogs = new HashMap<>();
+  private static final HashMap<Integer, DoubleArrayLogEntry> doubleArrayLogs = new HashMap<>();
+  private static final HashMap<Integer, FloatArrayLogEntry> floatArrayLogs = new HashMap<>();
+  private static final HashMap<Integer, IntegerArrayLogEntry> integerArrayLogs = new HashMap<>();
+  private static final HashMap<Integer, StringArrayLogEntry> stringArrayLogs = new HashMap<>();
 
-  private static final Map<Integer, BooleanPublisher> booleanPublishers = new HashMap<>();
-  private static final Map<Integer, DoublePublisher> doublePublishers = new HashMap<>();
-  private static final Map<Integer, FloatPublisher> floatPublishers = new HashMap<>();
-  private static final Map<Integer, IntegerPublisher> integerPublishers = new HashMap<>();
-  private static final Map<Integer, StringPublisher> stringPublishers = new HashMap<>();
-  private static final Map<Integer, BooleanArrayPublisher> booleanArrayPublishers = new HashMap<>();
-  private static final Map<Integer, DoubleArrayPublisher> doubleArrayPublishers = new HashMap<>();
-  private static final Map<Integer, FloatArrayPublisher> floatArrayPublishers = new HashMap<>();
-  private static final Map<Integer, IntegerArrayPublisher> integerArrayPublishers = new HashMap<>();
-  private static final Map<Integer, StringArrayPublisher> stringArrayPublishers = new HashMap<>();
+  // Network tables Tables for data logging directories
+  private static NetworkTable outputTable;
+  private static NetworkTable metadataTable;
+
+  // Publisher maps for data logging to network tables
+  private static final HashMap<Integer, BooleanPublisher> booleanPublishers = new HashMap<>();
+  private static final HashMap<Integer, DoublePublisher> doublePublishers = new HashMap<>();
+  private static final HashMap<Integer, FloatPublisher> floatPublishers = new HashMap<>();
+  private static final HashMap<Integer, IntegerPublisher> integerPublishers = new HashMap<>();
+  private static final HashMap<Integer, StringPublisher> stringPublishers = new HashMap<>();
+  private static final HashMap<Integer, BooleanArrayPublisher> booleanArrayPublishers = new HashMap<>();
+  private static final HashMap<Integer, DoubleArrayPublisher> doubleArrayPublishers = new HashMap<>();
+  private static final HashMap<Integer, FloatArrayPublisher> floatArrayPublishers = new HashMap<>();
+  private static final HashMap<Integer, IntegerArrayPublisher> integerArrayPublishers = new HashMap<>();
+  private static final HashMap<Integer, StringArrayPublisher> stringArrayPublishers = new HashMap<>();
 
   // There should be no instances of the class
   private Logger() {}
@@ -108,6 +114,17 @@ public class Logger {
       outputTable = table.getSubTable("RealOutputs");
       metadataTable = table.getSubTable("RealMetadata");
     }
+  }
+
+  /** @param loggable loggable to register for periodic update calls */
+  public static void registerLoggable(Loggable loggable) {
+    loggables.add(loggable);
+    log("Device " + loggable.getDirectory() + " initialized");
+  }
+
+  /** Update all registered loggables. Should be called every period. */
+  public static void updateLogs() {
+    loggables.forEach(e -> e.log());
   }
 
   /**
