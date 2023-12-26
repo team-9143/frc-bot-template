@@ -87,9 +87,6 @@ public class Logger {
   private static final HashMap<String, IntegerArrayPublisher> integerArrayPublishers = new HashMap<>();
   private static final HashMap<String, StringArrayPublisher> stringArrayPublishers = new HashMap<>();
 
-  // There should be no instances of the class
-  private Logger() {}
-
   // Cannot be initialized until after start to ensure proper file creation
   private static DataLog log;
 
