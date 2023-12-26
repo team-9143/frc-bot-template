@@ -72,25 +72,25 @@ public class Constants {
 
     public static final SwerveModuleConstants
       kSwerve_fl = new SwerveModuleConstants(
-        41, 42, 43, 31.465,
+        "module_FL", 41, 42, 43, 31.465,
         new Translation2d(0.22225, 0.22225),
         new PIDController(kDriveP.getAsDouble(), 0, 0),
         new PIDController(kAngleP.getAsDouble(), 0, kAngleD.getAsDouble())
       ),
       kSwerve_fr = new SwerveModuleConstants(
-        11, 12, 13, 28.037,
+        "module_FR", 11, 12, 13, 28.037,
         new Translation2d(0.22225, -0.22225),
         new PIDController(kDriveP.getAsDouble(), 0, 0),
         new PIDController(kAngleP.getAsDouble(), 0, kAngleD.getAsDouble())
       ),
       kSwerve_bl = new SwerveModuleConstants(
-        31, 32, 33, 86.748,
+        "module_BL", 31, 32, 33, 86.748,
         new Translation2d(-0.22225, 0.22225),
         new PIDController(kDriveP.getAsDouble(), 0, 0),
         new PIDController(kAngleP.getAsDouble(), 0, kAngleD.getAsDouble())
       ),
       kSwerve_br = new SwerveModuleConstants(
-        21, 22, 23, -96.943,
+        "module_BR", 21, 22, 23, -96.943,
         new Translation2d(-0.22225, -0.22225),
         new PIDController(kDriveP.getAsDouble(), 0, 0),
         new PIDController(kAngleP.getAsDouble(), 0, kAngleD.getAsDouble())

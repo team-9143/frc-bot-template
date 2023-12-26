@@ -1,7 +1,7 @@
 package frc.robot.util;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import frc.robot.logger.Logger;
 import java.util.ArrayList;
 
 /** Subsystem with a stop method for safety measures. */
@@ -9,8 +9,8 @@ public abstract class SafeSubsystem extends SubsystemBase {
   private static final ArrayList<SafeSubsystem> s_subsystems = new ArrayList<>();
 
   public SafeSubsystem() {
-    Logger.log(getName() + " initialized");
     s_subsystems.add(this);
+    Logger.log(getName() + " initialized");
   }
 
   /** @return a list of all initalized subsystems */

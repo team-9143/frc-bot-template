@@ -1,7 +1,7 @@
 package frc.robot.subsystems;
 
 import frc.robot.util.StateSubsystem;
-import frc.robot.util.Logger;
+import frc.robot.logger.Logger;
 
 /** And example state-based subsystem that serves no purpose whatsoever. */
 public class ExampleStateSubsystem extends StateSubsystem<ExampleStateSubsystem.States> {

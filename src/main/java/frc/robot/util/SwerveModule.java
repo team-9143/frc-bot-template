@@ -8,8 +8,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 
 import edu.wpi.first.math.controller.PIDController;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
+import frc.robot.logger.LoggedSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
@@ -18,21 +18,19 @@ import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 
 /** Controls a single swerve module. */
 public class SwerveModule {
-  private final CANSparkMax drive_motor;
-  private final CANSparkMax angle_motor;
+  private final LoggedSparkMax drive_motor;
+  private final LoggedSparkMax angle_motor;
   private final CANCoder cancoder;
   private final double cancoderOffset;
-  private final RelativeEncoder drive_encoder;
 
   private final PIDController speed_controller;
   private final PIDController angle_controller;
 
   protected SwerveModule(SwerveModuleConstants constants) {
-    drive_motor = new CANSparkMax(constants.drive_ID, CANSparkMax.MotorType.kBrushless);
-    angle_motor = new CANSparkMax(constants.angle_ID, CANSparkMax.MotorType.kBrushless);
+    drive_motor = new LoggedSparkMax(constants.drive_ID, MotorType.kBrushless, constants.name + "_drive");
+    angle_motor = new LoggedSparkMax(constants.angle_ID, MotorType.kBrushless, constants.name + "_angle");
     cancoder = new CANCoder(constants.cancoder_ID);
     cancoderOffset = constants.cancoderOffset;
-    drive_encoder = drive_motor.getEncoder();
     speed_controller = constants.speed_controller;
     angle_controller = constants.angle_controller;
 
@@ -43,10 +41,10 @@ public class SwerveModule {
     cancoder.configVelocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_20Ms);
 
     // Set up drive encoder units
-    drive_encoder.setPositionConversionFactor(PhysConsts.kSwerveWheelGearbox * PhysConsts.kSwerveWheelCircumferenceMeters); // UNIT: meters
-    drive_encoder.setVelocityConversionFactor(PhysConsts.kSwerveWheelGearbox * PhysConsts.kSwerveWheelCircumferenceMeters / 60); // UNIT: meters/s
-    drive_encoder.setMeasurementPeriod(20);
-    drive_encoder.setPosition(0);
+    drive_motor.encoder.setPositionConversionFactor(PhysConsts.kSwerveWheelGearbox * PhysConsts.kSwerveWheelCircumferenceMeters); // UNIT: meters
+    drive_motor.encoder.setVelocityConversionFactor(PhysConsts.kSwerveWheelGearbox * PhysConsts.kSwerveWheelCircumferenceMeters / 60); // UNIT: meters/s
+    drive_motor.encoder.setMeasurementPeriod(20);
+    drive_motor.encoder.setPosition(0);
 
     // Set up speed PID controller
     speed_controller.setSetpoint(0);
@@ -97,7 +95,7 @@ public class SwerveModule {
 
   /** @return the velocity of the module (UNIT: meters/s) */
   public double getVelocity() {
-    return drive_encoder.getVelocity();
+    return drive_motor.encoder.getVelocity();
   }
 
   /** @return the current error in the angle of the module (UNIT: ccw degrees) */
@@ -107,7 +105,7 @@ public class SwerveModule {
 
   /** @return the distance traveled by the module (UNIT: meters) */
   public double getDistance() {
-    return drive_encoder.getPosition();
+    return drive_motor.encoder.getPosition();
   }
 
   public void stopMotor() {
@@ -120,6 +118,7 @@ public class SwerveModule {
 
   /** Basic constants for the construction of a {@link SwerveModule}. */
   public static class SwerveModuleConstants {
+    public final String name;
     public final byte drive_ID;
     public final byte angle_ID;
     public final byte cancoder_ID;
@@ -130,6 +129,7 @@ public class SwerveModule {
     public final PIDController angle_controller;
 
     /**
+     * @param name device name for logging
      * @param drive_ID driving motor ID (Spark Max with brushless motor)
      * @param angle_ID angular motor ID (Spark Max with brushless motor)
      * @param cancoder_ID cancoder ID
@@ -138,7 +138,8 @@ public class SwerveModule {
      * @param speed_controller PID controller to calculate drive motor speed from velocity error
      * @param angle_controller PID controller to calculate angular motor speed from degree error
      */
-    public SwerveModuleConstants(int drive_ID, int angle_ID, int cancoder_ID, double cancoderOffset, Translation2d location, PIDController speed_controller, PIDController angle_controller) {
+    public SwerveModuleConstants(String name, int drive_ID, int angle_ID, int cancoder_ID, double cancoderOffset, Translation2d location, PIDController speed_controller, PIDController angle_controller) {
+      this.name = name;
       this.drive_ID = (byte) drive_ID;
       this.angle_ID = (byte) angle_ID;
       this.cancoder_ID = (byte) cancoder_ID;

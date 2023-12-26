@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.logger;
 
 import frc.robot.Constants.Config;
 import edu.wpi.first.util.datalog.DataLog;
@@ -42,13 +42,11 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 
 /**
- * <p> Huge credit to FRC Team 581: Littleton Robotics for the basis of this implementation. </p>
+ * <p> Huge credit to FRC Team 581: Littleton Robotics for the basis for this implementation. </p>
  *
- * <p> For consistency, logging calls should be done by subsystems and the main robot class (after
- * control logic), and be under a directory corresponding to the same. </p>
+ * <p> For consistency, logging calls should be done by subsystems and the main robot class (after control logic), and be under a directory corresponding to the same. </p>
  *
- * A logger that is almost fully compatible with the AdvantageKit `Logger` class. It uses WPILib's
- * DataLog to log the data to a file, and streams the data using NetworkTables 4.
+ * A logger that is almost fully compatible with the AdvantageKit `Logger` class. It uses WPILib's DataLog to log the data to a file, and streams the data using NetworkTables 4.
  *
  * @see https://github.com/team581/frc-2023-charged-up/pull/64
  */

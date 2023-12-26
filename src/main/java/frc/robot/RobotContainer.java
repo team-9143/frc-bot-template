@@ -1,6 +1,6 @@
 package frc.robot;
 
-import frc.robot.util.Logger;
+import frc.robot.logger.Logger;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import java.time.LocalDateTime;

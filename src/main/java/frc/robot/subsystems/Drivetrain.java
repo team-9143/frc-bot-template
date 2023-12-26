@@ -2,7 +2,7 @@ package frc.robot.subsystems;
 
 import frc.robot.util.SafeSubsystem;
 import frc.robot.util.SwerveDrive;
-import frc.robot.util.Logger;
+import frc.robot.logger.Logger;
 
 import frc.robot.devices.OI;
 import frc.robot.Constants.DriveConsts;
