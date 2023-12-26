@@ -6,8 +6,11 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import java.util.HashMap;
 import java.util.ArrayList;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import edu.wpi.first.wpilibj.DriverStation;
 
 import edu.wpi.first.util.datalog.BooleanLogEntry;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
@@ -53,8 +56,6 @@ public class Logger {
   private static final String OUTPUT_LOG_DIR = "/RealOutputs/";
   private static final String METADATA_LOG_DIR = "/RealMetadata/";
 
-  private static final DataLog log = DataLogManager.getLog();
-
   /** List of loggables to be updated each period. */
   private static final ArrayList<Loggable> loggables = new ArrayList<>();
 
@@ -89,14 +90,16 @@ public class Logger {
   // There should be no instances of the class
   private Logger() {}
 
+  // Cannot be initialized until after start to ensure proper file creation
+  private static DataLog log;
+
   // Start log manager
   static {
-    if (RobotBase.isSimulation()) {
-      // Log to project directory in simulation
-      DataLogManager.start();
-    } else {
-      DataLogManager.start(Config.DATA_LOG_DIR);
-    }
+    DataLogManager.start(
+      RobotBase.isSimulation() ? "" : Config.DATA_LOG_DIR, // Log to project directory in simulation
+      "FRC_" + LocalDateTime.now(ZoneId.of("UTC-8")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss")) + ".wpilog"); // File name
+
+    log = DataLogManager.getLog();
     // Disable logging NT values to separate logger and networktables
     DataLogManager.logNetworkTables(false);
     // Log inputs from DriverStation

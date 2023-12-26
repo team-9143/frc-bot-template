@@ -35,13 +35,10 @@ public class RobotContainer {
     configureBindings();
   }
 
-  /** Send metadata to logger, then start logger. */
+  /** Send metadata to logger. */
   private static void configureMetadata() {
     Logger.recordMetadata("RoborioSerialNum", RobotBase.isReal() ? System.getenv("serialnum") : "Simulation");
     Logger.recordMetadata("BuildDate", LocalDateTime.now(ZoneId.of("UTC-8")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-
-    // Close metadata acceptance and open output logging
-    Logger.start();
   }
 
   /** Initialize OI devices. */
