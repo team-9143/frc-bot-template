@@ -88,16 +88,11 @@ public class Drivetrain extends SafeSubsystem {
   /**
    * Drive to a position, relative to the odometry. Must be continuously called.
    *
-   * @param forward forward distance (UNIT: meters)
-   * @param left left distance (UNIT: meters)
-   * @param ccw counter-clockwise angle (UNIT: ccw degrees)
+   * @param desiredPoseMetersCCW robot pose relative to the same origin as the odometry (UNIT: meters, ccw native angle)
    * @param desiredLinearVelocityMetersPerSecond desired linear velocity for feedforward
    */
-  public void driveToLocation(double forward, double left, double ccw, double desiredLinearVelocityMetersPerSecond) {
-    m_swerve.setDesiredPose(
-      new Pose2d(forward, left, Rotation2d.fromDegrees(ccw)),
-      desiredLinearVelocityMetersPerSecond
-    );
+  public void driveToLocation(Pose2d desiredPoseMetersCCW, double desiredLinearVelocityMetersPerSecond) {
+    m_swerve.setDesiredPose(desiredPoseMetersCCW, desiredLinearVelocityMetersPerSecond);
   }
 
   /** Set the drivetrain to x-stance for traction. Must be continuously called. */
@@ -113,12 +108,10 @@ public class Drivetrain extends SafeSubsystem {
   /**
    * Reset the odometry to a given position.
    *
-   * @param forward forward distance (UNIT: meters)
-   * @param left left distance (UNIT: meters)
-   * @param ccw counter-clockwise angle (UNIT: ccw degrees)
+   * @param positionMetersCCW robot position (UNIT: meters, ccw native angle)
    */
-  public void resetOdometry(double forward, double left, double ccw) {
-    m_swerve.resetOdometry(new Pose2d(forward, left, Rotation2d.fromDegrees(ccw)));
+  public void resetOdometry(Pose2d positionMetersCCW) {
+    m_swerve.resetOdometry(positionMetersCCW);
   }
 
   /** @return the robot's estimated location */

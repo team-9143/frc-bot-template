@@ -175,7 +175,7 @@ public class SwerveDrive extends MotorSafety {
    * @param desiredPoseMetersCCW robot pose relative to the same origin as the odometry (UNIT: meters, ccw native angle)
    * @param desiredLinearVelocityMetersPerSecond desired linear velocity for feedforward
    */
-  public void setDesiredPose(Pose2d desiredPose, double desiredLinearVelocityMetersPerSecond) {
+  public void setDesiredPose(Pose2d desiredPoseMetersCCW, double desiredLinearVelocityMetersPerSecond) {
     if (!locationControl) {
       // Reset controllers if swapping into location control
       x_controller.reset();
@@ -185,7 +185,7 @@ public class SwerveDrive extends MotorSafety {
     locationControl = true;
 
     // As far as I can tell, the rotation aspect of the trajectory pose is supposed to point from the current pose to the trajectory pose. This is that math. It probably works.
-    var desiredTransform = desiredPose.minus(odometry.getEstimatedPosition());
+    var desiredTransform = desiredPoseMetersCCW.minus(odometry.getEstimatedPosition());
     double trajectoryAngleRadians = Math.atan2(desiredTransform.getX(), -desiredTransform.getY()); // Get angle from current pose to desired
     if (trajectoryAngleRadians < 0) {
       trajectoryAngleRadians += Math.toRadians(360); // Map range to 0..2PI
@@ -197,7 +197,7 @@ public class SwerveDrive extends MotorSafety {
       odometry.getEstimatedPosition(),
       new Pose2d(),
       desiredLinearVelocityMetersPerSecond,
-      desiredPose.getRotation()
+      desiredPoseMetersCCW.getRotation()
     ));
 
     feed();
