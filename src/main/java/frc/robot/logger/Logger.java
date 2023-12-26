@@ -61,36 +61,33 @@ public class Logger {
   /** If the logger has been started. Metadata is no longer accepted, and logged values are. */
   private static boolean running = false;
 
-  /** All used keys. The index of a key corresponds to its ID, which is used to find corresponding entries. */
-  private static final ArrayList<String> indexedKeys = new ArrayList<>();
-
-  // Log entry maps for data logging to disk
-  private static final HashMap<Integer, BooleanLogEntry> booleanLogs = new HashMap<>();
-  private static final HashMap<Integer, DoubleLogEntry> doubleLogs = new HashMap<>();
-  private static final HashMap<Integer, FloatLogEntry> floatLogs = new HashMap<>();
-  private static final HashMap<Integer, IntegerLogEntry> integerLogs = new HashMap<>();
-  private static final HashMap<Integer, StringLogEntry> stringLogs = new HashMap<>();
-  private static final HashMap<Integer, BooleanArrayLogEntry> booleanArrayLogs = new HashMap<>();
-  private static final HashMap<Integer, DoubleArrayLogEntry> doubleArrayLogs = new HashMap<>();
-  private static final HashMap<Integer, FloatArrayLogEntry> floatArrayLogs = new HashMap<>();
-  private static final HashMap<Integer, IntegerArrayLogEntry> integerArrayLogs = new HashMap<>();
-  private static final HashMap<Integer, StringArrayLogEntry> stringArrayLogs = new HashMap<>();
+  // Entry maps for logging to disk
+  private static final HashMap<String, BooleanLogEntry> booleanLogs = new HashMap<>();
+  private static final HashMap<String, DoubleLogEntry> doubleLogs = new HashMap<>();
+  private static final HashMap<String, FloatLogEntry> floatLogs = new HashMap<>();
+  private static final HashMap<String, IntegerLogEntry> integerLogs = new HashMap<>();
+  private static final HashMap<String, StringLogEntry> stringLogs = new HashMap<>();
+  private static final HashMap<String, BooleanArrayLogEntry> booleanArrayLogs = new HashMap<>();
+  private static final HashMap<String, DoubleArrayLogEntry> doubleArrayLogs = new HashMap<>();
+  private static final HashMap<String, FloatArrayLogEntry> floatArrayLogs = new HashMap<>();
+  private static final HashMap<String, IntegerArrayLogEntry> integerArrayLogs = new HashMap<>();
+  private static final HashMap<String, StringArrayLogEntry> stringArrayLogs = new HashMap<>();
 
   // Network tables Tables for data logging directories
   private static NetworkTable outputTable;
   private static NetworkTable metadataTable;
 
-  // Publisher maps for data logging to network tables
-  private static final HashMap<Integer, BooleanPublisher> booleanPublishers = new HashMap<>();
-  private static final HashMap<Integer, DoublePublisher> doublePublishers = new HashMap<>();
-  private static final HashMap<Integer, FloatPublisher> floatPublishers = new HashMap<>();
-  private static final HashMap<Integer, IntegerPublisher> integerPublishers = new HashMap<>();
-  private static final HashMap<Integer, StringPublisher> stringPublishers = new HashMap<>();
-  private static final HashMap<Integer, BooleanArrayPublisher> booleanArrayPublishers = new HashMap<>();
-  private static final HashMap<Integer, DoubleArrayPublisher> doubleArrayPublishers = new HashMap<>();
-  private static final HashMap<Integer, FloatArrayPublisher> floatArrayPublishers = new HashMap<>();
-  private static final HashMap<Integer, IntegerArrayPublisher> integerArrayPublishers = new HashMap<>();
-  private static final HashMap<Integer, StringArrayPublisher> stringArrayPublishers = new HashMap<>();
+  // Publisher maps for logging to network tables
+  private static final HashMap<String, BooleanPublisher> booleanPublishers = new HashMap<>();
+  private static final HashMap<String, DoublePublisher> doublePublishers = new HashMap<>();
+  private static final HashMap<String, FloatPublisher> floatPublishers = new HashMap<>();
+  private static final HashMap<String, IntegerPublisher> integerPublishers = new HashMap<>();
+  private static final HashMap<String, StringPublisher> stringPublishers = new HashMap<>();
+  private static final HashMap<String, BooleanArrayPublisher> booleanArrayPublishers = new HashMap<>();
+  private static final HashMap<String, DoubleArrayPublisher> doubleArrayPublishers = new HashMap<>();
+  private static final HashMap<String, FloatArrayPublisher> floatArrayPublishers = new HashMap<>();
+  private static final HashMap<String, IntegerArrayPublisher> integerArrayPublishers = new HashMap<>();
+  private static final HashMap<String, StringArrayPublisher> stringArrayPublishers = new HashMap<>();
 
   // There should be no instances of the class
   private Logger() {}
@@ -147,14 +144,13 @@ public class Logger {
 
   public static void recordOutput(String key, boolean value) {
     if (running) {
-      int id = getId(key);
       booleanLogs
-        .computeIfAbsent(id, k -> new BooleanLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
+        .computeIfAbsent(key, k -> new BooleanLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
         .append(value); // Record value to log file
 
       if (Config.NTStream) {
         booleanPublishers
-          .computeIfAbsent(id, k -> outputTable.getBooleanTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+          .computeIfAbsent(key, k -> outputTable.getBooleanTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
           .set(value); // Record value to network tables
       }
     }
@@ -162,14 +158,13 @@ public class Logger {
 
   public static void recordOutput(String key, double value) {
     if (running) {
-      int id = getId(key);
       doubleLogs
-        .computeIfAbsent(id, k -> new DoubleLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
+        .computeIfAbsent(key, k -> new DoubleLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
         .append(value); // Record value to log file
 
       if (Config.NTStream) {
         doublePublishers
-          .computeIfAbsent(id, k -> outputTable.getDoubleTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+          .computeIfAbsent(key, k -> outputTable.getDoubleTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
           .set(value); // Record value to network tables
       }
     }
@@ -177,14 +172,13 @@ public class Logger {
 
   public static void recordOutput(String key, float value) {
     if (running) {
-      int id = getId(key);
       floatLogs
-        .computeIfAbsent(id, k -> new FloatLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
+        .computeIfAbsent(key, k -> new FloatLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
         .append(value); // Record value to log file
 
       if (Config.NTStream) {
         floatPublishers
-          .computeIfAbsent(id, k -> outputTable.getFloatTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+          .computeIfAbsent(key, k -> outputTable.getFloatTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
           .set(value); // Record value to network tables
       }
     }
@@ -192,14 +186,13 @@ public class Logger {
 
   public static void recordOutput(String key, int value) {
     if (running) {
-      int id = getId(key);
       integerLogs
-        .computeIfAbsent(id, k -> new IntegerLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
+        .computeIfAbsent(key, k -> new IntegerLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
         .append(value); // Record value to log file
 
       if (Config.NTStream) {
         integerPublishers
-          .computeIfAbsent(id, k -> outputTable.getIntegerTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+          .computeIfAbsent(key, k -> outputTable.getIntegerTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
           .set(value); // Record value to network tables
       }
     }
@@ -207,14 +200,13 @@ public class Logger {
 
   public static void recordOutput(String key, String value) {
     if (running) {
-      int id = getId(key);
       stringLogs
-        .computeIfAbsent(id, k -> new StringLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
+        .computeIfAbsent(key, k -> new StringLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
         .append(value); // Record value to log file
 
       if (Config.NTStream) {
         stringPublishers
-          .computeIfAbsent(id, k -> outputTable.getStringTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+          .computeIfAbsent(key, k -> outputTable.getStringTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
           .set(value); // Record value to network tables
       }
     }
@@ -222,14 +214,13 @@ public class Logger {
 
   public static void recordOutput(String key, boolean[] values) {
     if (running) {
-      int id = getId(key);
       booleanArrayLogs
-        .computeIfAbsent(id, k -> new BooleanArrayLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
+        .computeIfAbsent(key, k -> new BooleanArrayLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
         .append(values); // Record value to log file
 
       if (Config.NTStream) {
         booleanArrayPublishers
-          .computeIfAbsent(id, k -> outputTable.getBooleanArrayTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+          .computeIfAbsent(key, k -> outputTable.getBooleanArrayTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
           .set(values); // Record value to network tables
       }
     }
@@ -237,14 +228,13 @@ public class Logger {
 
   public static void recordOutput(String key, double[] values) {
     if (running) {
-      int id = getId(key);
       doubleArrayLogs
-        .computeIfAbsent(id, k -> new DoubleArrayLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
+        .computeIfAbsent(key, k -> new DoubleArrayLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
         .append(values); // Record value to log file
 
       if (Config.NTStream) {
         doubleArrayPublishers
-          .computeIfAbsent(id, k -> outputTable.getDoubleArrayTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+          .computeIfAbsent(key, k -> outputTable.getDoubleArrayTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
           .set(values); // Record value to network tables
       }
     }
@@ -252,14 +242,13 @@ public class Logger {
 
   public static void recordOutput(String key, float[] values) {
     if (running) {
-      int id = getId(key);
       floatArrayLogs
-        .computeIfAbsent(id, k -> new FloatArrayLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
+        .computeIfAbsent(key, k -> new FloatArrayLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
         .append(values); // Record value to log file
 
       if (Config.NTStream) {
         floatArrayPublishers
-          .computeIfAbsent(id, k -> outputTable.getFloatArrayTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+          .computeIfAbsent(key, k -> outputTable.getFloatArrayTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
           .set(values); // Record value to network tables
       }
     }
@@ -267,14 +256,13 @@ public class Logger {
 
   public static void recordOutput(String key, long[] values) {
     if (running) {
-      int id = getId(key);
       integerArrayLogs
-        .computeIfAbsent(id, k -> new IntegerArrayLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
+        .computeIfAbsent(key, k -> new IntegerArrayLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
         .append(values); // Record value to log file
 
       if (Config.NTStream) {
         integerArrayPublishers
-          .computeIfAbsent(id, k -> outputTable.getIntegerArrayTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+          .computeIfAbsent(key, k -> outputTable.getIntegerArrayTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
           .set(values); // Record value to network tables
       }
     }
@@ -292,14 +280,13 @@ public class Logger {
 
   public static void recordOutput(String key, String[] values) {
     if (running) {
-      int id = getId(key);
       stringArrayLogs
-        .computeIfAbsent(id, k -> new StringArrayLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
+        .computeIfAbsent(key, k -> new StringArrayLogEntry(log, OUTPUT_LOG_DIR + key)) // Retrieve/create log entry
         .append(values); // Record value to log file
 
       if (Config.NTStream) {
         stringArrayPublishers
-          .computeIfAbsent(id, k -> outputTable.getStringArrayTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+          .computeIfAbsent(key, k -> outputTable.getStringArrayTopic(key).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
           .set(values); // Record value to network tables
       }
     }
@@ -364,14 +351,5 @@ public class Logger {
         publisher.close(); // Close unused publisher
       }
     }
-  }
-
-  /** @return id of given key (newly created if necessary) to be used in log and entry maps */
-  private static synchronized int getId(String key) {
-    // Add key if new
-    if (!indexedKeys.contains(key)) {
-      indexedKeys.add(key);
-    }
-    return indexedKeys.indexOf(key);
   }
 }
