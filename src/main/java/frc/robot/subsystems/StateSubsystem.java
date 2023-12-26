@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.subsystems;
 
 /**
  * Subsystem with state-based control and a stop method for safety.

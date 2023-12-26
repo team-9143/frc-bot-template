@@ -12,7 +12,6 @@ import frc.robot.devices.Controller.btn;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 
-import frc.robot.util.SafeSubsystem;
 import frc.robot.subsystems.*;
 
 import edu.wpi.first.wpilibj2.command.RunCommand;

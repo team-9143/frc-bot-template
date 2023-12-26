@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import frc.robot.util.SafeSubsystem;
 import frc.robot.logger.Logger;
 import frc.robot.util.SwerveDrive;
 

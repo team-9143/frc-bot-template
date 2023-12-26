@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import frc.robot.util.SafeSubsystem;
-
 /** An example subsystem that serves no purpose whatsoever. */
 public class ExampleSubsystem extends SafeSubsystem {
   private static ExampleSubsystem m_instance;
