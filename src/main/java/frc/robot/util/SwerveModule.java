@@ -27,8 +27,8 @@ public class SwerveModule {
   private final PIDController angle_controller;
 
   protected SwerveModule(SwerveModuleConstants constants) {
-    drive_motor = new LoggedSparkMax(constants.drive_ID, MotorType.kBrushless, constants.name + "_drive");
-    angle_motor = new LoggedSparkMax(constants.angle_ID, MotorType.kBrushless, constants.name + "_angle");
+    drive_motor = new LoggedSparkMax(constants.drive_ID, MotorType.kBrushless, constants.directory + "/drive/");
+    angle_motor = new LoggedSparkMax(constants.angle_ID, MotorType.kBrushless, constants.directory + "/angle/");
     cancoder = new CANCoder(constants.cancoder_ID);
     cancoderOffset = constants.cancoderOffset;
     speed_controller = constants.speed_controller;
@@ -118,7 +118,7 @@ public class SwerveModule {
 
   /** Basic constants for the construction of a {@link SwerveModule}. */
   public static class SwerveModuleConstants {
-    public final String name;
+    public final String directory;
     public final byte drive_ID;
     public final byte angle_ID;
     public final byte cancoder_ID;
@@ -129,7 +129,7 @@ public class SwerveModule {
     public final PIDController angle_controller;
 
     /**
-     * @param name device name for logging
+     * @param directory sub-directory for logging (with trailing slash)
      * @param drive_ID driving motor ID (Spark Max with brushless motor)
      * @param angle_ID angular motor ID (Spark Max with brushless motor)
      * @param cancoder_ID cancoder ID
@@ -138,8 +138,8 @@ public class SwerveModule {
      * @param speed_controller PID controller to calculate drive motor speed from velocity error
      * @param angle_controller PID controller to calculate angular motor speed from degree error
      */
-    public SwerveModuleConstants(String name, int drive_ID, int angle_ID, int cancoder_ID, double cancoderOffset, Translation2d location, PIDController speed_controller, PIDController angle_controller) {
-      this.name = name;
+    public SwerveModuleConstants(String directory, int drive_ID, int angle_ID, int cancoder_ID, double cancoderOffset, Translation2d location, PIDController speed_controller, PIDController angle_controller) {
+      this.directory = directory;
       this.drive_ID = (byte) drive_ID;
       this.angle_ID = (byte) angle_ID;
       this.cancoder_ID = (byte) cancoder_ID;

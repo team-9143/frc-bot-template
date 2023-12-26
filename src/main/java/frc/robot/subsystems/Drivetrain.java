@@ -1,8 +1,8 @@
 package frc.robot.subsystems;
 
 import frc.robot.util.SafeSubsystem;
-import frc.robot.util.SwerveDrive;
 import frc.robot.logger.Logger;
+import frc.robot.util.SwerveDrive;
 
 import frc.robot.devices.OI;
 import frc.robot.Constants.DriveConsts;
@@ -60,13 +60,6 @@ public class Drivetrain extends SafeSubsystem {
   public void periodic() {
     // Update swerve speeds and odometry
     m_swerve.update();
-
-    Logger.recordOutput("/"+getName()+"/odometry", getPose());
-
-    Logger.recordOutput("/"+getName()+"/measuredStates", getMeasuredStates());
-    Logger.recordOutput("/"+getName()+"/desiredStates", getDesiredStates());
-
-    Logger.recordOutput("/"+getName()+"/atReference", atReference());
   }
 
   /**
@@ -144,6 +137,16 @@ public class Drivetrain extends SafeSubsystem {
 
   /** @return individual measured module states */
   public SwerveModuleState[] getMeasuredStates() {return m_swerve.getMeasuredStates();}
+
+  @Override
+  public void log() {
+    Logger.recordOutput(getDirectory()+"odometry", getPose());
+
+    Logger.recordOutput(getDirectory()+"measuredStates", getMeasuredStates());
+    Logger.recordOutput(getDirectory()+"desiredStates", getDesiredStates());
+
+    Logger.recordOutput(getDirectory()+"atReference", atReference());
+  }
 
   @Override
   public void stop() {

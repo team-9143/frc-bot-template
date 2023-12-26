@@ -107,7 +107,7 @@ public class Logger {
 
     // Set up network tables for data stream
     if (Config.NTStream) {
-      var table = NetworkTableInstance.getDefault().getTable("/AdvantageKit");
+      var table = NetworkTableInstance.getDefault().getTable("AdvantageKit");
       outputTable = table.getSubTable("RealOutputs");
       metadataTable = table.getSubTable("RealMetadata");
     }
