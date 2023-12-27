@@ -138,6 +138,9 @@ public class Drivetrain extends SafeSubsystem {
     Logger.recordOutput(getDirectory()+"measuredStates", getMeasuredStates());
     Logger.recordOutput(getDirectory()+"desiredStates", getDesiredStates());
 
+    Logger.recordOutput(getDirectory()+"measuredSpeeds", getMeasuredSpeeds());
+    Logger.recordOutput(getDirectory()+"desiredSpeeds", getDesiredSpeeds());
+
     Logger.recordOutput(getDirectory()+"atReference", atReference());
 
     Logger.recordOutput(getDirectory()+"3dPosition",

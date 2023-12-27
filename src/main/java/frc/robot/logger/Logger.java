@@ -40,8 +40,9 @@ import edu.wpi.first.networktables.StringArrayPublisher;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 /**
  * <p> Huge thanks to FRC Team 581: Littleton Robotics for the basis for this implementation. </p>
@@ -292,6 +293,11 @@ public class Logger {
     // Map trajectory into Pose2d[]
     recordOutput(path,
       value.getStates().stream().map(state -> state.poseMeters).toArray(Pose2d[]::new));
+  }
+
+  public static void recordOutput(String path, ChassisSpeeds value) {
+    // Map speeds in double[]
+    recordOutput(path, new double[] {value.vxMetersPerSecond, value.vyMetersPerSecond, value.omegaRadiansPerSecond});
   }
 
   public static void recordOutput(String path, SwerveModuleState... values) {
