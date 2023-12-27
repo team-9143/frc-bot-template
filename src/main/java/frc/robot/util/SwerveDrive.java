@@ -153,7 +153,7 @@ public class SwerveDrive extends MotorSafety {
    * @param ccw counter-clockwise speed (UNIT: ccw radians/s)
    */
   public void setDesiredVelocityFieldRelative(double forward, double left, double ccw) {
-    var states = kinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(forward, left, ccw, Rotation2d.fromDegrees(OI.PIGEON2.getYaw())));
+    var states = kinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(forward, left, ccw, getPose().getRotation()));
     setDesiredStates(states[0], states[1], states[2], states[3]);
   }
 
@@ -179,7 +179,7 @@ public class SwerveDrive extends MotorSafety {
       // Reset controllers if swapping into location control
       x_controller.reset();
       y_controller.reset();
-      theta_controller.reset(Math.toRadians(OI.PIGEON2.getYaw()));
+      theta_controller.reset(getPose().getRotation().getRadians());
     }
     locationControl = true;
 
