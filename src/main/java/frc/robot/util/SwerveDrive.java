@@ -187,7 +187,7 @@ public class SwerveDrive extends MotorSafety {
     desiredStates = kinematics.toSwerveModuleStates(m_controller.calculate(
       odometry.getEstimatedPosition(),
       desiredPoseMetersCCW,
-      0,
+      0, // Feedforward isn't necessary because of zero-velocity ending, it's also very weird here
       desiredPoseMetersCCW.getRotation()
     ));
 
