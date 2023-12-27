@@ -20,7 +20,7 @@ public class Pathing {
       traj -> Logger.recordOutput(PATH_LOG_DIR+"basic-follow/trajectory", traj.getStates().stream().map(state -> state.poseMeters).toArray(Pose2d[]::new)), // Log trajectory on command initialization
       pose -> Logger.recordOutput(PATH_LOG_DIR+"basic-follow/referencePose", pose), // Log reference pose during command run
       speeds -> Logger.recordOutput(PATH_LOG_DIR+"basic-follow/setpointSpeeds", speeds), // Log setpoint velocities during command run
-      (t, r) -> {} // Don't need to log error
+      null // Don't need to log error
     );
   }
 
