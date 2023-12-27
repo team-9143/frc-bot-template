@@ -86,13 +86,12 @@ public class Drivetrain extends SafeSubsystem {
   }
 
   /**
-   * Drive to a position, relative to the odometry. Must be continuously called.
+   * Drive directly to a position and stop, relative to the odometry. Not for trajectory following. Must be continuously called.
    *
-   * @param desiredPoseMetersCCW robot pose relative to the same origin as the odometry (UNIT: meters, ccw native angle)
-   * @param desiredLinearVelocityMetersPerSecond desired linear velocity for feedforward
+   * @param targetPoseMetersCCW robot pose relative to the odometry (UNIT: meters, ccw native angle)
    */
-  public void driveToLocation(Pose2d desiredPoseMetersCCW, double desiredLinearVelocityMetersPerSecond) {
-    m_swerve.setDesiredPose(desiredPoseMetersCCW, desiredLinearVelocityMetersPerSecond);
+  public void driveTargetPose(Pose2d targetPoseMetersCCW) {
+    m_swerve.setDesiredPose(targetPoseMetersCCW);
   }
 
   /** Set the drivetrain to x-stance for traction. Must be continuously called. */

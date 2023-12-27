@@ -11,8 +11,9 @@ public class Pathing {
   /** Utility method to retrieve an easy direct move command. Would not recommend using this over any pathing software.
    *
    * @param desiredPoseMetersCCW robot pose relative to the same origin as the odometry (UNIT: meters, ccw native angle)
+   * @return the command
    */
   public static Command getDirectMoveCommand(Pose2d desiredPoseMetersCCW) {
-    return Drivetrain.getInstance().run(() -> Drivetrain.getInstance().driveToLocation(desiredPoseMetersCCW, DriveConsts.kMaxWheelVelMetersPerSecond));
+    return Drivetrain.getInstance().run(() -> Drivetrain.getInstance().driveTargetPose(desiredPoseMetersCCW));
   }
 }
