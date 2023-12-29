@@ -2,8 +2,8 @@ package frc.robot.util;
 
 import edu.wpi.first.wpilibj.MotorSafety;
 
-import frc.robot.devices.SimplifiedIMU;
 import frc.robot.Constants.DriveConsts;
+import frc.robot.devices.OI;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -49,7 +49,7 @@ public class SwerveDrive extends MotorSafety {
     // Initialize odometry - If using vision adjustments, add standard deviation matrices
     odometry = new SwerveDrivePoseEstimator(
       kinematics,
-      Rotation2d.fromDegrees(SimplifiedIMU.getYaw()),
+      Rotation2d.fromDegrees(OI.IMU.getYaw()),
       new SwerveModulePosition[] {
         new SwerveModulePosition(modules[0].getDistance(), Rotation2d.fromDegrees(modules[0].getAngle())),
         new SwerveModulePosition(modules[1].getDistance(), Rotation2d.fromDegrees(modules[1].getAngle())),
@@ -63,7 +63,7 @@ public class SwerveDrive extends MotorSafety {
   /** Updates odometry and pushes desired control to modules. Should be called every robot loop. */
   public void update() {
     // Update odometry state estimation
-    odometry.update(Rotation2d.fromDegrees(SimplifiedIMU.getYaw()), new SwerveModulePosition[] {
+    odometry.update(Rotation2d.fromDegrees(OI.IMU.getYaw()), new SwerveModulePosition[] {
       new SwerveModulePosition(modules[0].getDistance(), Rotation2d.fromDegrees(modules[0].getAngle())),
       new SwerveModulePosition(modules[1].getDistance(), Rotation2d.fromDegrees(modules[1].getAngle())),
       new SwerveModulePosition(modules[2].getDistance(), Rotation2d.fromDegrees(modules[2].getAngle())),
@@ -119,7 +119,7 @@ public class SwerveDrive extends MotorSafety {
    */
   public void resetOdometry(Pose2d positionMetersCCW) {
     odometry.resetPosition(
-      Rotation2d.fromDegrees(SimplifiedIMU.getYaw()),
+      Rotation2d.fromDegrees(OI.IMU.getYaw()),
       new SwerveModulePosition[] {
         new SwerveModulePosition(modules[0].getDistance(), Rotation2d.fromDegrees(modules[0].getAngle())),
         new SwerveModulePosition(modules[1].getDistance(), Rotation2d.fromDegrees(modules[1].getAngle())),

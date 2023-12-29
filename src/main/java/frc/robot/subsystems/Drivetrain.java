@@ -4,7 +4,6 @@ import frc.robot.logger.Logger;
 import frc.robot.util.SwerveDrive;
 
 import frc.robot.devices.OI;
-import frc.robot.devices.SimplifiedIMU;
 import frc.robot.Constants.DriveConsts;
 import frc.robot.Constants.SwerveConsts;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -132,7 +131,7 @@ public class Drivetrain extends SafeSubsystem {
 
     Logger.recordOutput(getDirectory()+"3dPosition",
       new Pose3d(getPose().getX(), getPose().getY(), 0, // Height always set to 0
-      new Rotation3d(Math.toRadians(SimplifiedIMU.getRoll()), Math.toRadians(SimplifiedIMU.getPitch()), getPose().getRotation().getRadians())));
+      new Rotation3d(Math.toRadians(OI.IMU.getRoll()), Math.toRadians(OI.IMU.getPitch()), getPose().getRotation().getRadians())));
   }
 
   @Override
