@@ -14,10 +14,14 @@ import java.util.Map;
 import com.pathplanner.lib.auto.PIDConstants;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPoint;
 
 public class Pathing {
   private static final String PATH_LOG_DIR = "/pathplanner/";
 
+  /** Costraints for accurately generating and following paths */
   private static final PathConstraints constraints = new PathConstraints(DriveConsts.kMaxWheelVelMetersPerSecond, DriveConsts.kMaxLinearAccelMetersPerSecondSquared);
 
   // Set up logging for basic path following
@@ -40,14 +44,57 @@ public class Pathing {
   }
 
   /**
-   * Follow a pathplanner path, constrained by maximum robot velocity and maximum controlled acceleration. Logs everything on command run through Logger.
+   * Load a pathplanner path, constrained by maximum robot velocity and controlled acceleration.
    *
    * @param name name of the path file under [deploy/pathplanner/], omitting ".path"
+   * @return the path as a PathPlannerTrajectory
+   */
+  public static PathPlannerTrajectory loadPath(String name) {
+    return PathPlanner.loadPath(name, constraints);
+  }
+
+  /**
+   * Create a pathplanner path, constrained by given velocity and acceleration.
+   *
+   * @param startPoseMetersCCW starting position for the command
+   * @param endPoseMetersCCW ending position for the command
+   * @param maxVelMetersPerSecond max velocity along the path. Paths will not exceed the maximum velocity of the robot.
+   * @param maxAccelMetersPerSecondPerSecond max acceleration along the path. Use {@link Double.POSITIVE_INFINITY} for instant starts and stops.
+   * @return the path as a PathPlannerTrajectory
+   */
+  public static PathPlannerTrajectory createDirectPath(Pose2d startPoseMetersCCW, Pose2d endPoseMetersCCW, double maxVelMetersPerSecond, double maxAccelMetersPerSecondPerSecond) {
+    // Find the angle between the poses for heading calculation
+    Pose2d relativePose = endPoseMetersCCW.relativeTo(startPoseMetersCCW);
+    Rotation2d relativeAngle = new Rotation2d(relativePose.getX(), relativePose.getY());
+
+    // Create the path points from the given poses and the calculated heading
+    PathPoint first = new PathPoint(startPoseMetersCCW.getTranslation(), relativeAngle, startPoseMetersCCW.getRotation());
+    PathPoint last = new PathPoint(endPoseMetersCCW.getTranslation(), relativeAngle, endPoseMetersCCW.getRotation());
+
+    // Generate the path with the constraints provided (velocity cannot exceed maximum robot velocity)
+    return PathPlanner.generatePath(new PathConstraints(Math.min(maxVelMetersPerSecond, constraints.maxVelocity), maxAccelMetersPerSecondPerSecond), first, last);
+  }
+
+  /**
+   * Create a pathplanner path. constrained by maximum robot velocity and controlled acceleration.
+   *
+   * @param startPoseMetersCCW starting position for the command
+   * @param endPoseMetersCCW ending position for the command
+   * @return the path as a PathPlannerTrajectory
+   */
+  public static PathPlannerTrajectory createDirectPath(Pose2d startPoseMetersCCW, Pose2d endPoseMetersCCW) {
+    return createDirectPath(startPoseMetersCCW, endPoseMetersCCW, constraints.maxVelocity, constraints.maxAcceleration);
+  }
+
+  /**
+   * Follow a pathplanner path, constrained by maximum robot velocity and controlled acceleration. Logs everything on command run through Logger.
+   *
+   * @param path the pathplanner path to follow
    * @return the command
    */
-  public static Command getFollowPathplannerCommand(String name) {
-    var command = new PPSwerveControllerCommand(
-      PathPlanner.loadPath(name, constraints), // Path to follow
+  public static Command getFollowPathplannerCommand(PathPlannerTrajectory path) {
+    return new PPSwerveControllerCommand(
+      path, // Path to follow
       Drivetrain.getInstance()::getPose, // Pose supplier
       new PIDController(DriveConsts.kTranslateP.getAsDouble(), DriveConsts.kTranslateI.getAsDouble(), DriveConsts.kTranslateD.getAsDouble()), // Translation controller for position error -> velocity
       new PIDController(DriveConsts.kTranslateP.getAsDouble(), DriveConsts.kTranslateI.getAsDouble(), DriveConsts.kTranslateD.getAsDouble()), // Translation controller for position error -> velocity
@@ -56,13 +103,10 @@ public class Pathing {
       true, // Whether to mirror path to match alliance
       Drivetrain.getInstance() // Subsystem requirements
     );
-    return command;
   }
 
   /**
-   * Create a complete autonomous command group. This will reset the robot pose at the begininng of
-   * the first path, follow paths, trigger events during path following, and run commands between
-   * paths with stop events.
+   * Create a complete autonomous command group, constrained by maximum robot velocity and controlled acceleration. This will reset the robot pose at the begininng of the first path, follow paths, trigger events during path following, and run commands between paths with stop events.
    *
    * @param name name of the path file under [deploy/pathplanner/], omitting ".path"
    * @param events String-Command map of named commands to run at events. Names may be reused for multiple events. Commands that run at stop events may require the drivetrain, but no others should.
