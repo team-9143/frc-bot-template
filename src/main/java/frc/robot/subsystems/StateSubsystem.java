@@ -2,7 +2,7 @@ package frc.robot.subsystems;
 
 /**
  * Subsystem with state-based control and a stop method for safety.
- * 
+ *
  * @param <T> Enum containing control states of the subsystem
  */
 public abstract class StateSubsystem<T extends Enum<T>> extends SafeSubsystem {
