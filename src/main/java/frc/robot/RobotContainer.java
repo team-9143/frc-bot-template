@@ -1,11 +1,14 @@
 package frc.robot;
 
 import frc.robot.logger.Logger;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Pose2d;
 
 import frc.robot.devices.OI;
 import frc.robot.devices.Controller.btn;
@@ -59,13 +62,15 @@ public class RobotContainer {
   }
 
   private static void configureDriver() {
-    // Button 'X' (debounced 0.5s) will reset gyro
+    // Button 'X' (debounced 0.5s) will reset heading
     final var cRumble = OI.DRIVER_CONTROLLER.getRumbleCommand(0.5, 0.5, 0.25);
     new Trigger(() -> OI.DRIVER_CONTROLLER.getButton(btn.X))
     .debounce(0.3) // Wait 0.3s to avoid accidental press
       .onTrue(new InstantCommand(() -> {
-        OI.PIGEON2.setYaw(0); // Reset gyro
-        cRumble.schedule(); // Rumble to indicate event
+        // Reset odometry so that forward is away from the driver station
+        Drivetrain.getInstance().resetOdometry(
+          new Pose2d(Drivetrain.getInstance().getPose().getTranslation(), new Rotation2d(0)));
+        cRumble.schedule(); // Rumble to indicate odometry has been reset
       }));
 
     // Button 'Y' (hold) will set drivetrain to x-stance (for stability)

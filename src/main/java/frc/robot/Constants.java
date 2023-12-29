@@ -45,7 +45,7 @@ public class Constants {
     public static final double kMaxLinearAccelMetersPerSecondSquared = kMaxWheelVelMetersPerSecond * 2; // UNIT: meters/s/s
     public static final double kMaxTurnAccelRadiansPerSecondSquared = kMaxTurnVelRadiansPerSecond * 2; // UNIT: radians/s/s
 
-    // Gains for drivetrain position error -> desired velocity
+    // Gains for drivetrain position error -> velocity
     public static final TunableNumber
       kTranslateP = new TunableNumber("P", 1, "Robot Translation"),
       kTranslateI = new TunableNumber("I", 0, "Robot Translation"),
@@ -72,25 +72,25 @@ public class Constants {
 
     public static final SwerveModuleConstants
       kSwerve_fl = new SwerveModuleConstants(
-        "/modules/FL/", 41, 42, 43, 31.465,
+        "/swerve-modules/front-left/", 41, 42, 43, 31.465,
         new Translation2d(0.22225, 0.22225),
         new PIDController(kDriveP.getAsDouble(), 0, 0),
         new PIDController(kAngleP.getAsDouble(), 0, kAngleD.getAsDouble())
       ),
       kSwerve_fr = new SwerveModuleConstants(
-        "/modules/FR/", 11, 12, 13, 28.037,
+        "/swerve-modules/front-right/", 11, 12, 13, 28.037,
         new Translation2d(0.22225, -0.22225),
         new PIDController(kDriveP.getAsDouble(), 0, 0),
         new PIDController(kAngleP.getAsDouble(), 0, kAngleD.getAsDouble())
       ),
       kSwerve_bl = new SwerveModuleConstants(
-        "/modules/BL/", 31, 32, 33, 86.748,
+        "/swerve-modules/back-left/", 31, 32, 33, 86.748,
         new Translation2d(-0.22225, 0.22225),
         new PIDController(kDriveP.getAsDouble(), 0, 0),
         new PIDController(kAngleP.getAsDouble(), 0, kAngleD.getAsDouble())
       ),
       kSwerve_br = new SwerveModuleConstants(
-        "/modules/BR/", 21, 22, 23, -96.943,
+        "/swerve-modules/back-right/", 21, 22, 23, -96.943,
         new Translation2d(-0.22225, -0.22225),
         new PIDController(kDriveP.getAsDouble(), 0, 0),
         new PIDController(kAngleP.getAsDouble(), 0, kAngleD.getAsDouble())

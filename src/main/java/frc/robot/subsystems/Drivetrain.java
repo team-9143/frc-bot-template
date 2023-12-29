@@ -85,21 +85,6 @@ public class Drivetrain extends SafeSubsystem {
     m_swerve.setDesiredVelocity(forward, left, ccw);
   }
 
-  /**
-   * Drive to a position, relative to the odometry. Must be continuously called.
-   *
-   * @param forward forward distance (UNIT: meters)
-   * @param left left distance (UNIT: meters)
-   * @param ccw counter-clockwise angle (UNIT: ccw degrees)
-   * @param desiredLinearVelocityMetersPerSecond desired linear velocity for feedforward
-   */
-  public void driveToLocation(double forward, double left, double ccw, double desiredLinearVelocityMetersPerSecond) {
-    m_swerve.setDesiredPose(
-      new Pose2d(forward, left, Rotation2d.fromDegrees(ccw)),
-      desiredLinearVelocityMetersPerSecond
-    );
-  }
-
   /** Set the drivetrain to x-stance for traction. Must be continuously called. */
   public void toXStance() {
     m_swerve.setDesiredStates(
@@ -113,19 +98,14 @@ public class Drivetrain extends SafeSubsystem {
   /**
    * Reset the odometry to a given position.
    *
-   * @param forward forward distance (UNIT: meters)
-   * @param left left distance (UNIT: meters)
-   * @param ccw counter-clockwise angle (UNIT: ccw degrees)
+   * @param positionMetersCCW robot position (UNIT: meters, ccw native angle)
    */
-  public void resetOdometry(double forward, double left, double ccw) {
-    m_swerve.resetOdometry(new Pose2d(forward, left, Rotation2d.fromDegrees(ccw)));
+  public void resetOdometry(Pose2d positionMetersCCW) {
+    m_swerve.resetOdometry(positionMetersCCW);
   }
 
   /** @return the robot's estimated location */
   public Pose2d getPose() {return m_swerve.getPose();}
-
-  /** @return {@code true} if trajectory following and near desired location */
-  public boolean atReference() {return m_swerve.atReference();}
 
   /** @return the drivetrain's desired velocities */
   public ChassisSpeeds getDesiredSpeeds() {return m_swerve.getDesiredSpeeds();}
@@ -146,7 +126,8 @@ public class Drivetrain extends SafeSubsystem {
     Logger.recordOutput(getDirectory()+"measuredStates", getMeasuredStates());
     Logger.recordOutput(getDirectory()+"desiredStates", getDesiredStates());
 
-    Logger.recordOutput(getDirectory()+"atReference", atReference());
+    Logger.recordOutput(getDirectory()+"measuredSpeeds", getMeasuredSpeeds());
+    Logger.recordOutput(getDirectory()+"desiredSpeeds", getDesiredSpeeds());
 
     Logger.recordOutput(getDirectory()+"3dPosition",
       new Pose3d(getPose().getX(), getPose().getY(), 0, // Height always set to 0

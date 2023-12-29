@@ -10,13 +10,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
-import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 
 /** Controls a set of four {@link SwerveModule SwerveModules}. Protected by {@link MotorSafety}, and speeds must be set every iteration. */
 public class SwerveDrive extends MotorSafety {
@@ -30,56 +25,6 @@ public class SwerveDrive extends MotorSafety {
 
   public final SwerveDriveKinematics kinematics;
   private final SwerveDrivePoseEstimator odometry;
-
-  /** {@code true} if trajectory following through a {@link HolonomicDriveController} */
-  private boolean locationControl = false;
-
-  // Create PID controllers for position change -> velocity calculations
-  private static final PIDController x_controller = new PIDController(
-    DriveConsts.kTranslateP.getAsDouble(),
-    DriveConsts.kTranslateI.getAsDouble(),
-    DriveConsts.kTranslateD.getAsDouble()
-  );
-  private static final PIDController y_controller = new PIDController(
-    DriveConsts.kTranslateP.getAsDouble(),
-    DriveConsts.kTranslateI.getAsDouble(),
-    DriveConsts.kTranslateD.getAsDouble()
-  );
-  private static final ProfiledPIDController theta_controller = new ProfiledPIDController(
-    DriveConsts.kRotateP.getAsDouble(),
-    DriveConsts.kRotateI.getAsDouble(),
-    DriveConsts.kRotateD.getAsDouble(),
-    new Constraints(DriveConsts.kMaxTurnVelRadiansPerSecond, DriveConsts.kMaxTurnAccelRadiansPerSecondSquared)
-  );
-
-  // Main controller
-  private static final HolonomicDriveController m_controller = new HolonomicDriveController(x_controller, y_controller, theta_controller);
-
-  // Initialize controller settings and bind Tunables
-  static {
-    m_controller.setTolerance(DriveConsts.kPosTolerance);
-
-    x_controller.setIntegratorRange(-DriveConsts.kMaxWheelVelMetersPerSecond, DriveConsts.kMaxWheelVelMetersPerSecond);
-    y_controller.setIntegratorRange(-DriveConsts.kMaxWheelVelMetersPerSecond, DriveConsts.kMaxWheelVelMetersPerSecond);
-    theta_controller.setIntegratorRange(-DriveConsts.kMaxTurnVelRadiansPerSecond, DriveConsts.kMaxTurnVelRadiansPerSecond);
-
-    DriveConsts.kTranslateP.bindTo(val -> {
-      x_controller.setP(val);
-      y_controller.setP(val);
-    });
-    DriveConsts.kTranslateI.bindTo(val -> {
-      x_controller.setI(val);
-      y_controller.setI(val);
-    });
-    DriveConsts.kTranslateI.bindTo(val -> {
-      x_controller.setI(val);
-      y_controller.setI(val);
-    });
-
-    DriveConsts.kRotateP.bindTo(theta_controller::setP);
-    DriveConsts.kRotateI.bindTo(theta_controller::setI);
-    DriveConsts.kRotateD.bindTo(theta_controller::setD);
-  }
 
   public SwerveDrive(SwerveModule.SwerveModuleConstants consts_fl, SwerveModule.SwerveModuleConstants consts_fr, SwerveModule.SwerveModuleConstants consts_bl, SwerveModule.SwerveModuleConstants consts_br) {
     // Turn on motor safety watchdog
@@ -140,8 +85,6 @@ public class SwerveDrive extends MotorSafety {
     desiredStates[2] = state_bl;
     desiredStates[3] = state_br;
 
-    locationControl = false;
-
     feed();
   }
 
@@ -153,7 +96,7 @@ public class SwerveDrive extends MotorSafety {
    * @param ccw counter-clockwise speed (UNIT: ccw radians/s)
    */
   public void setDesiredVelocityFieldRelative(double forward, double left, double ccw) {
-    var states = kinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(forward, left, ccw, Rotation2d.fromDegrees(OI.PIGEON2.getYaw())));
+    var states = kinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(forward, left, ccw, getPose().getRotation()));
     setDesiredStates(states[0], states[1], states[2], states[3]);
   }
 
@@ -167,40 +110,6 @@ public class SwerveDrive extends MotorSafety {
   public void setDesiredVelocity(double forward, double left, double ccw) {
     var states = kinematics.toSwerveModuleStates(new ChassisSpeeds(forward, left, ccw));
     setDesiredStates(states[0], states[1], states[2], states[3]);
-  }
-
-  /**
-   * Sets desired pose and linear velocity, to be controlled with a {@link HolonomicDriveController}.
-   *
-   * @param desiredPoseMetersCCW robot pose relative to the same origin as the odometry (UNIT: meters, ccw native angle)
-   * @param desiredLinearVelocityMetersPerSecond desired linear velocity for feedforward
-   */
-  public void setDesiredPose(Pose2d desiredPose, double desiredLinearVelocityMetersPerSecond) {
-    if (!locationControl) {
-      // Reset controllers if swapping into location control
-      x_controller.reset();
-      y_controller.reset();
-      theta_controller.reset(Math.toRadians(OI.PIGEON2.getYaw()));
-    }
-    locationControl = true;
-
-    // As far as I can tell, the rotation aspect of the trajectory pose is supposed to point from the current pose to the trajectory pose. This is that math. It probably works.
-    var desiredTransform = desiredPose.minus(odometry.getEstimatedPosition());
-    double trajectoryAngleRadians = Math.atan2(desiredTransform.getX(), -desiredTransform.getY()); // Get angle from current pose to desired
-    if (trajectoryAngleRadians < 0) {
-      trajectoryAngleRadians += Math.toRadians(360); // Map range to 0..2PI
-    }
-    trajectoryAngleRadians += Math.toRadians(90); // Map 0 to forward
-
-    // Actually do the calculation
-    desiredStates = kinematics.toSwerveModuleStates(m_controller.calculate(
-      odometry.getEstimatedPosition(),
-      new Pose2d(),
-      desiredLinearVelocityMetersPerSecond,
-      desiredPose.getRotation()
-    ));
-
-    feed();
   }
 
   /**
@@ -223,9 +132,6 @@ public class SwerveDrive extends MotorSafety {
 
   /** @return the robot's estimated location */
   public Pose2d getPose() {return odometry.getEstimatedPosition();}
-
-  /** @return {@code true} if trajectory following and near desired location */
-  public boolean atReference() {return locationControl && m_controller.atReference();}
 
   /** @return the drivetrain's desired velocities */
   public ChassisSpeeds getDesiredSpeeds() {return kinematics.toChassisSpeeds(desiredStates);}
