@@ -11,17 +11,13 @@ import edu.wpi.first.math.controller.PIDController;
 import frc.robot.logger.LoggedSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import com.ctre.phoenix.sensors.CANCoder;
-import com.ctre.phoenix.sensors.AbsoluteSensorRange;
-import com.ctre.phoenix.sensors.SensorInitializationStrategy;
-import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
+import frc.robot.logger.LoggedCANCoder;
 
 /** Controls a single swerve module. */
 public class SwerveModule {
   private final LoggedSparkMax drive_motor;
   private final LoggedSparkMax angle_motor;
-  private final CANCoder cancoder;
-  private final double cancoderOffset;
+  private final LoggedCANCoder cancoder;
 
   private final PIDController speed_controller;
   private final PIDController angle_controller;
@@ -29,16 +25,9 @@ public class SwerveModule {
   protected SwerveModule(SwerveModuleConstants constants) {
     drive_motor = new LoggedSparkMax(constants.drive_ID, MotorType.kBrushless, constants.directory + "/drive/");
     angle_motor = new LoggedSparkMax(constants.angle_ID, MotorType.kBrushless, constants.directory + "/angle/");
-    cancoder = new CANCoder(constants.cancoder_ID);
-    cancoderOffset = constants.cancoderOffset;
+    cancoder = new LoggedCANCoder(constants.cancoder_ID, constants.directory, constants.cancoderOffset);
     speed_controller = constants.speed_controller;
     angle_controller = constants.angle_controller;
-
-    // Set up cancoder
-    cancoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360); // Set range [0..360]
-    cancoder.configSensorDirection(false); // Set counterclockwise
-    cancoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition); // Set absolute
-    cancoder.configVelocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_20Ms);
 
     // Set up drive encoder units
     drive_motor.encoder.setPositionConversionFactor(PhysConsts.kSwerveWheelGearbox * PhysConsts.kSwerveWheelCircumferenceMeters); // UNIT: meters
@@ -90,7 +79,7 @@ public class SwerveModule {
 
   /** @return the angle of the module (UNIT: ccw degrees) */
   public double getAngle() {
-    return cancoder.getPosition() + cancoderOffset;
+    return cancoder.getPosition();
   }
 
   /** @return the velocity of the module (UNIT: meters/s) */
