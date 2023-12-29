@@ -26,7 +26,7 @@ public class LoggedCANCoder implements Loggable {
     cancoder.configSensorDirection(false); // Set counterclockwise
     cancoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360); // Set output range [0,360)
     cancoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToZero); // Set position offset to start at 0
-    cancoder.configVelocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_20Ms); // Measurement period should coincide with robot update period
+    cancoder.configVelocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_20Ms); // Measurement period should be consistent with robot update period
 
     // Register for periodic logging
     this.directory = directory;
