@@ -23,9 +23,11 @@ public class ExampleStateSubsystem extends StateSubsystem<ExampleStateSubsystem.
   public void periodic() {
     switch (getState()) {
       case FAST:
-        System.out.println(getName() + " is fast");
+        Logger.log(getName() + " is fast");
+        break;
       case SLOW:
-        System.out.println(getName() + " is slow");
+        Logger.log(getName() + " is slow");
+        break;
       default:
         stop();
     }
@@ -33,7 +35,7 @@ public class ExampleStateSubsystem extends StateSubsystem<ExampleStateSubsystem.
 
   @Override
   public void log() {
-    Logger.recordOutput(getDirectory()+"state", getState().getClass().getSimpleName());
+    Logger.recordOutput(getDirectory()+"state", getState().toString());
   }
 
   @Override
