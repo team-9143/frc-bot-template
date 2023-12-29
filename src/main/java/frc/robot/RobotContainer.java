@@ -62,16 +62,15 @@ public class RobotContainer {
   }
 
   private static void configureDriver() {
-    // Button 'X' (debounced 0.5s) will reset gyro
+    // Button 'X' (debounced 0.5s) will reset heading
     final var cRumble = OI.DRIVER_CONTROLLER.getRumbleCommand(0.5, 0.5, 0.25);
     new Trigger(() -> OI.DRIVER_CONTROLLER.getButton(btn.X))
     .debounce(0.3) // Wait 0.3s to avoid accidental press
       .onTrue(new InstantCommand(() -> {
-        OI.PIGEON2.setYaw(0); // Reset gyro
-        // Reset odometry to match gyro
+        // Reset odometry so that forward is away from the driver station
         Drivetrain.getInstance().resetOdometry(
           new Pose2d(Drivetrain.getInstance().getPose().getTranslation(), new Rotation2d(0)));
-        cRumble.schedule(); // Rumble to indicate event
+        cRumble.schedule(); // Rumble to indicate odometry has been reset
       }));
 
     // Button 'Y' (hold) will set drivetrain to x-stance (for stability)
