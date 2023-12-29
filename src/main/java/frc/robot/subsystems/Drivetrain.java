@@ -85,15 +85,6 @@ public class Drivetrain extends SafeSubsystem {
     m_swerve.setDesiredVelocity(forward, left, ccw);
   }
 
-  /**
-   * Drive directly to a position and stop, relative to the odometry. Not for trajectory following. Must be continuously called.
-   *
-   * @param targetPoseMetersCCW robot pose relative to the odometry (UNIT: meters, ccw native angle)
-   */
-  public void driveTargetPose(Pose2d targetPoseMetersCCW) {
-    m_swerve.setDesiredPose(targetPoseMetersCCW);
-  }
-
   /** Set the drivetrain to x-stance for traction. Must be continuously called. */
   public void toXStance() {
     m_swerve.setDesiredStates(
@@ -116,9 +107,6 @@ public class Drivetrain extends SafeSubsystem {
   /** @return the robot's estimated location */
   public Pose2d getPose() {return m_swerve.getPose();}
 
-  /** @return {@code true} if trajectory following and near desired location */
-  public boolean atReference() {return m_swerve.atReference();}
-
   /** @return the drivetrain's desired velocities */
   public ChassisSpeeds getDesiredSpeeds() {return m_swerve.getDesiredSpeeds();}
 
@@ -140,8 +128,6 @@ public class Drivetrain extends SafeSubsystem {
 
     Logger.recordOutput(getDirectory()+"measuredSpeeds", getMeasuredSpeeds());
     Logger.recordOutput(getDirectory()+"desiredSpeeds", getDesiredSpeeds());
-
-    Logger.recordOutput(getDirectory()+"atReference", atReference());
 
     Logger.recordOutput(getDirectory()+"3dPosition",
       new Pose3d(getPose().getX(), getPose().getY(), 0, // Height always set to 0

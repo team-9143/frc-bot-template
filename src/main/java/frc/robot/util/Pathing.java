@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
 
+/** Utility class for loading, generating, following, and logging paths through PathPlanner. PID controllers are initialized at runtime so that TunableNumbers can take effect. */
 public class Pathing {
   private static final String PATH_LOG_DIR = "/pathplanner/";
 
@@ -32,15 +33,6 @@ public class Pathing {
       speeds -> Logger.recordOutput(PATH_LOG_DIR+"setpointSpeeds", speeds), // Log setpoint velocities during command run
       null // Don't need to log error
     );
-  }
-
-  /** Utility method to retrieve a straight-line pose targeting command.
-   *
-   * @param desiredPoseMetersCCW robot pose relative to the same origin as the odometry (UNIT: meters, ccw native angle)
-   * @return the command
-   */
-  public static Command getDirectMoveCommand(Pose2d desiredPoseMetersCCW) {
-    return Drivetrain.getInstance().run(() -> Drivetrain.getInstance().driveTargetPose(desiredPoseMetersCCW));
   }
 
   /**
