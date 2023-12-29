@@ -17,13 +17,14 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
+import java.util.List;
 
 /** Utility class for loading, generating, following, and logging paths through PathPlanner. PID controllers are initialized at runtime so that TunableNumbers can take effect. */
 public class Pathing {
   private static final String PATH_LOG_DIR = "/pathplanner/";
 
   /** Costraints for accurately generating and following paths */
-  private static final PathConstraints constraints = new PathConstraints(DriveConsts.kMaxWheelVelMetersPerSecond, DriveConsts.kMaxLinearAccelMetersPerSecondSquared);
+  private static final PathConstraints default_constraints = new PathConstraints(DriveConsts.kMaxWheelVelMetersPerSecond, DriveConsts.kMaxLinearAccelMetersPerSecondSquared);
 
   // Set up logging for basic path following
   static {
@@ -36,23 +37,52 @@ public class Pathing {
   }
 
   /**
-   * Load a pathplanner path, constrained by maximum robot velocity and controlled acceleration.
+   * Load a pathplanner path, constrained by given maximum velocity and acceleration.
    *
    * @param name name of the path file under [deploy/pathplanner/], omitting ".path"
-   * @return the path as a PathPlannerTrajectory
+   * @param maxVelMetersPerSecond max velocity along the path. Paths will not exceed the maximum velocity of the robot.
+   * @param maxAccelMetersPerSecondPerSecond max acceleration along the path. Use {@code Double.POSITIVE_INFINITY} for immediate starts and stops.
    */
-  public static PathPlannerTrajectory loadPath(String name) {
-    return PathPlanner.loadPath(name, constraints);
+  public static PathPlannerTrajectory loadPath(String name, double maxVelMetersPerSecond, double maxAccelMetersPerSecondPerSecond) {
+    return PathPlanner.loadPath(name, Math.min(maxVelMetersPerSecond, default_constraints.maxVelocity), maxAccelMetersPerSecondPerSecond);
   }
 
   /**
-   * Create a pathplanner path, constrained by given velocity and acceleration.
+   * Load a pathplanner path, constrained by the default maximum velocity and acceleration.
+   *
+   * @param name name of the path file under [deploy/pathplanner/], omitting ".path"
+   */
+  public static PathPlannerTrajectory loadPath(String name) {
+    return loadPath(name, default_constraints.maxVelocity, default_constraints.maxAcceleration);
+  }
+
+  /**
+   * Load a pathplanner path, separated into a list by stop events, constrained by the default maximum velocity and acceleration.
+   *
+   * @param name name of the path file under [deploy/pathplanner/], omitting ".path"
+   * @param maxVelMetersPerSecond max velocity along the path. Paths will not exceed the maximum velocity of the robot.
+   * @param maxAccelMetersPerSecondPerSecond max acceleration along the path. Use {@code Double.POSITIVE_INFINITY} for immediate starts and stops.
+   */
+  public static List<PathPlannerTrajectory> loadPathGroup(String name, double maxVelMetersPerSecond, double maxAccelMetersPerSecondPerSecond) {
+    return PathPlanner.loadPathGroup(name, Math.min(maxVelMetersPerSecond, default_constraints.maxVelocity), maxAccelMetersPerSecondPerSecond);
+  }
+
+  /**
+   * Load a pathplanner path, separated into a list by stop events, constrained by the default maximum velocity and acceleration.
+   *
+   * @param name name of the path file under [deploy/pathplanner/], omitting ".path"
+   */
+  public static List<PathPlannerTrajectory> loadPathGroup(String name) {
+    return loadPathGroup(name, default_constraints.maxVelocity, default_constraints.maxAcceleration);
+  }
+
+  /**
+   * Create a pathplanner path, constrained by given maximum velocity and acceleration.
    *
    * @param startPoseMetersCCW starting position for the command
    * @param endPoseMetersCCW ending position for the command
    * @param maxVelMetersPerSecond max velocity along the path. Paths will not exceed the maximum velocity of the robot.
-   * @param maxAccelMetersPerSecondPerSecond max acceleration along the path. Use {@link Double.POSITIVE_INFINITY} for instant starts and stops.
-   * @return the path as a PathPlannerTrajectory
+   * @param maxAccelMetersPerSecondPerSecond max acceleration along the path. Use {@code Double.POSITIVE_INFINITY} for immediate starts and stops.
    */
   public static PathPlannerTrajectory createDirectPath(Pose2d startPoseMetersCCW, Pose2d endPoseMetersCCW, double maxVelMetersPerSecond, double maxAccelMetersPerSecondPerSecond) {
     // Find the angle between the poses for heading calculation
@@ -64,25 +94,23 @@ public class Pathing {
     PathPoint last = new PathPoint(endPoseMetersCCW.getTranslation(), relativeAngle, endPoseMetersCCW.getRotation());
 
     // Generate the path with the constraints provided (velocity cannot exceed maximum robot velocity)
-    return PathPlanner.generatePath(new PathConstraints(Math.min(maxVelMetersPerSecond, constraints.maxVelocity), maxAccelMetersPerSecondPerSecond), first, last);
+    return PathPlanner.generatePath(new PathConstraints(Math.min(maxVelMetersPerSecond, default_constraints.maxVelocity), maxAccelMetersPerSecondPerSecond), first, last);
   }
 
   /**
-   * Create a pathplanner path. constrained by maximum robot velocity and controlled acceleration.
+   * Create a pathplanner path, constrained by the default maximum velocity and acceleration.
    *
    * @param startPoseMetersCCW starting position for the command
    * @param endPoseMetersCCW ending position for the command
-   * @return the path as a PathPlannerTrajectory
    */
   public static PathPlannerTrajectory createDirectPath(Pose2d startPoseMetersCCW, Pose2d endPoseMetersCCW) {
-    return createDirectPath(startPoseMetersCCW, endPoseMetersCCW, constraints.maxVelocity, constraints.maxAcceleration);
+    return createDirectPath(startPoseMetersCCW, endPoseMetersCCW, default_constraints.maxVelocity, default_constraints.maxAcceleration);
   }
 
   /**
-   * Follow a pathplanner path, constrained by maximum robot velocity and controlled acceleration. Logs everything on command run through Logger.
+   * Create a command to follow a pathplanner path. Logs everything through the Logger during the command run.
    *
    * @param path the pathplanner path to follow
-   * @return the command
    */
   public static Command getFollowPathplannerCommand(PathPlannerTrajectory path) {
     return new PPSwerveControllerCommand(
@@ -98,13 +126,14 @@ public class Pathing {
   }
 
   /**
-   * Create a complete autonomous command group, constrained by maximum robot velocity and controlled acceleration. This will reset the robot pose at the begininng of the first path, follow paths, trigger events during path following, and run commands between paths with stop events.
+   * Create a complete autonomous PathPlanner-based command group. This will reset the odometry at the begininng of the first path, follow paths, trigger events during path following, and run commands between paths with stop events.
    *
-   * @param name name of the path file under [deploy/pathplanner/], omitting ".path"
+   * <p> Inserting disconnected paths in the list allows for stop events that move the position of the robot separately from the pathplanner control. </p>
+   *
+   * @param paths PathPlanner paths to follow
    * @param events String-Command map of named commands to run at events. Names may be reused for multiple events. Commands that run at stop events may require the drivetrain, but no others should.
-   * @return the command
    */
-  public static Command getFollowPathplannerWithEventsCommand(String name, Map<String, Command> events) {
+  public static Command getFollowPathplannerWithEventsCommand(List<PathPlannerTrajectory> paths, Map<String, Command> events) {
     var builder = new SwerveAutoBuilder(
       Drivetrain.getInstance()::getPose, // Pose supplier
       Drivetrain.getInstance()::resetOdometry, // Pose consumer to set the odometry to the start of the path
@@ -116,7 +145,6 @@ public class Pathing {
       Drivetrain.getInstance() // Subsystem requirements
     );
 
-    // Load and compute path
-    return builder.fullAuto(PathPlanner.loadPathGroup(name, constraints));
+    return builder.fullAuto(paths);
   }
 }
