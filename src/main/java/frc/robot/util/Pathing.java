@@ -23,7 +23,7 @@ import java.util.List;
 public class Pathing {
   private static final String PATH_LOG_DIR = "/pathplanner/";
 
-  /** Costraints for accurately generating and following paths */
+  /** Default constraints for accurately generating and following paths */
   private static final PathConstraints default_constraints = new PathConstraints(DriveConsts.kMaxWheelVelMetersPerSecond, DriveConsts.kMaxLinearAccelMetersPerSecondSquared);
 
   // Set up logging for basic path following
@@ -35,6 +35,12 @@ public class Pathing {
       null // Don't need to log error
     );
   }
+
+  /******
+   *
+   * Path loading and generation
+   *
+   ******/
 
   /**
    * Load a pathplanner path, constrained by given maximum velocity and acceleration.
@@ -84,7 +90,7 @@ public class Pathing {
    * @param maxVelMetersPerSecond max velocity along the path. Paths will not exceed the maximum velocity of the robot.
    * @param maxAccelMetersPerSecondPerSecond max acceleration along the path. Use {@code Double.POSITIVE_INFINITY} for immediate starts and stops.
    */
-  public static PathPlannerTrajectory createDirectPath(Pose2d startPoseMetersCCW, Pose2d endPoseMetersCCW, double maxVelMetersPerSecond, double maxAccelMetersPerSecondPerSecond) {
+  public static PathPlannerTrajectory generateDirectPath(Pose2d startPoseMetersCCW, Pose2d endPoseMetersCCW, double maxVelMetersPerSecond, double maxAccelMetersPerSecondPerSecond) {
     // Find the angle between the poses for heading calculation
     Pose2d relativePose = endPoseMetersCCW.relativeTo(startPoseMetersCCW);
     Rotation2d relativeAngle = new Rotation2d(relativePose.getX(), relativePose.getY());
@@ -103,9 +109,15 @@ public class Pathing {
    * @param startPoseMetersCCW starting position for the command
    * @param endPoseMetersCCW ending position for the command
    */
-  public static PathPlannerTrajectory createDirectPath(Pose2d startPoseMetersCCW, Pose2d endPoseMetersCCW) {
-    return createDirectPath(startPoseMetersCCW, endPoseMetersCCW, default_constraints.maxVelocity, default_constraints.maxAcceleration);
+  public static PathPlannerTrajectory generateDirectPath(Pose2d startPoseMetersCCW, Pose2d endPoseMetersCCW) {
+    return generateDirectPath(startPoseMetersCCW, endPoseMetersCCW, default_constraints.maxVelocity, default_constraints.maxAcceleration);
   }
+
+  /******
+   *
+   * Path following
+   *
+   ******/
 
   /**
    * Create a command to follow a pathplanner path. Logs everything through the Logger during the command run.
