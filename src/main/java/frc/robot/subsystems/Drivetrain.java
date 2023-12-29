@@ -131,7 +131,7 @@ public class Drivetrain extends SafeSubsystem {
 
     Logger.recordOutput(getDirectory()+"3dPosition",
       new Pose3d(getPose().getX(), getPose().getY(), 0, // Height always set to 0
-      new Rotation3d(Math.toRadians(OI.PIGEON2.getRoll()), Math.toRadians(OI.PIGEON2.getPitch()), getPose().getRotation().getRadians())));
+      new Rotation3d(Math.toRadians(OI.IMU.getRoll()), Math.toRadians(OI.IMU.getPitch()), getPose().getRotation().getRadians())));
   }
 
   @Override
