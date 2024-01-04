@@ -37,6 +37,6 @@ public class LoggedSparkMax extends CANSparkMax implements Loggable {
     Logger.recordOutput(getDirectory()+"percentOut", this.get());
     Logger.recordOutput(getDirectory()+"speedRPM", encoder.getVelocity() / encoder.getVelocityConversionFactor());
     Logger.recordOutput(getDirectory()+"totalRotations", encoder.getPosition() / encoder.getPositionConversionFactor());
-    Logger.recordOutput(getDirectory()+"tempCelsius", this.getMotorTemperature());
+    Logger.recordOutput(getDirectory()+"motorTempCelsius", this.getMotorTemperature());
   }
 }

@@ -73,12 +73,13 @@ public class LoggedCANCoder implements Loggable {
   }
 
   /**
-   * Get the offset position of the sensor, which remains constant through a power cycle. Affected by the position offset. UNIT: ccw degrees
+   * Get the offset position of the sensor, which remains constant through a power cycle. Affected by the position offset. UNIT: ccw degrees, range [0, 360)
    *
    * @return The offset position of the sensor.
    */
   public double getPosition() {
-    return cancoder.getAbsolutePosition() + offset;
+    // Add the offset and then ensure the range binding remains stable
+    return (cancoder.getAbsolutePosition() + offset + 360) % 360;
   }
 
   /**
@@ -106,7 +107,6 @@ public class LoggedCANCoder implements Loggable {
 
   @Override
   public void log() {
-    Logger.recordOutput(getDirectory()+"absoluteDegCCW", this.getAbsolutePosition());
     Logger.recordOutput(getDirectory()+"offsetDegCCW", this.getPosition());
     Logger.recordOutput(getDirectory()+"velocityDegPerSecondCCW", this.getVelocity());
     Logger.recordOutput(getDirectory()+"totalDegCCW", this.getTravel());
