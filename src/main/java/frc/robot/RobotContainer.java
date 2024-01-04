@@ -2,7 +2,6 @@ package frc.robot;
 
 import frc.robot.logger.Logger;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -10,6 +9,8 @@ import java.time.format.DateTimeFormatter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Pose2d;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.logger.LoggedPowerDistribution;
 import frc.robot.devices.OI;
 import frc.robot.devices.Controller.btn;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -46,6 +47,7 @@ public class RobotContainer {
   /** Initialize OI devices. */
   private static void configureOI() {
     DriverStation.silenceJoystickConnectionWarning(true); // Stop those ridiculously persistent messages
+    new LoggedPowerDistribution(); // Resource leak here is unwarranted, object remains referenced and used within the loggable system
   }
 
   /** Create button bindings. */
