@@ -2,7 +2,6 @@ package frc.robot;
 
 import frc.robot.logger.Logger;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -10,6 +9,8 @@ import java.time.format.DateTimeFormatter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Pose2d;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.logger.LoggedPowerDistribution;
 import frc.robot.devices.OI;
 import frc.robot.devices.Controller.btn;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -25,6 +26,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 public class RobotContainer {
   private static boolean m_initialized = false;
 
+  private static LoggedPowerDistribution powerDist;
+
   /** Initialize robot container. */
   public static void init() {
     if (m_initialized == true) {
@@ -32,8 +35,8 @@ public class RobotContainer {
     }
     m_initialized = true;
 
-    configureMetadata();
     configureOI();
+    configureMetadata();
     configureBindings();
   }
 
@@ -41,10 +44,12 @@ public class RobotContainer {
   private static void configureMetadata() {
     Logger.recordMetadata("RoborioSerialNum", RobotBase.isReal() ? System.getenv("serialnum") : "Simulation");
     Logger.recordMetadata("BuildDate", LocalDateTime.now(ZoneId.of("UTC-8")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+    Logger.recordMetadata("PowerDistributionType", powerDist.getType().name());
   }
 
   /** Initialize OI devices. */
   private static void configureOI() {
+    powerDist = new LoggedPowerDistribution();
     DriverStation.silenceJoystickConnectionWarning(true); // Stop those ridiculously persistent messages
   }
 
