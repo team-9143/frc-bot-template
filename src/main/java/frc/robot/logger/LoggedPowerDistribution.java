@@ -30,10 +30,11 @@ public class LoggedPowerDistribution extends PowerDistribution implements Loggab
   @Override
   public void log() {
     Logger.recordOutput(getDirectory()+"inputVoltage", this.getVoltage());
+    Logger.recordOutput(getDirectory()+"totalEnergyJoules", this.getTotalEnergy());
 
     // Log the output current for each channel on the power distribution device
     for (int i = 0; i < this.getNumChannels(); i++) {
-      Logger.recordOutput(getDirectory()+"outputCurrent/"+i, this.getCurrent(i));
+      Logger.recordOutput(getDirectory()+"outputCurrentAmps/"+i, this.getCurrent(i));
     }
 
     // Log any new faults
