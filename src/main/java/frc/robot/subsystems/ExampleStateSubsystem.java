@@ -35,7 +35,7 @@ public class ExampleStateSubsystem extends StateSubsystem<ExampleStateSubsystem.
 
   @Override
   public void log() {
-    Logger.recordOutput(getDirectory()+"state", getState().toString());
+    Logger.recordOutput(getDirectory()+"state", getState().name());
   }
 
   @Override
