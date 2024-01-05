@@ -26,6 +26,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 public class RobotContainer {
   private static boolean m_initialized = false;
 
+  private static LoggedPowerDistribution powerDist;
+
   /** Initialize robot container. */
   public static void init() {
     if (m_initialized == true) {
@@ -33,8 +35,8 @@ public class RobotContainer {
     }
     m_initialized = true;
 
-    configureMetadata();
     configureOI();
+    configureMetadata();
     configureBindings();
   }
 
@@ -42,12 +44,13 @@ public class RobotContainer {
   private static void configureMetadata() {
     Logger.recordMetadata("RoborioSerialNum", RobotBase.isReal() ? System.getenv("serialnum") : "Simulation");
     Logger.recordMetadata("BuildDate", LocalDateTime.now(ZoneId.of("UTC-8")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+    Logger.recordMetadata("PowerDistributionType", powerDist.getType().name());
   }
 
   /** Initialize OI devices. */
   private static void configureOI() {
+    powerDist = new LoggedPowerDistribution();
     DriverStation.silenceJoystickConnectionWarning(true); // Stop those ridiculously persistent messages
-    new LoggedPowerDistribution(); // Resource leak here is unwarranted, object remains referenced and used within the loggable system
   }
 
   /** Create button bindings. */
