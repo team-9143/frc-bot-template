@@ -3,7 +3,7 @@ package frc.robot.devices;
 import com.ctre.phoenix.sensors.Pigeon2;
 
 /**
- * This class is meant to remove much of the functionality of the Pigeon2 so that data cannot be set by unauthorized code. If new data needs to be available, wrapper methods may be added easily. This class does not implement the Loggable interface because IMU logging should be done by the subsystem it is associated with (usually, the drivetrain).
+ * This class is meant to remove much of the functionality of the Pigeon2 so that data cannot be set by unauthorized code. If new data needs to be available, wrapper methods may be added easily. This class does not implement the Loggable interface because IMU logging should be done by the subsystem it is associated with (usually, the drivetrain). Additionally, the constructor is able to clearly set the orientation of the IMU for standardized use across robots.
  * <p> Roll should increase to robot-right, pitch to robot-front, and yaw counter-clockwise. </p>
 */
 public class SimplifiedPigeon2 {
