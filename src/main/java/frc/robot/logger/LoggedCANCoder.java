@@ -1,16 +1,23 @@
 package frc.robot.logger;
 
-import com.ctre.phoenix.sensors.CANCoder;
-import com.ctre.phoenix.sensors.AbsoluteSensorRange;
-import com.ctre.phoenix.sensors.SensorInitializationStrategy;
-import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
+import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
+
+import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 /** CANCoder interface class with logging functionality. Many configuration parameters have been removed for constant units, but an offset has been added. */
 public class LoggedCANCoder implements Loggable {
   private static final String LOG_DIR = "/cancoders/";
   public final String directory;
 
-  private final CANCoder cancoder;
+  private final CANcoder cancoder;
+  private static final CANcoderConfiguration config = new CANcoderConfiguration()
+    .withMagnetSensor(new MagnetSensorConfigs()
+      .withAbsoluteSensorRange(AbsoluteSensorRangeValue.Unsigned_0To1)
+      .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive));
 
   private double offset;
 
@@ -21,12 +28,9 @@ public class LoggedCANCoder implements Loggable {
    * @param directory sub-directory where data will be logged (with trailing slash)
    */
   public LoggedCANCoder(int deviceId, String directory) {
-    // Set up cancoder
-    cancoder = new CANCoder(deviceId);
-    cancoder.configSensorDirection(false); // Set counterclockwise
-    cancoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360); // Set output range [0,360)
-    cancoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToZero); // Set position offset to start at 0
-    cancoder.configVelocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_20Ms); // Measurement period should be consistent with robot update period
+    // Configure cancoder
+    cancoder = new CANcoder(deviceId);
+    cancoder.getConfigurator().apply(config);
 
     // Register for periodic logging
     this.directory = directory;
