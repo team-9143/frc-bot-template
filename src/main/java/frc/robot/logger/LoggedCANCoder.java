@@ -55,7 +55,7 @@ public class LoggedCANCoder implements Loggable {
    * @return The position of the sensor.
    */
   public double getAbsolutePosition() {
-    return cancoder.getAbsolutePosition();
+    return cancoder.getAbsolutePosition().getValueAsDouble();
   }
 
   /**
@@ -83,7 +83,7 @@ public class LoggedCANCoder implements Loggable {
    */
   public double getPosition() {
     // Add the offset and then ensure the range binding remains stable
-    return (cancoder.getAbsolutePosition() + offset + 360) % 360;
+    return (cancoder.getAbsolutePosition().getValueAsDouble() + offset + 360) % 360;
   }
 
   /**
@@ -92,7 +92,7 @@ public class LoggedCANCoder implements Loggable {
    * @return The distance of the sensor.
    */
   public double getTravel() {
-    return cancoder.getPosition();
+    return cancoder.getPosition().getValueAsDouble();
   }
 
   /**
@@ -101,7 +101,7 @@ public class LoggedCANCoder implements Loggable {
    * @return The velocity of the sensor.
    */
   public double getVelocity() {
-    return cancoder.getVelocity();
+    return cancoder.getVelocity().getValueAsDouble();
   }
 
   @Override

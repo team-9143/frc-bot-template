@@ -4,19 +4,21 @@ import frc.robot.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.logger.Logger;
 
-import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.PathPlannerTrajectory;
+import com.pathplanner.lib.path.PathPoint;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
+import com.pathplanner.lib.auto.AutoBuilder;
 
 import frc.robot.Constants.DriveConsts;
 import java.util.Map;
-import com.pathplanner.lib.auto.PIDConstants;
+import com.pathplanner.lib.util.PIDConstants;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPoint;
 import java.util.List;
 
 /** Utility class for loading, generating, following, and logging paths through PathPlanner. PID controllers are initialized at runtime so that TunableNumbers can take effect. */
@@ -24,7 +26,7 @@ public class Pathing {
   private static final String PATH_LOG_DIR = "/pathplanner/";
 
   /** Default constraints for accurately generating and following paths */
-  private static final PathConstraints default_constraints = new PathConstraints(DriveConsts.kMaxWheelVelMetersPerSecond, DriveConsts.kMaxLinearAccelMetersPerSecondSquared);
+  private static final PathConstraints default_constraints = new PathConstraints(DriveConsts.kMaxWheelVelMetersPerSecond, DriveConsts.kMaxLinearAccelMetersPerSecondSquared, 0, 0); //Need new constraints
 
   // Set up logging for basic path following
   static {
@@ -49,17 +51,21 @@ public class Pathing {
    * @param maxVelMetersPerSecond max velocity along the path. Paths will not exceed the maximum velocity of the robot.
    * @param maxAccelMetersPerSecondPerSecond max acceleration along the path. Use {@code Double.POSITIVE_INFINITY} for immediate starts and stops.
    */
-  public static PathPlannerTrajectory loadPath(String name, double maxVelMetersPerSecond, double maxAccelMetersPerSecondPerSecond) {
-    return PathPlanner.loadPath(name, Math.min(maxVelMetersPerSecond, default_constraints.maxVelocity), maxAccelMetersPerSecondPerSecond);
-  }
+    /*DOES NOT WORK */
+  // public static PathPlannerTrajectory loadPath(String name, double maxVelMetersPerSecond, double maxAccelMetersPerSecondPerSecond) {
+  //   return PathPlannerPath.(name, Math.min(maxVelMetersPerSecond, default_constraints.getMaxVelocityMps()), maxAccelMetersPerSecondPerSecond);
+  // }
 
   /**
    * Load a pathplanner path, constrained by the default maximum velocity and acceleration.
    *
    * @param name name of the path file under [deploy/pathplanner/], omitting ".path"
    */
-  public static PathPlannerTrajectory loadPath(String name) {
-    return loadPath(name, default_constraints.maxVelocity, default_constraints.maxAcceleration);
+  // public static PathPlannerTrajectory loadPath(String name) {
+  //   return loadPath(name, default_constraints.getMaxVelocityMps(), default_constraints.getMaxAccelerationMpsSq());
+  // }
+  public static PathPlannerPath loadPath(String name) {
+    return loadPath(name);
   }
 
   /**
@@ -146,7 +152,7 @@ public class Pathing {
    * @param events String-Command map of named commands to run at events. Names may be reused for multiple events. Commands that run at stop events may require the drivetrain, but no others should.
    */
   public static Command getFollowPathplannerWithEventsCommand(List<PathPlannerTrajectory> paths, Map<String, Command> events) {
-    var builder = new SwerveAutoBuilder(
+    var builder = new AutoBuilder();//new AutoBuilder( 
       Drivetrain.getInstance()::getPose, // Pose supplier
       Drivetrain.getInstance()::resetOdometry, // Pose consumer to set the odometry to the start of the path
       new PIDConstants(DriveConsts.kTranslateP.getAsDouble(), DriveConsts.kTranslateI.getAsDouble(), DriveConsts.kTranslateD.getAsDouble()), // Translation controller for position error -> velocity

@@ -1,6 +1,6 @@
 package frc.robot.devices;
 
-import com.ctre.phoenix.sensors.Pigeon2;
+import com.ctre.phoenix6.hardware.Pigeon2;
 
 /**
  * This class is meant to remove much of the functionality of the Pigeon2 so that data cannot be set by unauthorized code. If new data needs to be available, wrapper methods may be added easily. This class does not implement the Loggable interface because IMU logging should be done by the subsystem it is associated with (usually, the drivetrain). Additionally, the constructor is able to clearly set the orientation of the IMU for standardized use across robots.
@@ -31,7 +31,7 @@ public class SimplifiedPigeon2 {
     this.swapPitchAndRoll = swapPitchAndRoll;
 
     // Set up the mount pose and reset the yaw
-    PIGEON2.configMountPose(0, pitchOffset, rollOffset);
+    //PIGEON2.configMountPose(0, pitchOffset, rollOffset); HMMMMM
     PIGEON2.setYaw(0);
   }
 
@@ -48,22 +48,22 @@ public class SimplifiedPigeon2 {
 
   /** @return IMU yaw, counter-clockwise positive. If this IMU is being used for odometry, use the odometry heading instead of this method to avoid conflicting data due to odometry pose resets */
   public double getYaw() {
-    return PIGEON2.getYaw();
+    return PIGEON2.getYaw().getValueAsDouble();
   }
 
   /** @return IMU pitch, robot-front positive */
   public double getPitch() {
     if (swapPitchAndRoll) {
-      return invertPitch ? PIGEON2.getRoll() * -1 : PIGEON2.getRoll(); // Invert the role if needed
+      return invertPitch ? PIGEON2.getRoll().getValueAsDouble() * -1 : PIGEON2.getRoll().getValueAsDouble(); // Invert the role if needed
     }
-    return invertPitch ? PIGEON2.getPitch() * -1 : PIGEON2.getPitch();
+    return invertPitch ? PIGEON2.getPitch().getValueAsDouble() * -1 : PIGEON2.getPitch().getValueAsDouble();
   }
 
   /** @return IMU roll, robot-right positive */
   public double getRoll() {
     if (swapPitchAndRoll) {
-      return invertRoll ? PIGEON2.getPitch() * -1 : PIGEON2.getPitch();
+      return invertRoll ? PIGEON2.getPitch().getValueAsDouble() * -1 : PIGEON2.getPitch().getValueAsDouble();
     }
-    return invertRoll ? PIGEON2.getRoll() * -1 : PIGEON2.getRoll();
+    return invertRoll ? PIGEON2.getRoll().getValueAsDouble() * -1 : PIGEON2.getRoll().getValueAsDouble();
   }
 }
