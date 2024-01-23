@@ -9,7 +9,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.controller.PIDController;
 
 import frc.robot.logger.LoggedSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+//import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import frc.robot.logger.LoggedCANCoder;
 
