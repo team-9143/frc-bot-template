@@ -5,15 +5,16 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.logger.Logger;
 
 import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
+//import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPlannerTrajectory;
 import com.pathplanner.lib.path.PathPoint;
-import com.pathplanner.lib.commands.PPSwerveControllerCommand;
+import com.pathplanner.lib.commands.FollowPathHolonomic;
+//import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
-import com.pathplanner.lib.auto.SwerveAutoBuilder;
+//import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import frc.robot.Constants.DriveConsts;
@@ -21,11 +22,14 @@ import java.util.Map;
 
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
+
+import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 
+import java.nio.file.Path;
 import java.util.List;
 
 /** Utility class for loading, generating, following, and logging paths through PathPlanner. PID controllers are initialized at runtime so that TunableNumbers can take effect. */
@@ -37,13 +41,7 @@ public class Pathing {
 
   // Set up logging for basic path following
   static {
-    PathPlannerLogging.setLogActivePathCallback(      
-      traj -> Logger.recordOutput(PATH_LOG_DIR+"trajectory", traj.getStates().stream().map(state -> state.poseMeters).toArray(Pose2d[]::new)), // Log trajectory on command initialization
-    pose -> Logger.recordOutput(PATH_LOG_DIR+"referencePose", pose), // Log reference pose during command run
-    speeds -> Logger.recordOutput(PATH_LOG_DIR+"setpointSpeeds", speeds), // Log setpoint velocities during command run
-    null // Don't need to log error);
-    );
-
+    PathPlannerLogging.setLogCurrentPoseCallback(pose -> Logger.recordOutput(PATH_LOG_DIR+"referencePose", pose)); // Log reference pose during command run);
     // PPSwerveControllerCommand.setLoggingCallbacks(
     //   traj` -> Logger.recordOutput(PATH_LOG_DIR+"trajectory", traj.getStates().stream().map(state -> state.poseMeters).toArray(Pose2d[]::new)), // Log trajectory on command initialization
     //   pose -> Logger.recordOutput(PATH_LOG_DIR+"referencePose", pose), // Log reference pose during command run
@@ -80,6 +78,7 @@ public class Pathing {
   // }
   public static PathPlannerPath loadPath(String name) {
     return loadPath(name);
+    
   }
 
   /**
@@ -90,8 +89,11 @@ public class Pathing {
    * @param maxAccelMetersPerSecondPerSecond max acceleration along the path. Use {@code Double.POSITIVE_INFINITY} for immediate starts and stops.
    */
   public static List<PathPlannerTrajectory> loadPathGroup(String name, double maxVelMetersPerSecond, double maxAccelMetersPerSecondPerSecond) {
-    return 
-    return PathPlanner.loadPathGroup(name, Math.min(maxVelMetersPerSecond, default_constraints.maxVelocity), maxAccelMetersPerSecondPerSecond);
+    return loadPathGroup(name, Math.min(maxVelMetersPerSecond, default_constraints.getMaxVelocityMps()), maxAccelMetersPerSecondPerSecond);
+  }
+
+  public static Command loadPath(PathPlannerPath path){
+    return AutoBuilder.followPath(path);
   }
 
   /**
@@ -100,7 +102,7 @@ public class Pathing {
    * @param name name of the path file under [deploy/pathplanner/], omitting ".path"
    */
   public static List<PathPlannerTrajectory> loadPathGroup(String name) {
-    return loadPathGroup(name, default_constraints.maxVelocity, default_constraints.maxAcceleration);
+    return loadPathGroup(name, default_constraints.getMaxVelocityMps(), default_constraints.getMaxAccelerationMpsSq());
   }
 
   /**
@@ -117,11 +119,15 @@ public class Pathing {
     Rotation2d relativeAngle = new Rotation2d(relativePose.getX(), relativePose.getY());
 
     // Create the path points from the given poses and the calculated heading
-    PathPoint first = new PathPoint(startPoseMetersCCW.getTranslation(), relativeAngle, startPoseMetersCCW.getRotation());
-    PathPoint last = new PathPoint(endPoseMetersCCW.getTranslation(), relativeAngle, endPoseMetersCCW.getRotation());
+    //PathPoint first = new PathPoint(startPoseMetersCCW.getTranslation(), relativeAngle, startPoseMetersCCW.getRotation());
+    //PathPoint last = new PathPoint(endPoseMetersCCW.getTranslation(), relativeAngle, endPoseMetersCCW.getRotation());
+    Pose2d first = new Pose2d(startPoseMetersCCW.getTranslation(), startPoseMetersCCW.getRotation());
+    Pose2d last = new Pose2d(endPoseMetersCCW.getTranslation(), endPoseMetersCCW.getRotation());
+
 
     // Generate the path with the constraints provided (velocity cannot exceed maximum robot velocity)
-    return PathPlanner.generatePath(new PathConstraints(Math.min(maxVelMetersPerSecond, default_constraints.maxVelocity), maxAccelMetersPerSecondPerSecond), first, last);
+    //return PathPlanner.generatePath(new PathConstraints(Math.min(maxVelMetersPerSecond, default_constraints.getMaxVelocityMps()), maxAccelMetersPerSecondPerSecond), first, last);
+    return generateDirectPath(first, last, Math.min(maxVelMetersPerSecond, default_constraints.getMaxVelocityMps()), maxAccelMetersPerSecondPerSecond);
   }
 
   /**
@@ -131,7 +137,7 @@ public class Pathing {
    * @param endPoseMetersCCW ending position for the command
    */
   public static PathPlannerTrajectory generateDirectPath(Pose2d startPoseMetersCCW, Pose2d endPoseMetersCCW) {
-    return generateDirectPath(startPoseMetersCCW, endPoseMetersCCW, default_constraints.maxVelocity, default_constraints.maxAcceleration);
+    return generateDirectPath(startPoseMetersCCW, endPoseMetersCCW, default_constraints.getMaxVelocityMps(), default_constraints.getMaxAccelerationMpsSq());
   }
 
   /******
@@ -145,18 +151,19 @@ public class Pathing {
    *
    * @param path the pathplanner path to follow
    */
-  public static Command getFollowPathplannerCommand(PathPlannerTrajectory path) {
-    return new PPSwerveControllerCommand(
-      path, // Path to follow
-      Drivetrain.getInstance()::getPose, // Pose supplier
-      new PIDController(DriveConsts.kTranslateP.getAsDouble(), DriveConsts.kTranslateI.getAsDouble(), DriveConsts.kTranslateD.getAsDouble()), // Translation controller for position error -> velocity
-      new PIDController(DriveConsts.kTranslateP.getAsDouble(), DriveConsts.kTranslateI.getAsDouble(), DriveConsts.kTranslateD.getAsDouble()), // Translation controller for position error -> velocity
-      new PIDController(DriveConsts.kRotateP.getAsDouble(), DriveConsts.kRotateI.getAsDouble(), DriveConsts.kRotateD.getAsDouble()), // Rotation controller for angle error -> angular velocity
-      speeds -> Drivetrain.getInstance().driveFieldRelativeVelocity(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond), // Field-relative velocities consumer
-      true, // Whether to mirror path to match alliance
-      Drivetrain.getInstance() // Subsystem requirements
-    );
-  }
+  public static HolonomicDriveController getFollowPathplannerCommand(PathPlannerTrajectory path) {
+    // return new PPSwerveControllerCommand(
+    //   path, // Path to follow
+    //   Drivetrain.getInstance()::getPose, // Pose supplier
+    //   new PIDController(DriveConsts.kTranslateP.getAsDouble(), DriveConsts.kTranslateI.getAsDouble(), DriveConsts.kTranslateD.getAsDouble()), // Translation controller for position error -> velocity
+    //   new PIDController(DriveConsts.kTranslateP.getAsDouble(), DriveConsts.kTranslateI.getAsDouble(), DriveConsts.kTranslateD.getAsDouble()), // Translation controller for position error -> velocity
+    //   new PIDController(DriveConsts.kRotateP.getAsDouble(), DriveConsts.kRotateI.getAsDouble(), DriveConsts.kRotateD.getAsDouble()), // Rotation controller for angle error -> angular velocity
+    //   speeds -> Drivetrain.getInstance().driveFieldRelativeVelocity(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond), // Field-relative velocities consumer
+    //   true, // Whether to mirror path to match alliance
+    //   Drivetrain.getInstance() // Subsystem requirements
+    // );
+    return new FollowPathHolonomic(path, null, speeds -> Drivetrain.getInstance().driveFieldRelativeVelocity(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond), null, null, true, Drivetrain.getInstance());
+    }
 
   /**
    * Create a complete autonomous PathPlanner-based command group. This will reset the odometry at the begininng of the first path, follow paths, trigger events during path following, and run commands between paths with stop events.
@@ -182,29 +189,29 @@ public class Pathing {
   // }
   public static Command getFollowPathplannerWithEventsCommand(){
     AutoBuilder.configureHolonomic(
-                Drivetrain.getInstance()::getPose, // Pose supplier
-                Drivetrain.getInstance()::resetOdometry, // Pose consumer to set the odometry to the start
-                Drivetrain.getInstance()::getMeasuredSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-                speeds -> Drivetrain.getInstance().driveFieldRelativeVelocity(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond), // Field-relative velocities consumer
-                new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-                        new PIDConstants(DriveConsts.kTranslateP.getAsDouble(), DriveConsts.kTranslateI.getAsDouble(), DriveConsts.kTranslateD.getAsDouble()), // Translation controller for position error -> velocity
-                        new PIDConstants(DriveConsts.kRotateP.getAsDouble(), DriveConsts.kRotateI.getAsDouble(), DriveConsts.kRotateD.getAsDouble()), // Rotation controller for angle error -> angular velocity
-                        4.5, // Max module speed, in m/s
-                        0.4, // Drive base radius in meters. Distance from robot center to furthest module.
-                        new ReplanningConfig() // Default path replanning config. See the API for the options here
-                ),
-                () -> {
-                    // Boolean supplier that controls when the path will be mirrored for the red alliance
-                    // This will flip the path being followed to the red side of the field.
-                    // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+      Drivetrain.getInstance()::getPose, // Pose supplier
+      Drivetrain.getInstance()::resetOdometry, // Pose consumer to set the odometry to the start
+      Drivetrain.getInstance()::getMeasuredSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+      speeds -> Drivetrain.getInstance().driveFieldRelativeVelocity(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond), // Field-relative velocities consumer
+      new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
+        new PIDConstants(DriveConsts.kTranslateP.getAsDouble(), DriveConsts.kTranslateI.getAsDouble(), DriveConsts.kTranslateD.getAsDouble()), //Translation controller for position error -> velocity
+        new PIDConstants(DriveConsts.kRotateP.getAsDouble(), DriveConsts.kRotateI.getAsDouble(), DriveConsts.kRotateD.getAsDouble()), // Rotationcontroller for angle error -> angular velocity
+        4.5, // Max module speed, in m/s
+        0.4, // Drive base radius in meters. Distance from robot center to furthest module.
+        new ReplanningConfig() // Default path replanning config. See the API for the options here
+      ),
+      () -> {
+          // Boolean supplier that controls when the path will be mirrored for the red alliance
+          // This will flip the path being followed to the red side of the field.
+          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
-                    var alliance = DriverStation.getAlliance();
-                    if (alliance.isPresent()) {
-                        return alliance.get() == DriverStation.Alliance.Red;
-                    }
-                    return false;
-                },
-                Drivetrain.getInstance() // Subsystem requirements
+          var alliance = DriverStation.getAlliance();
+          if (alliance.isPresent()) {
+              return alliance.get() == DriverStation.Alliance.Red;
+          }
+          return false;
+      },
+      Drivetrain.getInstance() // Subsystem requirements
         );
   }
 }
