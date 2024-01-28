@@ -26,20 +26,20 @@ public class Constants {
 
   /** Physical parts of the robot, such as gearboxes or wheel diameters. */
   public static class PhysConsts {
-    public static final double kSwerveWheelGearbox = 1/5.14; // SDS L4 modules
+    public static final double kSwerveWheelGearbox = 1d/5.14; // SDS L4 modules
     public static final double kSwerveWheelCircumferenceMeters = 0.09779 * Math.PI; // Colson wheels
   }
 
   /** Data relating to the entire drivetrain. */
   public static class DriveConsts {
+    // Upper bound drivetrain constraints
+    public static final double kMaxLinearVelMetersPerSecond = 6d * 0.8; // 80% of theoretical max 6 m/s
+    public static final double kMaxTurnVelRadiansPerSecond = kMaxLinearVelMetersPerSecond / Constants.SwerveConsts.kSwerve_fl.location.getDistance(new Translation2d()); // ω = velocity / radius (assumes square swerve drivetrain)
+    public static final double kMaxModuleRotateSpeedPercentage = 0.65; // Maximum rotational motor speed
+
     // Multipliers for all teleop driving
     public static final double kTeleopSpeedMult = 1;
-    public static final double kTeleopTurnMult = 0.7;
-
-    // Upper bound drivetrain constraints
-    public static final double kMaxLinearVelMetersPerSecond = 6 * 0.8; // 80% of theoretical max 6 m/s
-    public static final double kMaxTurnVelRadiansPerSecond = 9.5; // 1.5 rotations/sec
-    public static final double kMaxModuleRotateSpeedPercentage = 0.65; // Maximum rotational motor speed
+    public static final double kTeleopTurnMult = 9.5 / kMaxTurnVelRadiansPerSecond; // Set maximum teleop turn speed to 1.5 rotations/s
 
     // Upper bound drivetrain accelerations for path following and pose targeting
     public static final double kMaxLinearAccelMetersPerSecondSquared = kMaxLinearVelMetersPerSecond * 2; // UNIT: meters/s/s
