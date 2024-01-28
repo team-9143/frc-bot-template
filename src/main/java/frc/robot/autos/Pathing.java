@@ -210,4 +210,13 @@ public class Pathing {
       replanningConfig
     );
   }
+
+  /**
+   * Utility method to check driver station alliance
+   *
+   * @return {@code true} if alliance is red and not null
+   */
+  private static boolean isRedAlliance() {
+    return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red;
+  }
 }
