@@ -5,6 +5,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.logger.Logger;
 
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.GoalEndState;
 
 import com.pathplanner.lib.path.PathConstraints;
 //import com.pathplanner.lib.PathPlanner;
@@ -40,7 +42,7 @@ public class Pathing {
   private static final String PATH_LOG_DIR = "/pathplanner/";
 
   /** Default constraints for accurately generating and following paths */
-  private static final PathConstraints default_constraints = new PathConstraints(DriveConsts.kMaxLinearVelMetersPerSecond, DriveConsts.kMaxLinearAccelMetersPerSecondSquared, DriveConsts.kMaxTurnVelRadiansPerSecond, DriveConsts.kMaxTurnAccelRadiansPerSecondSquared);
+  private static final PathConstraints DEFAULT_CONSTRAINTS = new PathConstraints(DriveConsts.kMaxLinearVelMetersPerSecond, DriveConsts.kMaxLinearAccelMetersPerSecondSquared, DriveConsts.kMaxTurnVelRadiansPerSecond, DriveConsts.kMaxTurnAccelRadiansPerSecondSquared);
 
   // Set up logging for basic path following
   static {
@@ -84,6 +86,21 @@ public class Pathing {
 
   // TODO: Path gen
   /**
+   * Create a pathplanner path to move directly from one position to another
+   *
+   * @param startPoseMetersCCW starting position for the command
+   * @param endPoseMetersCCW ending position for the command
+   */
+  public static PathPlannerPath generateDirectPath(Pose2d startPoseMetersCCW, Pose2d endPoseMetersCCW) {
+    return new PathPlannerPath(
+      // TODO: Test this path generation, start post/end pose rotations may need to be changed to match with bezier curve
+      PathPlannerPath.bezierFromPoses(startPoseMetersCCW, endPoseMetersCCW), // Create bezier points from waypoints
+      DEFAULT_CONSTRAINTS, // Default constraints
+      new GoalEndState(0, endPoseMetersCCW.getRotation()) // End with 0 velocity at specified rotation
+    );
+  }
+
+  /**
    * Create a pathplanner path, constrained by given maximum velocity and acceleration.
    *
    * @param startPoseMetersCCW starting position for the command
@@ -104,18 +121,8 @@ public class Pathing {
 
 
     // Generate the path with the constraints provided (velocity cannot exceed maximum robot velocity)
-    //return PathPlanner.generatePath(new PathConstraints(Math.min(maxVelMetersPerSecond, default_constraints.getMaxVelocityMps()), maxAccelMetersPerSecondPerSecond), first, last);
-    return generateDirectPath(first, last, Math.min(maxVelMetersPerSecond, default_constraints.getMaxVelocityMps()), maxAccelMetersPerSecondPerSecond);
-  }
-
-  /**
-   * Create a pathplanner path, constrained by the default maximum velocity and acceleration.
-   *
-   * @param startPoseMetersCCW starting position for the command
-   * @param endPoseMetersCCW ending position for the command
-   */
-  public static PathPlannerTrajectory generateDirectPath(Pose2d startPoseMetersCCW, Pose2d endPoseMetersCCW) {
-    return generateDirectPath(startPoseMetersCCW, endPoseMetersCCW, default_constraints.getMaxVelocityMps(), default_constraints.getMaxAccelerationMpsSq());
+    //return PathPlanner.generatePath(new PathConstraints(Math.min(maxVelMetersPerSecond, DEFAULT_CONSTRAINTS.getMaxVelocityMps()), maxAccelMetersPerSecondPerSecond), first, last);
+    return generateDirectPath(first, last, Math.min(maxVelMetersPerSecond, DEFAULT_CONSTRAINTS.getMaxVelocityMps()), maxAccelMetersPerSecondPerSecond);
   }
 
   /******
