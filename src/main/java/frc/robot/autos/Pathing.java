@@ -2,7 +2,6 @@ package frc.robot.autos;
 
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.logger.Logger;
-import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.Constants.DriveConsts;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -13,13 +12,9 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.GoalEndState;
 
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-
 import com.pathplanner.lib.commands.FollowPathHolonomic;
-import com.pathplanner.lib.commands.PathfindHolonomic;
-import com.pathplanner.lib.commands.PathfindThenFollowPathHolonomic;
-
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -73,7 +68,7 @@ public class Pathing {
     return PathPlannerPath.fromChoreoTrajectory(name);
   }
 
-  // TODO: Path gen
+  // TODO: Path gen obstacles in Constants? (stage)
   /**
    * Create a pathplanner path to move directly from one position to another
    *
@@ -113,55 +108,8 @@ public class Pathing {
     );
   }
 
-  /**
-   * Create a complete autonomous PathPlanner-based command group. This will reset the odometry at the begininng of the first path, follow paths, trigger events during path following, and run commands between paths with stop events.
-   *
-   * <p> Inserting disconnected paths in the list allows for stop events that move the position of the robot separately from the pathplanner control. </p>
-   *
-   * @param paths PathPlanner paths to follow
-   * @param events String-Command map of named commands to run at events. Names may be reused for multiple events. Commands that run at stop events may require the drivetrain, but no others should.
-   */
-  // public static Command getFollowPathplannerWithEventsCommand(List<PathPlannerTrajectory> paths, Map<String, Command> events) {
-  //   var builder = new AutoBuilder(
-  //     Drivetrain.getInstance()::getPose, // Pose supplier
-  //     Drivetrain.getInstance()::resetOdometry, // Pose consumer to set the odometry to the start of the path
-  //     new PIDConstants(DriveConsts.kTranslateP.getAsDouble(), DriveConsts.kTranslateI.getAsDouble(), DriveConsts.kTranslateD.getAsDouble()), // Translation controller for position error -> velocity
-  //     new PIDConstants(DriveConsts.kRotateP.getAsDouble(), DriveConsts.kRotateI.getAsDouble(), DriveConsts.kRotateD.getAsDouble()), // Rotation controller for angle error -> angular velocity
-  //     speeds -> Drivetrain.getInstance().driveFieldRelativeVelocity(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond), // Field-relative velocities consumer
-  //     events, // Commands to run at named events
-  //     true, // Whether to mirror path to match alliance
-  //     Drivetrain.getInstance() // Subsystem requirements
-  //   );
-
-  //   return builder.fullAuto(paths);
-  // }
-  public static Command getFollowPathplannerWithEventsCommand(){
-    AutoBuilder.configureHolonomic(
-      Drivetrain.getInstance()::getPose, // Pose supplier
-      Drivetrain.getInstance()::resetOdometry, // Pose consumer to set the odometry to the start
-      Drivetrain.getInstance()::getMeasuredSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-      speeds -> Drivetrain.getInstance().driveFieldRelativeVelocity(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond), // Field-relative velocities consumer
-      new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-        new PIDConstants(DriveConsts.kTranslateP.getAsDouble(), DriveConsts.kTranslateI.getAsDouble(), DriveConsts.kTranslateD.getAsDouble()), //Translation controller for position error -> velocity
-        new PIDConstants(DriveConsts.kRotateP.getAsDouble(), DriveConsts.kRotateI.getAsDouble(), DriveConsts.kRotateD.getAsDouble()), // Rotationcontroller for angle error -> angular velocity
-        4.5, // Max module speed, in m/s
-        0.4, // Drive base radius in meters. Distance from robot center to furthest module.
-        new ReplanningConfig() // Default path replanning config. See the API for the options here
-      ),
-      () -> {
-          // Boolean supplier that controls when the path will be mirrored for the red alliance
-          // This will flip the path being followed to the red side of the field.
-          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-
-          var alliance = DriverStation.getAlliance();
-          if (alliance.isPresent()) {
-              return alliance.get() == DriverStation.Alliance.Red;
-          }
-          return false;
-      },
-      Drivetrain.getInstance() // Subsystem requirements
-        );
-  }
+  // TODO: Implement auto builder here
+  // TODO: Create named commands list in Constants
 
   /******
    *
