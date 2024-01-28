@@ -3,6 +3,7 @@ package frc.robot.logger;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 
+// TODO Set smart current limit and move calls to setVelocity
 /** CANSparkMax wrapper class with logging functionality. */
 public class LoggedSparkMax extends CANSparkMax implements Loggable {
   private static final String LOG_DIR = "/sparkmaxes/";

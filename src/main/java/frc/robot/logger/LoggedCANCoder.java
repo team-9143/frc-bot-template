@@ -83,7 +83,7 @@ public class LoggedCANCoder implements Loggable {
    */
   public double getPosition() {
     // Add the offset and then ensure the range binding remains stable
-    // TODO: use automative updates
+    // TODO: use automatic updates through StatusSignal class
     return (cancoder.getAbsolutePosition().getValueAsDouble() + offset + 360) % 360;
   }
 
