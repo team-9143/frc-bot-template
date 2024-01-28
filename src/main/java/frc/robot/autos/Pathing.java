@@ -4,6 +4,8 @@ import frc.robot.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.logger.Logger;
 
+import com.pathplanner.lib.path.PathPlannerPath;
+
 import com.pathplanner.lib.path.PathConstraints;
 //import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -63,54 +65,24 @@ public class Pathing {
    ******/
 
   /**
-   * Load a pathplanner path, constrained by given maximum velocity and acceleration.
+   * Load a pathplanner path from RIO local storage
    *
-   * @param name name of the path file under [deploy/pathplanner/], omitting ".path"
-   * @param maxVelMetersPerSecond max velocity along the path. Paths will not exceed the maximum velocity of the robot.
-   * @param maxAccelMetersPerSecondPerSecond max acceleration along the path. Use {@code Double.POSITIVE_INFINITY} for immediate starts and stops.
+   * @param name name of the path file under [deploy/pathplanner/paths/], omitting ".path"
    */
-    /*DOES NOT WORK */
-  // public static PathPlannerTrajectory loadPath(String name, double maxVelMetersPerSecond, double maxAccelMetersPerSecondPerSecond) {
-  //   return PathPlannerPath.(name, Math.min(maxVelMetersPerSecond, default_constraints.getMaxVelocityMps()), maxAccelMetersPerSecondPerSecond);
-  // }
-
-  /**
-   * Load a pathplanner path, constrained by the default maximum velocity and acceleration.
-   *
-   * @param name name of the path file under [deploy/pathplanner/], omitting ".path"
-   */
-  // public static PathPlannerTrajectory loadPath(String name) {
-  //   return loadPath(name, default_constraints.getMaxVelocityMps(), default_constraints.getMaxAccelerationMpsSq());
-  // }
   public static PathPlannerPath loadPath(String name) {
-    return loadPath(name);
-
+    return PathPlannerPath.fromPathFile(name);
   }
 
   /**
-   * Load a pathplanner path, separated into a list by stop events, constrained by the default maximum velocity and acceleration.
+   * Load a choreo trajectory from RIO local storage
    *
-   * @param name name of the path file under [deploy/pathplanner/], omitting ".path"
-   * @param maxVelMetersPerSecond max velocity along the path. Paths will not exceed the maximum velocity of the robot.
-   * @param maxAccelMetersPerSecondPerSecond max acceleration along the path. Use {@code Double.POSITIVE_INFINITY} for immediate starts and stops.
+   * @param name name of the path file under [deploy/choreo/], omitting ".traj"
    */
-  public static List<PathPlannerTrajectory> loadPathGroup(String name, double maxVelMetersPerSecond, double maxAccelMetersPerSecondPerSecond) {
-    return loadPathGroup(name, Math.min(maxVelMetersPerSecond, default_constraints.getMaxVelocityMps()), maxAccelMetersPerSecondPerSecond);
+  public static PathPlannerPath loadChoreoTraj(String name) {
+    return PathPlannerPath.fromChoreoTrajectory(name);
   }
 
-  public static Command loadPath(PathPlannerPath path){
-    return AutoBuilder.followPath(path);
-  }
-
-  /**
-   * Load a pathplanner path, separated into a list by stop events, constrained by the default maximum velocity and acceleration.
-   *
-   * @param name name of the path file under [deploy/pathplanner/], omitting ".path"
-   */
-  public static List<PathPlannerTrajectory> loadPathGroup(String name) {
-    return loadPathGroup(name, default_constraints.getMaxVelocityMps(), default_constraints.getMaxAccelerationMpsSq());
-  }
-
+  // TODO: Path gen
   /**
    * Create a pathplanner path, constrained by given maximum velocity and acceleration.
    *
