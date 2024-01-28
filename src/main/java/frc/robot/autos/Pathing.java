@@ -27,6 +27,7 @@ import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 
 import java.nio.file.Path;
@@ -218,5 +219,27 @@ public class Pathing {
       },
       Drivetrain.getInstance() // Subsystem requirements
         );
+  }
+
+  /******
+   *
+   * Utility
+   *
+   ******/
+
+  /**
+   * Utility method to get a path follower config for the swerve drivetrain
+   *
+   * @param replanningConfig replanning configuration to use
+   * @return the configuration
+   */
+  private static HolonomicPathFollowerConfig getFollowerConfig(ReplanningConfig replanningConfig) {
+    return new HolonomicPathFollowerConfig(
+      new PIDConstants(DriveConsts.kTranslateP.getAsDouble(), DriveConsts.kTranslateI.getAsDouble(), DriveConsts.kTranslateD.getAsDouble()), // Translation controller for position error -> velocity
+      new PIDConstants(DriveConsts.kRotateP.getAsDouble(), DriveConsts.kRotateI.getAsDouble(), DriveConsts.kRotateD.getAsDouble()), // Rotation controller for angle error -> angular velocity
+      DriveConsts.kMaxLinearVelMetersPerSecond, // Maximum module speed
+      frc.robot.Constants.SwerveConsts.kSwerve_fl.location.getDistance(new Translation2d()), // Radius of drive base
+      replanningConfig
+    );
   }
 }
