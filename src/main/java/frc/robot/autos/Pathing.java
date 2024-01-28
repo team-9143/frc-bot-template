@@ -89,31 +89,6 @@ public class Pathing {
     );
   }
 
-  /**
-   * Create a pathplanner path, constrained by given maximum velocity and acceleration.
-   *
-   * @param startPoseMetersCCW starting position for the command
-   * @param endPoseMetersCCW ending position for the command
-   * @param maxVelMetersPerSecond max velocity along the path. Paths will not exceed the maximum velocity of the robot.
-   * @param maxAccelMetersPerSecondPerSecond max acceleration along the path. Use {@code Double.POSITIVE_INFINITY} for immediate starts and stops.
-   */
-  public static PathPlannerTrajectory generateDirectPath(Pose2d startPoseMetersCCW, Pose2d endPoseMetersCCW, double maxVelMetersPerSecond, double maxAccelMetersPerSecondPerSecond) {
-    // Find the angle between the poses for heading calculation
-    Pose2d relativePose = endPoseMetersCCW.relativeTo(startPoseMetersCCW);
-    Rotation2d relativeAngle = new Rotation2d(relativePose.getX(), relativePose.getY());
-
-    // Create the path points from the given poses and the calculated heading
-    //PathPoint first = new PathPoint(startPoseMetersCCW.getTranslation(), relativeAngle, startPoseMetersCCW.getRotation());
-    //PathPoint last = new PathPoint(endPoseMetersCCW.getTranslation(), relativeAngle, endPoseMetersCCW.getRotation());
-    Pose2d first = new Pose2d(startPoseMetersCCW.getTranslation(), startPoseMetersCCW.getRotation());
-    Pose2d last = new Pose2d(endPoseMetersCCW.getTranslation(), endPoseMetersCCW.getRotation());
-
-
-    // Generate the path with the constraints provided (velocity cannot exceed maximum robot velocity)
-    //return PathPlanner.generatePath(new PathConstraints(Math.min(maxVelMetersPerSecond, DEFAULT_CONSTRAINTS.getMaxVelocityMps()), maxAccelMetersPerSecondPerSecond), first, last);
-    return generateDirectPath(first, last, Math.min(maxVelMetersPerSecond, DEFAULT_CONSTRAINTS.getMaxVelocityMps()), maxAccelMetersPerSecondPerSecond);
-  }
-
   /******
    *
    * Path following
