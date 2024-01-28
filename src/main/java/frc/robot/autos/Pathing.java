@@ -1,41 +1,30 @@
 package frc.robot.autos;
 
 import frc.robot.subsystems.Drivetrain;
-import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.logger.Logger;
+import edu.wpi.first.wpilibj2.command.Command;
+
+import frc.robot.Constants.DriveConsts;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.GoalEndState;
 
-import com.pathplanner.lib.path.PathConstraints;
-//import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.PathPlannerTrajectory;
-import com.pathplanner.lib.path.PathPoint;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+
 import com.pathplanner.lib.commands.FollowPathHolonomic;
-//import com.pathplanner.lib.commands.PPSwerveControllerCommand;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.util.PathPlannerLogging;
-import com.pathplanner.lib.util.ReplanningConfig;
-//import com.pathplanner.lib.auto.SwerveAutoBuilder;
+import com.pathplanner.lib.commands.PathfindHolonomic;
+import com.pathplanner.lib.commands.PathfindThenFollowPathHolonomic;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 
-import frc.robot.Constants.DriveConsts;
-import java.util.Map;
-
+import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.ReplanningConfig;
 import com.pathplanner.lib.util.PIDConstants;
-
-import edu.wpi.first.math.controller.HolonomicDriveController;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-
-import java.nio.file.Path;
-import java.util.List;
 
 /** Utility class for loading, generating, following, and logging paths through PathPlanner. PID controllers are initialized at runtime so that TunableNumbers can take effect. */
 public class Pathing {
