@@ -44,6 +44,7 @@ public class SwerveModule {
     angle_controller.setSetpoint(0);
   }
 
+  // TODO: Use setVelocity()
   /**
    * Calculate and set swerve module speed.
    *
