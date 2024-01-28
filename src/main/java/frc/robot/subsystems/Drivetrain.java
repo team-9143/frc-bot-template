@@ -49,8 +49,8 @@ public class Drivetrain extends SafeSubsystem {
 
       // Field relative control, exponentially scaling inputs to increase sensitivity
       m_swerve.setDesiredVelocityFieldRelative(
-        Math.copySign(forward*forward, forward) * DriveConsts.kMaxWheelVelMetersPerSecond * DriveConsts.kTeleopSpeedMult,
-        Math.copySign(left*left, left) * DriveConsts.kMaxWheelVelMetersPerSecond * DriveConsts.kTeleopSpeedMult,
+        Math.copySign(forward*forward, forward) * DriveConsts.kMaxLinearVelMetersPerSecond * DriveConsts.kTeleopSpeedMult,
+        Math.copySign(left*left, left) * DriveConsts.kMaxLinearVelMetersPerSecond * DriveConsts.kTeleopSpeedMult,
         Math.copySign(ccw*ccw*ccw, ccw) * DriveConsts.kMaxTurnVelRadiansPerSecond * DriveConsts.kTeleopTurnMult // Extra sensitivity for fine rotation control
       );
     }));

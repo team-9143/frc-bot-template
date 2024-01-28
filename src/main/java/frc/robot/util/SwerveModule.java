@@ -60,7 +60,7 @@ public class SwerveModule {
     drive_motor.set(
       Math.max(-1, Math.min(1, // Clamp to maximum speed
         speed_controller.calculate(getVelocity(), speed) // Velocity adjustment feedback controller
-        + (speed/DriveConsts.kMaxWheelVelMetersPerSecond) // Simple velocity feedforward
+        + (speed/DriveConsts.kMaxLinearVelMetersPerSecond) // Simple velocity feedforward
       )) * Math.abs(Math.cos(getAngleError() * Math.PI/180)) // Scale velocity down if not at proper angle
     );
   }

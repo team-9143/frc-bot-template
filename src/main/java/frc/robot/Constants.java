@@ -37,12 +37,12 @@ public class Constants {
     public static final double kTeleopTurnMult = 0.7;
 
     // Upper bound drivetrain constraints
-    public static final double kMaxWheelVelMetersPerSecond = 6 * 0.8; // 80% of theoretical max 6 m/s
+    public static final double kMaxLinearVelMetersPerSecond = 6 * 0.8; // 80% of theoretical max 6 m/s
     public static final double kMaxTurnVelRadiansPerSecond = 9.5; // 1.5 rotations/sec
     public static final double kMaxModuleRotateSpeedPercentage = 0.65; // Maximum rotational motor speed
 
     // Upper bound drivetrain accelerations for path following and pose targeting
-    public static final double kMaxLinearAccelMetersPerSecondSquared = kMaxWheelVelMetersPerSecond * 2; // UNIT: meters/s/s
+    public static final double kMaxLinearAccelMetersPerSecondSquared = kMaxLinearVelMetersPerSecond * 2; // UNIT: meters/s/s
     public static final double kMaxTurnAccelRadiansPerSecondSquared = kMaxTurnVelRadiansPerSecond * 2; // UNIT: radians/s/s
 
     // Gains for drivetrain position error -> velocity

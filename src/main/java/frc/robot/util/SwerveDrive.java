@@ -71,7 +71,7 @@ public class SwerveDrive extends MotorSafety {
     });
 
     // Normalize and push angles and speeds to modules
-    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConsts.kMaxWheelVelMetersPerSecond);
+    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConsts.kMaxLinearVelMetersPerSecond);
     modules[0].desiredStateDrive(desiredStates[0]);
     modules[1].desiredStateDrive(desiredStates[1]);
     modules[2].desiredStateDrive(desiredStates[2]);

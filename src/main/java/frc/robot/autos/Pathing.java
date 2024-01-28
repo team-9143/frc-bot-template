@@ -37,7 +37,7 @@ public class Pathing {
   private static final String PATH_LOG_DIR = "/pathplanner/";
 
   /** Default constraints for accurately generating and following paths */
-  private static final PathConstraints default_constraints = new PathConstraints(DriveConsts.kMaxWheelVelMetersPerSecond, DriveConsts.kMaxLinearAccelMetersPerSecondSquared, DriveConsts.kMaxTurnVelRadiansPerSecond, DriveConsts.kMaxTurnAccelRadiansPerSecondSquared);
+  private static final PathConstraints default_constraints = new PathConstraints(DriveConsts.kMaxLinearVelMetersPerSecond, DriveConsts.kMaxLinearAccelMetersPerSecondSquared, DriveConsts.kMaxTurnVelRadiansPerSecond, DriveConsts.kMaxTurnAccelRadiansPerSecondSquared);
 
   // Set up logging for basic path following
   static {
