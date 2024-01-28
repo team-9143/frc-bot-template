@@ -41,13 +41,18 @@ public class Pathing {
 
   // Set up logging for basic path following
   static {
-    PathPlannerLogging.setLogCurrentPoseCallback(pose -> Logger.recordOutput(PATH_LOG_DIR+"referencePose", pose)); // Log reference pose during command run);
-    // PPSwerveControllerCommand.setLoggingCallbacks(
-    //   traj` -> Logger.recordOutput(PATH_LOG_DIR+"trajectory", traj.getStates().stream().map(state -> state.poseMeters).toArray(Pose2d[]::new)), // Log trajectory on command initialization
-    //   pose -> Logger.recordOutput(PATH_LOG_DIR+"referencePose", pose), // Log reference pose during command run
-    //   speeds -> Logger.recordOutput(PATH_LOG_DIR+"setpointSpeeds", speeds), // Log setpoint velocities during command run
-    //   null // Don't need to log error
-    // );
+    // Log trajectory on command initialization
+    PathPlannerLogging.setLogActivePathCallback(poses ->
+      Logger.recordOutput(PATH_LOG_DIR+"activePath", poses.toArray(Pose2d[]::new))
+    );
+
+    // No need to log current robot pose, drivetrain will do that
+    PathPlannerLogging.setLogCurrentPoseCallback(null);
+
+    // Log reference pose during command run
+    PathPlannerLogging.setLogTargetPoseCallback(pose ->
+      Logger.recordOutput(PATH_LOG_DIR+"referencePose", pose)
+    );
   }
 
   /******
@@ -78,7 +83,7 @@ public class Pathing {
   // }
   public static PathPlannerPath loadPath(String name) {
     return loadPath(name);
-    
+
   }
 
   /**
@@ -174,7 +179,7 @@ public class Pathing {
    * @param events String-Command map of named commands to run at events. Names may be reused for multiple events. Commands that run at stop events may require the drivetrain, but no others should.
    */
   // public static Command getFollowPathplannerWithEventsCommand(List<PathPlannerTrajectory> paths, Map<String, Command> events) {
-  //   var builder = new AutoBuilder( 
+  //   var builder = new AutoBuilder(
   //     Drivetrain.getInstance()::getPose, // Pose supplier
   //     Drivetrain.getInstance()::resetOdometry, // Pose consumer to set the odometry to the start of the path
   //     new PIDConstants(DriveConsts.kTranslateP.getAsDouble(), DriveConsts.kTranslateI.getAsDouble(), DriveConsts.kTranslateD.getAsDouble()), // Translation controller for position error -> velocity
