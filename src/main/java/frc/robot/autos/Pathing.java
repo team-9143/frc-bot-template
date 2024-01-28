@@ -99,20 +99,19 @@ public class Pathing {
    * Create a command to follow a pathplanner path. Logs everything through the Logger during the command run.
    *
    * @param path the pathplanner path to follow
+   * @param replanningConfig replanning configuration to use
    */
-  public static HolonomicDriveController getFollowPathplannerCommand(PathPlannerTrajectory path) {
-    // return new PPSwerveControllerCommand(
-    //   path, // Path to follow
-    //   Drivetrain.getInstance()::getPose, // Pose supplier
-    //   new PIDController(DriveConsts.kTranslateP.getAsDouble(), DriveConsts.kTranslateI.getAsDouble(), DriveConsts.kTranslateD.getAsDouble()), // Translation controller for position error -> velocity
-    //   new PIDController(DriveConsts.kTranslateP.getAsDouble(), DriveConsts.kTranslateI.getAsDouble(), DriveConsts.kTranslateD.getAsDouble()), // Translation controller for position error -> velocity
-    //   new PIDController(DriveConsts.kRotateP.getAsDouble(), DriveConsts.kRotateI.getAsDouble(), DriveConsts.kRotateD.getAsDouble()), // Rotation controller for angle error -> angular velocity
-    //   speeds -> Drivetrain.getInstance().driveFieldRelativeVelocity(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond), // Field-relative velocities consumer
-    //   true, // Whether to mirror path to match alliance
-    //   Drivetrain.getInstance() // Subsystem requirements
-    // );
-    return new FollowPathHolonomic(path, null, speeds -> Drivetrain.getInstance().driveFieldRelativeVelocity(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond), null, null, true, Drivetrain.getInstance());
-    }
+  public static FollowPathHolonomic getFollowPathCommand(PathPlannerPath path, ReplanningConfig replanningConfig) {
+    return new FollowPathHolonomic(
+      path, // Path to follow
+      Drivetrain.getInstance()::getPose, // Pose supplier
+      Drivetrain.getInstance()::getMeasuredSpeeds, // Chassis speeds supplier
+      speeds -> Drivetrain.getInstance().driveRobotRelativeVelocity(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond), // Robot-relative velocities consumer
+      getFollowerConfig(replanningConfig), // Follower configuration
+      Pathing::isRedAlliance, // Flip the path if alliance is red
+      Drivetrain.getInstance() // Subsystem requirements
+    );
+  }
 
   /**
    * Create a complete autonomous PathPlanner-based command group. This will reset the odometry at the begininng of the first path, follow paths, trigger events during path following, and run commands between paths with stop events.
