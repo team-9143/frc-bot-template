@@ -9,7 +9,7 @@ import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 /** CANCoder interface class with logging functionality. Many configuration parameters have been removed for constant units, but an offset has been added. */
-public class LoggedCANCoder implements Loggable {
+public class LoggedCANcoder implements Loggable {
   private static final String LOG_DIR = "/cancoders/";
   public final String directory;
 
@@ -27,7 +27,7 @@ public class LoggedCANCoder implements Loggable {
    * @param deviceId The device ID.
    * @param directory sub-directory where data will be logged (with trailing slash)
    */
-  public LoggedCANCoder(int deviceId, String directory) {
+  public LoggedCANcoder(int deviceId, String directory) {
     // Configure cancoder
     cancoder = new CANcoder(deviceId);
     cancoder.getConfigurator().apply(config);
@@ -44,7 +44,7 @@ public class LoggedCANCoder implements Loggable {
    * @param directory sub-directory where data will be logged (with trailing slash)
    * @param offset additive offset for {@link LoggedCANCoder#getPosition()} in ccw degrees
    */
-  public LoggedCANCoder(int deviceId, String directory, double offset) {
+  public LoggedCANcoder(int deviceId, String directory, double offset) {
     this(deviceId, directory);
     this.offset = offset;
   }

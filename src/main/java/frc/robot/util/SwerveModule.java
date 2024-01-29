@@ -12,13 +12,13 @@ import frc.robot.logger.LoggedSparkMax;
 //import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
-import frc.robot.logger.LoggedCANCoder;
+import frc.robot.logger.LoggedCANcoder;
 
 /** Controls a single swerve module. */
 public class SwerveModule {
   private final LoggedSparkMax drive_motor;
   private final LoggedSparkMax angle_motor;
-  private final LoggedCANCoder cancoder;
+  private final LoggedCANcoder cancoder;
 
   private final PIDController speed_controller;
   private final PIDController angle_controller;
@@ -26,7 +26,7 @@ public class SwerveModule {
   protected SwerveModule(SwerveModuleConstants constants) {
     drive_motor = new LoggedSparkMax(constants.drive_ID, MotorType.kBrushless, constants.directory + "/drive/");
     angle_motor = new LoggedSparkMax(constants.angle_ID, MotorType.kBrushless, constants.directory + "/angle/");
-    cancoder = new LoggedCANCoder(constants.cancoder_ID, constants.directory, constants.cancoderOffset);
+    cancoder = new LoggedCANcoder(constants.cancoder_ID, constants.directory, constants.cancoderOffset);
     speed_controller = constants.speed_controller;
     angle_controller = constants.angle_controller;
 
