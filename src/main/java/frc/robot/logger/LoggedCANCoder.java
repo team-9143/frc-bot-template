@@ -13,11 +13,13 @@ public class LoggedCANcoder implements Loggable {
   private static final String LOG_DIR = "/cancoders/";
   public final String directory;
 
-  private final CANcoder cancoder;
+  /** CANcoder configuraation options */
   private static final CANcoderConfiguration config = new CANcoderConfiguration()
     .withMagnetSensor(new MagnetSensorConfigs()
       .withAbsoluteSensorRange(AbsoluteSensorRangeValue.Unsigned_0To1)
       .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive));
+
+  private final CANcoder cancoder;
 
   private double offset;
 
