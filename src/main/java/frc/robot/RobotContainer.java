@@ -40,6 +40,12 @@ public class RobotContainer {
     configureBindings();
   }
 
+  // private static void NamedCommands(String[] namedCommands){
+  //   for (String i : Constants.AutoConstants.commands){
+  //     com.pathplanner.lib.auto.NamedCommands.registerCommands();
+  //   }
+  // }
+
   /** Send metadata to logger. */
   private static void configureMetadata() {
     Logger.recordMetadata("RoborioSerialNum", RobotBase.isReal() ? System.getenv("serialnum") : "Simulation");

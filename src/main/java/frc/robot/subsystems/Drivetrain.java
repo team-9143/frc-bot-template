@@ -75,6 +75,13 @@ public class Drivetrain extends SafeSubsystem {
   }
 
   /**
+   * Drive with field relative velocities. Must be continuously called.
+   */
+  public void driveFieldRelativeVelocity(ChassisSpeeds chassisSpeeds) {
+    m_swerve.setDesiredVelocityFieldRelative(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond, chassisSpeeds.omegaRadiansPerSecond);
+  }
+
+  /**
    * Drive with robot relative velocities. Must be continuously called.
    *
    * @param forward forward speed (UNIT: meters/s)

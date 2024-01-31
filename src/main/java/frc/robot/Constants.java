@@ -118,4 +118,8 @@ public class Constants {
       });
     }
   }
+
+  public static class AutoConstants {
+    //static List<Pair<String, Command>> commands
+  }
 }

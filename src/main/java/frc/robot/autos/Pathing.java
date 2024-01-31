@@ -110,7 +110,17 @@ public class Pathing {
 
   // TODO: Implement auto builder here
   // TODO: Create named commands list in Constants
-
+  public static void HolonomicAutoBuilder(){
+    AutoBuilder.configureHolonomic(
+      Drivetrain.getInstance()::getPose, // Pose supplier
+      Drivetrain.getInstance()::resetOdometry, // Reset pose consumer
+      Drivetrain.getInstance()::getDesiredSpeeds, // Chassis speeds
+      Drivetrain.getInstance()::driveFieldRelativeVelocity, // Drives field relative from ChassisSpeeds
+      getFollowerConfig(new ReplanningConfig()), //Config
+      Pathing::isRedAlliance, // Flip if alliance is red
+      Drivetrain.getInstance() // Subsystem
+    );
+  }
   /******
    *
    * Utility
