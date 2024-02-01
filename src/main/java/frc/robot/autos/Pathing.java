@@ -96,13 +96,13 @@ public class Pathing {
    * @param path the pathplanner path to follow
    * @param replanningConfig replanning configuration to use
    */
-  public static FollowPathHolonomic getFollowPathCommand(PathPlannerPath path, ReplanningConfig replanningConfig) {
+  public static FollowPathHolonomic getHolonomicFollowPathCommand(PathPlannerPath path, ReplanningConfig replanningConfig) {
     return new FollowPathHolonomic(
       path, // Path to follow
       Drivetrain.getInstance()::getPose, // Pose supplier
       Drivetrain.getInstance()::getMeasuredSpeeds, // Chassis speeds supplier
       Drivetrain.getInstance()::driveRobotRelativeVelocity, // Robot-relative velocities consumer
-      getFollowerConfig(replanningConfig), // Follower configuration
+      getHolonomicConfig(replanningConfig), // Follower configuration
       Pathing::isRedAlliance, // Flip the path if alliance is red
       Drivetrain.getInstance() // Subsystem requirements
     );
@@ -110,17 +110,18 @@ public class Pathing {
 
   // TODO: Implement auto builder here
   // TODO: Create named commands list in Constants
-  public static void HolonomicAutoBuilder(){
+  public static void HolonomicAutoBuilder() {
     AutoBuilder.configureHolonomic(
       Drivetrain.getInstance()::getPose, // Pose supplier
       Drivetrain.getInstance()::resetOdometry, // Reset pose consumer
-      Drivetrain.getInstance()::getDesiredSpeeds, // Chassis speeds
+      Drivetrain.getInstance()::getDesiredSpeeds, // Current measured speeds
       Drivetrain.getInstance()::driveFieldRelativeVelocity, // Drives field relative from ChassisSpeeds
-      getFollowerConfig(new ReplanningConfig()), //Config
+      getHolonomicConfig(new ReplanningConfig(false, false)), // Config
       Pathing::isRedAlliance, // Flip if alliance is red
       Drivetrain.getInstance() // Subsystem
     );
   }
+
   /******
    *
    * Utility
@@ -133,13 +134,13 @@ public class Pathing {
    * @param replanningConfig replanning configuration to use
    * @return the configuration
    */
-  private static HolonomicPathFollowerConfig getFollowerConfig(ReplanningConfig replanningConfig) {
+  private static HolonomicPathFollowerConfig getHolonomicConfig(ReplanningConfig replanningConfig) {
     return new HolonomicPathFollowerConfig(
       new PIDConstants(DriveConsts.kTranslateP.getAsDouble(), DriveConsts.kTranslateI.getAsDouble(), DriveConsts.kTranslateD.getAsDouble()), // Translation controller for position error -> velocity
       new PIDConstants(DriveConsts.kRotateP.getAsDouble(), DriveConsts.kRotateI.getAsDouble(), DriveConsts.kRotateD.getAsDouble()), // Rotation controller for angle error -> angular velocity
       DriveConsts.kMaxLinearVelMetersPerSecond, // Maximum module speed
       frc.robot.Constants.SwerveConsts.kSwerve_fl.location.getDistance(new Translation2d()), // Radius of drive base
-      replanningConfig
+      replanningConfig // When to replan the path
     );
   }
 
