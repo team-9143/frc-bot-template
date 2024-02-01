@@ -44,6 +44,19 @@ public class Pathing {
     );
   }
 
+  // Configure AutoBuilder
+  static {
+    AutoBuilder.configureHolonomic(
+      Drivetrain.getInstance()::getPose, // Pose supplier
+      Drivetrain.getInstance()::resetOdometry, // Reset pose consumer
+      Drivetrain.getInstance()::getDesiredSpeeds, // Current measured speeds
+      Drivetrain.getInstance()::driveFieldRelativeVelocity, // Drives field relative from ChassisSpeeds
+      getHolonomicConfig(new ReplanningConfig(false, false)), // Config
+      Pathing::isRedAlliance, // Flip if alliance is red
+      Drivetrain.getInstance() // Subsystem
+    );
+  }
+
   /******
    *
    * Path loading and generation
@@ -110,17 +123,6 @@ public class Pathing {
 
   // TODO: Implement auto builder here
   // TODO: Create named commands list in Constants
-  public static void HolonomicAutoBuilder() {
-    AutoBuilder.configureHolonomic(
-      Drivetrain.getInstance()::getPose, // Pose supplier
-      Drivetrain.getInstance()::resetOdometry, // Reset pose consumer
-      Drivetrain.getInstance()::getDesiredSpeeds, // Current measured speeds
-      Drivetrain.getInstance()::driveFieldRelativeVelocity, // Drives field relative from ChassisSpeeds
-      getHolonomicConfig(new ReplanningConfig(false, false)), // Config
-      Pathing::isRedAlliance, // Flip if alliance is red
-      Drivetrain.getInstance() // Subsystem
-    );
-  }
 
   /******
    *
