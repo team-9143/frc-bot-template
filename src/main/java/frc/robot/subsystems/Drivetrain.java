@@ -48,7 +48,7 @@ public class Drivetrain extends SafeSubsystem {
       double ccw = -OI.DRIVER_CONTROLLER.getRightX(); // Right joystick horizontal for rotation
 
       // Field relative control, exponentially scaling inputs to increase sensitivity
-      m_swerve.setDesiredVelocityFieldRelative(
+      this.driveFieldRelativeVelocity(
         Math.copySign(forward*forward, forward) * DriveConsts.kMaxLinearVelMetersPerSecond * DriveConsts.kTeleopSpeedMult,
         Math.copySign(left*left, left) * DriveConsts.kMaxLinearVelMetersPerSecond * DriveConsts.kTeleopSpeedMult,
         Math.copySign(ccw*ccw*ccw, ccw) * DriveConsts.kMaxTurnVelRadiansPerSecond * DriveConsts.kTeleopTurnMult // Extra sensitivity for fine rotation control
@@ -64,32 +64,32 @@ public class Drivetrain extends SafeSubsystem {
   }
 
   /**
-   * Drive with field relative velocities. Must be continuously called.
+   * Drive with field relative velocities. Must be continuously called. This method is intended for general teleop drive use.
    *
    * @param forward forward speed (UNIT: meters/s)
    * @param left left speed (UNIT: meters/s)
    * @param ccw counter-clockwise speed (UNIT: ccw radians/s)
    */
   public void driveFieldRelativeVelocity(double forward, double left, double ccw) {
-    m_swerve.setDesiredVelocityFieldRelative(forward, left, ccw);
+    m_swerve.setDesiredVelocityRobotRelative(ChassisSpeeds.fromFieldRelativeSpeeds(forward, left, ccw, getPose().getRotation()));
   }
 
   /**
    * Drive with field relative velocities. Must be continuously called.
+   *
+   * @param speeds {@link ChassisSpeeds} object in meters/s
    */
-  public void driveFieldRelativeVelocity(ChassisSpeeds chassisSpeeds) {
-    m_swerve.setDesiredVelocityFieldRelative(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond, chassisSpeeds.omegaRadiansPerSecond);
+  public void driveFieldRelativeVelocity(ChassisSpeeds speeds) {
+    m_swerve.setDesiredVelocityRobotRelative(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getPose().getRotation()));
   }
 
   /**
    * Drive with robot relative velocities. Must be continuously called.
    *
-   * @param forward forward speed (UNIT: meters/s)
-   * @param left left speed (UNIT: meters/s)
-   * @param ccw counter-clockwise speed (UNIT: ccw radians/s)
+   * @param speeds {@link ChassisSpeeds} object in meters/s
    */
-  public void driveRobotRelativeVelocity(double forward, double left, double ccw) {
-    m_swerve.setDesiredVelocity(forward, left, ccw);
+  public void driveRobotRelativeVelocity(ChassisSpeeds speeds) {
+    m_swerve.setDesiredVelocityRobotRelative(speeds);
   }
 
   /** Set the drivetrain to x-stance for traction. Must be continuously called. */

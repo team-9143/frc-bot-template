@@ -101,7 +101,7 @@ public class Pathing {
       path, // Path to follow
       Drivetrain.getInstance()::getPose, // Pose supplier
       Drivetrain.getInstance()::getMeasuredSpeeds, // Chassis speeds supplier
-      speeds -> Drivetrain.getInstance().driveRobotRelativeVelocity(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond), // Robot-relative velocities consumer
+      Drivetrain.getInstance()::driveRobotRelativeVelocity, // Robot-relative velocities consumer
       getFollowerConfig(replanningConfig), // Follower configuration
       Pathing::isRedAlliance, // Flip the path if alliance is red
       Drivetrain.getInstance() // Subsystem requirements

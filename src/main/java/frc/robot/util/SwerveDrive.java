@@ -89,26 +89,12 @@ public class SwerveDrive extends MotorSafety {
   }
 
   /**
-   * Sets desired module states from field relative velocities.
-   *
-   * @param forward forward speed (UNIT: meters/s)
-   * @param left left speed (UNIT: meters/s)
-   * @param ccw counter-clockwise speed (UNIT: ccw radians/s)
-   */
-  public void setDesiredVelocityFieldRelative(double forward, double left, double ccw) {
-    var states = kinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(forward, left, ccw, getPose().getRotation()));
-    setDesiredStates(states[0], states[1], states[2], states[3]);
-  }
-
-  /**
    * Sets desired module states from robot relative velocities.
    *
-   * @param forward forward speed (UNIT: meters/s)
-   * @param left left speed (UNIT: meters/s)
-   * @param ccw counter-clockwise speed (UNIT: ccw radians/s)
+   * @param speeds {@link ChassisSpeeds} object in meters/s
    */
-  public void setDesiredVelocity(double forward, double left, double ccw) {
-    var states = kinematics.toSwerveModuleStates(new ChassisSpeeds(forward, left, ccw));
+  public void setDesiredVelocityRobotRelative(ChassisSpeeds speeds) {
+    var states = kinematics.toSwerveModuleStates(speeds);
     setDesiredStates(states[0], states[1], states[2], states[3]);
   }
 
