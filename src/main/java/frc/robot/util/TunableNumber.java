@@ -112,12 +112,12 @@ public class TunableNumber implements DoubleSupplier, DoubleConsumer {
   }
 
   /**
-   * Set a function to be called when the value is changed.
+   * Adds a consumer to be called when the value is changed.
    *
    * @param bindOnChange {@link DoubleConsumer} to be called with the new value
    */
-  public void bindTo(DoubleConsumer bindOnChange) {
-    m_bindOnChange = bindOnChange;
+  public void addBinding(DoubleConsumer bindOnChange) {
+    m_bindOnChange = (m_bindOnChange == null) ? bindOnChange : m_bindOnChange.andThen(bindOnChange);
   }
 
   /** Resets value to initialized value. */
