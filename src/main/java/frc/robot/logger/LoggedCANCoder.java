@@ -1,10 +1,10 @@
 package frc.robot.logger;
 
 import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 
+import java.util.function.Supplier;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
@@ -21,6 +21,10 @@ public class LoggedCANcoder implements Loggable {
 
   private final CANcoder cancoder;
 
+  private final Supplier<Double> positionSupplier;
+  private final Supplier<Double> velocitySupplier;
+  private final Supplier<Double> totalPositionSupplier;
+
   private double offset;
 
   /**
@@ -33,6 +37,19 @@ public class LoggedCANcoder implements Loggable {
     // Configure cancoder
     cancoder = new CANcoder(deviceId);
     cancoder.getConfigurator().apply(config);
+
+    // Configure status signals
+    cancoder.getAbsolutePosition().setUpdateFrequency(50);
+    positionSupplier = cancoder.getAbsolutePosition().asSupplier();
+
+    cancoder.getVelocity().setUpdateFrequency(50);
+    velocitySupplier = cancoder.getVelocity().asSupplier();
+
+    cancoder.getPositionSinceBoot().setUpdateFrequency(50);
+    totalPositionSupplier = cancoder.getPositionSinceBoot().asSupplier();
+
+    // Remove all other automatic updates
+    cancoder.optimizeBusUtilization();
 
     // Register for periodic logging
     this.directory = directory;
@@ -52,41 +69,42 @@ public class LoggedCANcoder implements Loggable {
   }
 
   /**
-   * Get the absolute position of the sensor, which remains constant through a power cycle. Unaffected by the position offset. UNIT: ccw degrees, range [0, 360)
+   * Get the absolute position of the sensor, which remains constant through a power cycle. Unaffected by {@link LoggedCANcoder#setOffset setOffset()} and {@link LoggedCANcoder#setPosition setPosition()}. UNIT: ccw degrees, range [0, 360)
    *
    * @return The position of the sensor.
    */
   public double getAbsolutePosition() {
-    return cancoder.getAbsolutePosition().getValueAsDouble();
+    return positionSupplier.get() * 360d;
   }
 
   /**
-   * Set the additive offset. UNIT: ccw degrees
+   * Set the additive offset for {@link LoggedCANcoder#getOffsetPosition getOffsetPosition()}. UNIT: ccw degrees
    *
-   * @param offset the offset for {@link LoggedCANCoder#getPosition()}
+   * @param offset the offset
    */
   public void setOffset(double offset) {
     this.offset = offset;
   }
 
   /**
-   * Get the additive offset. UNIT: ccw degrees
+   * Effectively set the position of the target for {@link LoggedCANcoder#getOffsetPosition getOffsetPosition()}. UNIT: ccw degrees
+   * <p>
+   * Uses the offset parameter. Overriding this through {@link LoggedCANcoder#setOffset setOffset()} may cause unwanted behavior.
    *
-   * @return The offset for {@link LoggedCANCoder#getPosition()}
+   * @param target the target position
    */
-  public double getOffset() {
-    return offset;
+  public void setPosition(double target) {
+    this.offset = target - getAbsolutePosition();
   }
 
   /**
-   * Get the offset position of the sensor, which remains constant through a power cycle. Affected by the position offset. UNIT: ccw degrees, range [0, 360)
+   * Get the offset position of the sensor, which remains constant through a power cycle. Affected by {@link LoggedCANcoder#setOffset setOffset()} and {@link LoggedCANcoder#setPosition setPosition()}. UNIT: ccw degrees, range [0, 360)
    *
    * @return The offset position of the sensor.
    */
-  public double getPosition() {
+  public double getOffsetPosition() {
     // Add the offset and then ensure the range binding remains stable
-    // TODO: use automatic updates through StatusSignal class
-    return (cancoder.getAbsolutePosition().getValueAsDouble() + offset + 360) % 360;
+    return (getAbsolutePosition() + offset) % 360;
   }
 
   /**
@@ -95,7 +113,7 @@ public class LoggedCANcoder implements Loggable {
    * @return The distance of the sensor.
    */
   public double getTravel() {
-    return cancoder.getPosition().getValueAsDouble();
+    return totalPositionSupplier.get() * 360d;
   }
 
   /**
@@ -104,7 +122,7 @@ public class LoggedCANcoder implements Loggable {
    * @return The velocity of the sensor.
    */
   public double getVelocity() {
-    return cancoder.getVelocity().getValueAsDouble();
+    return velocitySupplier.get() * 360d;
   }
 
   @Override
@@ -114,7 +132,7 @@ public class LoggedCANcoder implements Loggable {
 
   @Override
   public void log() {
-    Logger.recordOutput(getDirectory()+"offsetDegCCW", this.getPosition());
+    Logger.recordOutput(getDirectory()+"offsetDegCCW", this.getOffsetPosition());
     Logger.recordOutput(getDirectory()+"velocityDegPerSecondCCW", this.getVelocity());
     Logger.recordOutput(getDirectory()+"totalDegCCW", this.getTravel());
   }
