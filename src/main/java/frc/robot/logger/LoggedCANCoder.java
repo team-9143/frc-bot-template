@@ -93,6 +93,7 @@ public class LoggedCANcoder implements Loggable {
    *
    * @param target the target position
    */
+  // TODO: Fix this so that it works with setOffset(), then implement on swerve module
   public void setPosition(double target) {
     this.offset = target - getAbsolutePosition();
   }
