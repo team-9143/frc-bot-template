@@ -4,6 +4,7 @@ import frc.robot.subsystems.Drivetrain;
 import frc.robot.logger.Logger;
 
 import frc.robot.Constants.DriveConsts;
+import frc.robot.Constants.AutoConsts;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -26,7 +27,7 @@ public class Pathing {
   private static final String PATH_LOG_DIR = "/pathplanner/";
 
   /** Default constraints for accurately generating and following paths */
-  private static final PathConstraints DEFAULT_CONSTRAINTS = new PathConstraints(DriveConsts.kMaxLinearVelMetersPerSecond, DriveConsts.kMaxLinearAccelMetersPerSecondSquared, DriveConsts.kMaxTurnVelRadiansPerSecond, DriveConsts.kMaxTurnAccelRadiansPerSecondSquared);
+  private static final PathConstraints DEFAULT_CONSTRAINTS = new PathConstraints(DriveConsts.kMaxLinearVelMetersPerSecond, AutoConsts.kMaxLinearAccelMetersPerSecondSquared, DriveConsts.kMaxTurnVelRadiansPerSecond, AutoConsts.kMaxTurnAccelRadiansPerSecondSquared);
 
   // Set up logging for basic path following
   static {
@@ -121,8 +122,7 @@ public class Pathing {
     );
   }
 
-  // TODO: Implement auto builder here
-  // TODO: Create named commands list in Constants
+  // TODO: Implement auto building here
 
   /******
    *
@@ -138,8 +138,8 @@ public class Pathing {
    */
   private static HolonomicPathFollowerConfig getHolonomicConfig(ReplanningConfig replanningConfig) {
     return new HolonomicPathFollowerConfig(
-      new PIDConstants(DriveConsts.kTranslateP.getAsDouble(), DriveConsts.kTranslateI.getAsDouble(), DriveConsts.kTranslateD.getAsDouble()), // Translation controller for position error -> velocity
-      new PIDConstants(DriveConsts.kRotateP.getAsDouble(), DriveConsts.kRotateI.getAsDouble(), DriveConsts.kRotateD.getAsDouble()), // Rotation controller for angle error -> angular velocity
+      new PIDConstants(AutoConsts.kTranslateP.getAsDouble(), AutoConsts.kTranslateI.getAsDouble(), AutoConsts.kTranslateD.getAsDouble()), // Translation controller for position error -> velocity
+      new PIDConstants(AutoConsts.kRotateP.getAsDouble(), AutoConsts.kRotateI.getAsDouble(), AutoConsts.kRotateD.getAsDouble()), // Rotation controller for angle error -> angular velocity
       DriveConsts.kMaxLinearVelMetersPerSecond, // Maximum module speed
       frc.robot.Constants.SwerveConsts.kSwerve_fl.location.getDistance(new Translation2d()), // Radius of drive base
       replanningConfig // When to replan the path

@@ -1,9 +1,7 @@
 package frc.robot;
 
 import frc.robot.util.TunableNumber;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.util.SwerveModule.SwerveModuleConstants;
 import edu.wpi.first.math.controller.PIDController;
 
@@ -40,26 +38,6 @@ public class Constants {
     // Multipliers for all teleop driving
     public static final double kTeleopSpeedMult = 1;
     public static final double kTeleopTurnMult = 9.5 / kMaxTurnVelRadiansPerSecond; // Set maximum teleop turn speed to 1.5 rotations/s
-
-    // Upper bound drivetrain accelerations for path following and pose targeting
-    public static final double kMaxLinearAccelMetersPerSecondSquared = kMaxLinearVelMetersPerSecond * 2; // UNIT: meters/s/s
-    public static final double kMaxTurnAccelRadiansPerSecondSquared = kMaxTurnVelRadiansPerSecond * 2; // UNIT: radians/s/s
-
-    // Gains for drivetrain position error -> velocity
-    public static final TunableNumber
-      kTranslateP = new TunableNumber("P", 1, "Robot Translation"),
-      kTranslateI = new TunableNumber("I", 0, "Robot Translation"),
-      kTranslateD = new TunableNumber("D", 0, "Robot Translation");
-    public static final TunableNumber
-      kRotateP = new TunableNumber("P", 1, "Robot Rotation"),
-      kRotateI = new TunableNumber("I", 0, "Robot Rotation"),
-      kRotateD = new TunableNumber("D", 0, "Robot Rotation");
-
-    // Drivetrain location control tolerance
-    public static final Pose2d kPosTolerance = new Pose2d(
-      new Translation2d(0.0127, 0.0127), // UNIT: meters
-      Rotation2d.fromDegrees(0.75)
-    );
   }
 
   /** Data for each individual swerve module. */
@@ -98,19 +76,19 @@ public class Constants {
 
     // Bind Tunables
     static {
-      kDriveP.bindTo(val -> {
+      kDriveP.addBinding(val -> {
         kSwerve_fl.speed_controller.setP(val);
         kSwerve_fr.speed_controller.setP(val);
         kSwerve_bl.speed_controller.setP(val);
         kSwerve_br.speed_controller.setP(val);
       });
-      kAngleP.bindTo(val -> {
+      kAngleP.addBinding(val -> {
         kSwerve_fl.angle_controller.setP(val);
         kSwerve_fr.angle_controller.setP(val);
         kSwerve_bl.angle_controller.setP(val);
         kSwerve_br.angle_controller.setP(val);
       });
-      kAngleD.bindTo(val -> {
+      kAngleD.addBinding(val -> {
         kSwerve_fl.angle_controller.setD(val);
         kSwerve_fr.angle_controller.setD(val);
         kSwerve_bl.angle_controller.setD(val);
@@ -119,7 +97,22 @@ public class Constants {
     }
   }
 
-  public static class AutoConstants {
+  public static class AutoConsts {
+    // Upper bound drivetrain accelerations for path following and pose targeting
+    public static final double kMaxLinearAccelMetersPerSecondSquared = DriveConsts.kMaxLinearVelMetersPerSecond  / 0.5; // Reaches max speed in 0.5 seconds
+    public static final double kMaxTurnAccelRadiansPerSecondSquared = DriveConsts.kMaxTurnVelRadiansPerSecond / 0.5; // Reaches max speed in 0.5 seconds
+
+    // Gains for drivetrain position error -> velocity
+    public static final TunableNumber
+      kTranslateP = new TunableNumber("P", 1, "Robot Translation"),
+      kTranslateI = new TunableNumber("I", 0, "Robot Translation"),
+      kTranslateD = new TunableNumber("D", 0, "Robot Translation");
+    public static final TunableNumber
+      kRotateP = new TunableNumber("P", 1, "Robot Rotation"),
+      kRotateI = new TunableNumber("I", 0, "Robot Rotation"),
+      kRotateD = new TunableNumber("D", 0, "Robot Rotation");
+
+    // TODO: Initialize named commands here
     //static List<Pair<String, Command>> commands
   }
 }
