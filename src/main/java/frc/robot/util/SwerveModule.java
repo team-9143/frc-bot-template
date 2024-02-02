@@ -9,7 +9,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.controller.PIDController;
 
 import frc.robot.logger.LoggedSparkMax;
-//import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import frc.robot.logger.LoggedCANcoder;
@@ -44,7 +43,8 @@ public class SwerveModule {
     angle_controller.setSetpoint(0);
   }
 
-  // TODO: Use setVelocity()
+  // TODO: Use setVoltage()
+  // TODO: Implement SimpleMotorFeedForward
   /**
    * Calculate and set swerve module speed.
    *
