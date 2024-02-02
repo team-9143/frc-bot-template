@@ -8,6 +8,7 @@ import frc.robot.Constants.AutoConsts;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
 
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathConstraints;
@@ -15,7 +16,6 @@ import com.pathplanner.lib.path.GoalEndState;
 
 import com.pathplanner.lib.commands.FollowPathHolonomic;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
 
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -105,12 +105,21 @@ public class Pathing {
    ******/
 
   /**
-   * Create a command to follow a pathplanner path. Logs everything through the Logger during the command run.
+   * Create a command to follow a pathplanner path. Does not replan the path under any circumstances.
+   *
+   * @param path the pathplanner path to follow
+   */
+  public static Command getHolonomicFollowPathCommand(PathPlannerPath path) {
+    return AutoBuilder.followPath(path);
+  }
+
+  /**
+   * Create a command to follow a pathplanner path. Allows for customized replanning settings.
    *
    * @param path the pathplanner path to follow
    * @param replanningConfig replanning configuration to use
    */
-  public static FollowPathHolonomic getHolonomicFollowPathCommand(PathPlannerPath path, ReplanningConfig replanningConfig) {
+  public static Command getHolonomicFollowPathCommand(PathPlannerPath path, ReplanningConfig replanningConfig) {
     return new FollowPathHolonomic(
       path, // Path to follow
       Drivetrain.getInstance()::getPose, // Pose supplier
@@ -122,7 +131,32 @@ public class Pathing {
     );
   }
 
-  // TODO: Implement auto building here
+  /**
+   * Create a command to follow a pathplanner auto. Only replans the path if the initial error is too large.
+   *
+   * @param name name of the path file under [deploy/pathplanner/autos/], omitting ".auto"
+   */
+  public static Command getHolonomicFullAutoCommand(String name) {
+    return AutoBuilder.buildAuto(name);
+  }
+
+  /**
+   * Create a command that pathfinds to the target pose and stops.
+   *
+   * @param targetPoseMetersCCW target position for the command
+   */
+  public static Command getHolonomicTargetPoseCommand(Pose2d targetPoseMetersCCW) {
+    return AutoBuilder.pathfindToPose(targetPoseMetersCCW, DEFAULT_CONSTRAINTS);
+  }
+
+  /**
+   * Create a command that pathfinds to a path and then follows that path.
+   *
+   * @param path the pathplanner path to target and follow
+   */
+  public static Command getHolonomicTargetPathCommand(PathPlannerPath path) {
+    return AutoBuilder.pathfindThenFollowPath(path, DEFAULT_CONSTRAINTS);
+  }
 
   /******
    *
