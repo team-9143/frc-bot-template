@@ -87,18 +87,6 @@ public class LoggedCANcoder implements Loggable {
   }
 
   /**
-   * Effectively set the position of the target for {@link LoggedCANcoder#getOffsetPosition getOffsetPosition()}. UNIT: ccw degrees
-   * <p>
-   * Uses the offset parameter. Overriding this through {@link LoggedCANcoder#setOffset setOffset()} may cause unwanted behavior.
-   *
-   * @param target the target position
-   */
-  // TODO: Fix this so that it works with setOffset(), then implement on swerve module
-  public void setPosition(double target) {
-    this.offset = target - getAbsolutePosition();
-  }
-
-  /**
    * Get the offset position of the sensor, which remains constant through a power cycle. Affected by {@link LoggedCANcoder#setOffset setOffset()} and {@link LoggedCANcoder#setPosition setPosition()}. UNIT: ccw degrees, range [0, 360)
    *
    * @return The offset position of the sensor.
