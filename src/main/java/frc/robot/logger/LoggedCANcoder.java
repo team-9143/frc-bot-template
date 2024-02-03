@@ -4,7 +4,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 
-import java.util.function.Supplier;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
@@ -13,7 +13,7 @@ public class LoggedCANcoder implements Loggable {
   private static final String LOG_DIR = "/cancoders/";
   public final String directory;
 
-  /** CANcoder configuraation options */
+  /** CANcoder configuration options */
   private static final CANcoderConfiguration config = new CANcoderConfiguration()
     .withMagnetSensor(new MagnetSensorConfigs()
       .withAbsoluteSensorRange(AbsoluteSensorRangeValue.Unsigned_0To1)
@@ -21,9 +21,9 @@ public class LoggedCANcoder implements Loggable {
 
   private final CANcoder cancoder;
 
-  private final Supplier<Double> positionSupplier;
-  private final Supplier<Double> velocitySupplier;
-  private final Supplier<Double> totalPositionSupplier;
+  private final StatusSignal<Double> positionSignal;
+  private final StatusSignal<Double> velocitySignal;
+  private final StatusSignal<Double> totalPositionSignal;
 
   private double offset;
 
@@ -39,14 +39,14 @@ public class LoggedCANcoder implements Loggable {
     cancoder.getConfigurator().apply(config);
 
     // Configure status signals
-    cancoder.getAbsolutePosition().setUpdateFrequency(50);
-    positionSupplier = cancoder.getAbsolutePosition().asSupplier();
+    positionSignal = cancoder.getAbsolutePosition();
+    positionSignal.setUpdateFrequency(50);
 
-    cancoder.getVelocity().setUpdateFrequency(50);
-    velocitySupplier = cancoder.getVelocity().asSupplier();
+    velocitySignal = cancoder.getVelocity();
+    velocitySignal.setUpdateFrequency(50);
 
-    cancoder.getPositionSinceBoot().setUpdateFrequency(50);
-    totalPositionSupplier = cancoder.getPositionSinceBoot().asSupplier();
+    totalPositionSignal = cancoder.getPositionSinceBoot();
+    totalPositionSignal.setUpdateFrequency(50);
 
     // Remove all other automatic updates
     cancoder.optimizeBusUtilization();
@@ -74,7 +74,7 @@ public class LoggedCANcoder implements Loggable {
    * @return The position of the sensor.
    */
   public double getAbsolutePosition() {
-    return positionSupplier.get() * 360d;
+    return positionSignal.getValue() * 360d;
   }
 
   /**
@@ -102,7 +102,7 @@ public class LoggedCANcoder implements Loggable {
    * @return The distance of the sensor.
    */
   public double getTravel() {
-    return totalPositionSupplier.get() * 360d;
+    return totalPositionSignal.getValue() * 360d;
   }
 
   /**
@@ -111,7 +111,7 @@ public class LoggedCANcoder implements Loggable {
    * @return The velocity of the sensor.
    */
   public double getVelocity() {
-    return velocitySupplier.get() * 360d;
+    return velocitySignal.getValue() * 360d;
   }
 
   @Override
