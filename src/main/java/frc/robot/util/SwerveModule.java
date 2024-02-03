@@ -7,7 +7,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 import edu.wpi.first.math.controller.PIDController;
-
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import frc.robot.logger.LoggedSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
@@ -43,7 +43,6 @@ public class SwerveModule {
     angle_controller.setSetpoint(0);
   }
 
-  // TODO: Use setVoltage()
   // TODO: Implement SimpleMotorFeedForward
   /**
    * Calculate and set swerve module speed.
@@ -53,12 +52,10 @@ public class SwerveModule {
    */
   protected void drive(double speed, double angle) {
     // Calculate and set angle motor speed
-    angle_motor.set(Math.max(-DriveConsts.kMaxModuleRotateSpeedPercentage, Math.min(DriveConsts.kMaxModuleRotateSpeedPercentage, // Clamp to maximum speed
-      angle_controller.calculate(getAngle(), angle)
-    )));
+    angle_motor.setVoltage(12*Math.max(-DriveConsts.kMaxModuleRotateSpeedPercentage, Math.min(DriveConsts.kMaxModuleRotateSpeedPercentage, angle_controller.calculate(getAngle(), angle))));
 
     // Calculate and set drive motor speed
-    drive_motor.set(
+    drive_motor.setVoltage(12*
       Math.max(-1, Math.min(1, // Clamp to maximum speed
         speed_controller.calculate(getVelocity(), speed) // Velocity adjustment feedback controller
         + (speed/DriveConsts.kMaxLinearVelMetersPerSecond) // Simple velocity feedforward
@@ -81,7 +78,7 @@ public class SwerveModule {
 
   /** @return the angle of the module (UNIT: ccw degrees) */
   public double getAngle() {
-    return cancoder.getPosition();
+    return cancoder.getAbsolutePosition();
   }
 
   /** @return the velocity of the module (UNIT: meters/s) */
