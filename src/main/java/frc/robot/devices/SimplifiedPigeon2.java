@@ -32,7 +32,6 @@ public class SimplifiedPigeon2 {
    * @param invertRoll Whether to invert the roll to reach the proper positive direction (robot-right)
    * @param swapPitchAndRoll Whether to swap the pitch (should be forward/backward) and the roll (should be right/left) to align the axes
    */
-  // TODO: Fix with new ctre lib and move object scope to drivetrain subsystem
   public SimplifiedPigeon2(int deviceNumber, double pitchOffset, double rollOffset, boolean invertPitch, boolean invertRoll, boolean swapPitchAndRoll) {
     pigeon2 = new Pigeon2(deviceNumber);
     this.invertPitch = invertPitch ? -1 : 1;
