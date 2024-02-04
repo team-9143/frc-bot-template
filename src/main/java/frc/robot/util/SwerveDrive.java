@@ -3,7 +3,6 @@ package frc.robot.util;
 import edu.wpi.first.wpilibj.MotorSafety;
 
 import frc.robot.Constants.DriveConsts;
-import frc.robot.devices.OI;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -12,6 +11,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import java.util.function.Supplier;
 
 /** Controls a set of four {@link SwerveModule SwerveModules}. Protected by {@link MotorSafety}, and speeds must be set every iteration. */
 public class SwerveDrive extends MotorSafety {
@@ -25,10 +25,13 @@ public class SwerveDrive extends MotorSafety {
 
   public final SwerveDriveKinematics kinematics;
   private final SwerveDrivePoseEstimator odometry;
+  private final Supplier<Rotation2d> yawSupplier;
 
-  public SwerveDrive(SwerveModule.SwerveModuleConstants consts_fl, SwerveModule.SwerveModuleConstants consts_fr, SwerveModule.SwerveModuleConstants consts_bl, SwerveModule.SwerveModuleConstants consts_br) {
+  public SwerveDrive(Supplier<Rotation2d> yaw, SwerveModule.SwerveModuleConstants consts_fl, SwerveModule.SwerveModuleConstants consts_fr, SwerveModule.SwerveModuleConstants consts_bl, SwerveModule.SwerveModuleConstants consts_br) {
     // Turn on motor safety watchdog
     setSafetyEnabled(true);
+
+    yawSupplier = yaw;
 
     // Initialize swerve modules
     modules = new SwerveModule[] {
@@ -49,7 +52,7 @@ public class SwerveDrive extends MotorSafety {
     // Initialize odometry - If using vision adjustments, add standard deviation matrices
     odometry = new SwerveDrivePoseEstimator(
       kinematics,
-      Rotation2d.fromDegrees(OI.IMU.getYaw()),
+      yawSupplier.get(),
       new SwerveModulePosition[] {
         new SwerveModulePosition(modules[0].getDistance(), Rotation2d.fromDegrees(modules[0].getAngle())),
         new SwerveModulePosition(modules[1].getDistance(), Rotation2d.fromDegrees(modules[1].getAngle())),
@@ -63,7 +66,7 @@ public class SwerveDrive extends MotorSafety {
   /** Updates odometry and pushes desired control to modules. Should be called every robot loop. */
   public void update() {
     // Update odometry state estimation
-    odometry.update(Rotation2d.fromDegrees(OI.IMU.getYaw()), new SwerveModulePosition[] {
+    odometry.update(yawSupplier.get(), new SwerveModulePosition[] {
       new SwerveModulePosition(modules[0].getDistance(), Rotation2d.fromDegrees(modules[0].getAngle())),
       new SwerveModulePosition(modules[1].getDistance(), Rotation2d.fromDegrees(modules[1].getAngle())),
       new SwerveModulePosition(modules[2].getDistance(), Rotation2d.fromDegrees(modules[2].getAngle())),
@@ -105,7 +108,7 @@ public class SwerveDrive extends MotorSafety {
    */
   public void resetOdometry(Pose2d positionMetersCCW) {
     odometry.resetPosition(
-      Rotation2d.fromDegrees(OI.IMU.getYaw()),
+      yawSupplier.get(),
       new SwerveModulePosition[] {
         new SwerveModulePosition(modules[0].getDistance(), Rotation2d.fromDegrees(modules[0].getAngle())),
         new SwerveModulePosition(modules[1].getDistance(), Rotation2d.fromDegrees(modules[1].getAngle())),
