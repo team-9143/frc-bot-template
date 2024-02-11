@@ -93,6 +93,7 @@ public class SimplifiedPigeon2 {
 
   /** @return IMU orientation as a {@link Rotation3d}. May cause mild performance issues */
   public Rotation3d getRotation3d() {
+    // TODO: Create Rotation3d object with yaw-pitch-roll signals to allow for offsets
     return pigeon2.getRotation3d();
   }
 }
