@@ -28,8 +28,8 @@ public class Constants {
 
   /** Physical parts of the robot, such as gearboxes or wheel diameters. */
   public static class PhysConsts {
-    public static final double kSwerveWheelGearbox = 1d/5.14; // SDS L4 modules
-    public static final double kSwerveWheelCircumferenceMeters = 0.09779 * Math.PI; // Colson wheels
+    public static final double kSwerveDriveGearbox = 1d/5.355; // SDS L3 modules with 16T drive pinion
+    public static final double kSwerveWheelCircumferenceMeters = 0.099 * Math.PI; // Billet wheels
   }
 
   /** Data relating to the entire drivetrain. */
