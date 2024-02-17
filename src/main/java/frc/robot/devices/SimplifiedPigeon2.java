@@ -91,9 +91,8 @@ public class SimplifiedPigeon2 {
     return rollSignal.getValue() * invertRoll;
   }
 
-  /** @return IMU orientation as a {@link Rotation3d}. May cause mild performance issues */
+  /** @return IMU orientation as a {@link Rotation3d}. */
   public Rotation3d getRotation3d() {
-    // TODO: Create Rotation3d object with yaw-pitch-roll signals to allow for offsets
-    return pigeon2.getRotation3d();
+    return new Rotation3d(getRoll(), getPitch(), getYaw());
   }
 }

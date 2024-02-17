@@ -121,7 +121,7 @@ public class Constants {
       kRotateI = new TunableNumber("I", 0, "Robot Rotation"),
       kRotateD = new TunableNumber("D", 0, "Robot Rotation");
 
-    // TODO: Initialize named commands here
+    // TODO: Create and register named commands here
     //static List<Pair<String, Command>> commands
   }
 }
