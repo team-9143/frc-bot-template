@@ -2,6 +2,7 @@ package frc.robot.util;
 
 import frc.robot.Constants.PhysConsts;
 import frc.robot.Constants.DriveConsts;
+import frc.robot.Constants.SwerveConsts;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -51,14 +52,20 @@ public class SwerveModule {
    * @param angle module angle (UNIT: ccw degrees)
    */
   protected void drive(double speed, double angle) {
-    // Calculate and set angle motor speed
-    angle_motor.setVoltage(12*Math.max(-DriveConsts.kMaxModuleRotateSpeedPercentage, Math.min(DriveConsts.kMaxModuleRotateSpeedPercentage, angle_controller.calculate(getAngle(), angle))));
+    // Calculate and set azimuth motor speed
+    azimuth_motor.setVoltage(
+      Math.max(-DriveConsts.kMaxModuleAzimuthVoltage, Math.min(DriveConsts.kMaxModuleAzimuthVoltage, // Clamp to nominal voltage
+        SwerveConsts.kAzimuthS.getAsDouble() // Simple static feedforward
+        + azimuth_controller.calculate(getAngle(), angle)) // Azimuth feedback controller
+      )
+    );
 
     // Calculate and set drive motor speed
-    drive_motor.setVoltage(12*
-      Math.max(-1, Math.min(1, // Clamp to maximum speed
-        speed_controller.calculate(getVelocity(), speed) // Velocity adjustment feedback controller
-        + (speed/DriveConsts.kMaxLinearVelMetersPerSecond) // Simple velocity feedforward
+    drive_motor.setVoltage(
+      Math.max(-PhysConsts.kSwerveDriveMaxVoltage, Math.min(PhysConsts.kSwerveDriveMaxVoltage, // Clamp to nominal voltage
+        (PhysConsts.kSwerveDriveMaxVoltage * speed/DriveConsts.kMaxLinearVelMetersPerSecond) // Simple velocity feedforward
+        + SwerveConsts.kDriveS.getAsDouble() // Simple static feedforward
+        + speed_controller.calculate(getVelocity(), speed) // Velocity adjustment feedback controller
       )) * Math.abs(Math.cos(getAngleError() * Math.PI/180)) // Scale velocity down if not at proper angle
     );
   }
