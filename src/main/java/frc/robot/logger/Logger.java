@@ -75,6 +75,8 @@ public class Logger {
   // Network tables Tables for data logging directories
   private static NetworkTable outputTable;
   private static NetworkTable metadataTable;
+  /** PubSubOptions to use for logging. */
+  private static final PubSubOption pubOptions = PubSubOption.keepDuplicates(true);
 
   // Publisher maps for logging to network tables
   private static final HashMap<String, BooleanPublisher> booleanPublishers = new HashMap<>();
@@ -131,6 +133,7 @@ public class Logger {
     DataLogManager.log(msg);
   }
 
+  @SuppressWarnings("resource")
   public static void recordOutput(String path, boolean value) {
     booleanLogs
       .computeIfAbsent(path, k -> new BooleanLogEntry(log, OUTPUT_LOG_DIR + path)) // Retrieve/create log entry
@@ -138,11 +141,12 @@ public class Logger {
 
     if (Config.NTStream) {
       booleanPublishers
-        .computeIfAbsent(path, k -> outputTable.getBooleanTopic(path).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+      .computeIfAbsent(path, k -> outputTable.getBooleanTopic(path).publish(pubOptions)) // Retrieve/create publisher
         .set(value); // Record value to network tables
     }
   }
 
+  @SuppressWarnings("resource")
   public static void recordOutput(String path, double value) {
     doubleLogs
       .computeIfAbsent(path, k -> new DoubleLogEntry(log, OUTPUT_LOG_DIR + path)) // Retrieve/create log entry
@@ -150,11 +154,12 @@ public class Logger {
 
     if (Config.NTStream) {
       doublePublishers
-        .computeIfAbsent(path, k -> outputTable.getDoubleTopic(path).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+        .computeIfAbsent(path, k -> outputTable.getDoubleTopic(path).publish(pubOptions)) // Retrieve/create publisher
         .set(value); // Record value to network tables
     }
   }
 
+  @SuppressWarnings("resource")
   public static void recordOutput(String path, float value) {
     floatLogs
       .computeIfAbsent(path, k -> new FloatLogEntry(log, OUTPUT_LOG_DIR + path)) // Retrieve/create log entry
@@ -162,11 +167,12 @@ public class Logger {
 
     if (Config.NTStream) {
       floatPublishers
-        .computeIfAbsent(path, k -> outputTable.getFloatTopic(path).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+        .computeIfAbsent(path, k -> outputTable.getFloatTopic(path).publish(pubOptions)) // Retrieve/create publisher
         .set(value); // Record value to network tables
     }
   }
 
+  @SuppressWarnings("resource")
   public static void recordOutput(String path, int value) {
     integerLogs
       .computeIfAbsent(path, k -> new IntegerLogEntry(log, OUTPUT_LOG_DIR + path)) // Retrieve/create log entry
@@ -174,11 +180,12 @@ public class Logger {
 
     if (Config.NTStream) {
       integerPublishers
-        .computeIfAbsent(path, k -> outputTable.getIntegerTopic(path).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+        .computeIfAbsent(path, k -> outputTable.getIntegerTopic(path).publish(pubOptions)) // Retrieve/create publisher
         .set(value); // Record value to network tables
     }
   }
 
+  @SuppressWarnings("resource")
   public static void recordOutput(String path, String value) {
     stringLogs
       .computeIfAbsent(path, k -> new StringLogEntry(log, OUTPUT_LOG_DIR + path)) // Retrieve/create log entry
@@ -186,11 +193,12 @@ public class Logger {
 
     if (Config.NTStream) {
       stringPublishers
-        .computeIfAbsent(path, k -> outputTable.getStringTopic(path).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+        .computeIfAbsent(path, k -> outputTable.getStringTopic(path).publish(pubOptions)) // Retrieve/create publisher
         .set(value); // Record value to network tables
     }
   }
 
+  @SuppressWarnings("resource")
   public static void recordOutput(String path, boolean[] values) {
     booleanArrayLogs
       .computeIfAbsent(path, k -> new BooleanArrayLogEntry(log, OUTPUT_LOG_DIR + path)) // Retrieve/create log entry
@@ -198,11 +206,12 @@ public class Logger {
 
     if (Config.NTStream) {
       booleanArrayPublishers
-        .computeIfAbsent(path, k -> outputTable.getBooleanArrayTopic(path).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+        .computeIfAbsent(path, k -> outputTable.getBooleanArrayTopic(path).publish(pubOptions)) // Retrieve/create publisher
         .set(values); // Record value to network tables
     }
   }
 
+  @SuppressWarnings("resource")
   public static void recordOutput(String path, double[] values) {
     doubleArrayLogs
       .computeIfAbsent(path, k -> new DoubleArrayLogEntry(log, OUTPUT_LOG_DIR + path)) // Retrieve/create log entry
@@ -210,11 +219,12 @@ public class Logger {
 
     if (Config.NTStream) {
       doubleArrayPublishers
-        .computeIfAbsent(path, k -> outputTable.getDoubleArrayTopic(path).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+        .computeIfAbsent(path, k -> outputTable.getDoubleArrayTopic(path).publish(pubOptions)) // Retrieve/create publisher
         .set(values); // Record value to network tables
     }
   }
 
+  @SuppressWarnings("resource")
   public static void recordOutput(String path, float[] values) {
     floatArrayLogs
       .computeIfAbsent(path, k -> new FloatArrayLogEntry(log, OUTPUT_LOG_DIR + path)) // Retrieve/create log entry
@@ -222,11 +232,12 @@ public class Logger {
 
     if (Config.NTStream) {
       floatArrayPublishers
-        .computeIfAbsent(path, k -> outputTable.getFloatArrayTopic(path).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+        .computeIfAbsent(path, k -> outputTable.getFloatArrayTopic(path).publish(pubOptions)) // Retrieve/create publisher
         .set(values); // Record value to network tables
     }
   }
 
+  @SuppressWarnings("resource")
   public static void recordOutput(String path, long[] values) {
     integerArrayLogs
       .computeIfAbsent(path, k -> new IntegerArrayLogEntry(log, OUTPUT_LOG_DIR + path)) // Retrieve/create log entry
@@ -234,7 +245,7 @@ public class Logger {
 
     if (Config.NTStream) {
       integerArrayPublishers
-        .computeIfAbsent(path, k -> outputTable.getIntegerArrayTopic(path).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+        .computeIfAbsent(path, k -> outputTable.getIntegerArrayTopic(path).publish(pubOptions)) // Retrieve/create publisher
         .set(values); // Record value to network tables
     }
   }
@@ -249,6 +260,7 @@ public class Logger {
     recordOutput(path, longs);
   }
 
+  @SuppressWarnings("resource")
   public static void recordOutput(String path, String[] values) {
     stringArrayLogs
       .computeIfAbsent(path, k -> new StringArrayLogEntry(log, OUTPUT_LOG_DIR + path)) // Retrieve/create log entry
@@ -256,7 +268,7 @@ public class Logger {
 
     if (Config.NTStream) {
       stringArrayPublishers
-        .computeIfAbsent(path, k -> outputTable.getStringArrayTopic(path).publish(PubSubOption.keepDuplicates(true))) // Retrieve/create publisher
+        .computeIfAbsent(path, k -> outputTable.getStringArrayTopic(path).publish(pubOptions)) // Retrieve/create publisher
         .set(values); // Record value to network tables
     }
   }
