@@ -45,6 +45,7 @@ public class RobotContainer {
     Logger.recordMetadata("RoborioSerialNum", RobotBase.isReal() ? System.getenv("serialnum") : "Simulation");
     Logger.recordMetadata("BuildDate", LocalDateTime.now(ZoneId.of("UTC-8")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
     Logger.recordMetadata("PowerDistributionType", powerDist.getType().name());
+    Logger.recordMetadata("NT Streaming", Constants.Config.NTStream ? "true" : "false");
   }
 
   /** Initialize OI devices. */
