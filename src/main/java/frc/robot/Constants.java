@@ -45,6 +45,7 @@ public class Constants {
   }
 
   /** Data for each individual swerve module. */
+  // TODO: Rename all things relating to swerve rotate modules to "azimuth"
   public static class SwerveConsts {
     public static final TunableNumber
       kDriveP = new TunableNumber("P", 1.5e-2, "Module Drive");
