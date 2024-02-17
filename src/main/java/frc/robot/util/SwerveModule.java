@@ -43,8 +43,6 @@ public class SwerveModule {
     azimuth_controller.setSetpoint(0);
   }
 
-  // TODO: Implement SimpleMotorFeedForward
-  // TODO: Use voltage controls
   /**
    * Calculate and set swerve module speed.
    *
