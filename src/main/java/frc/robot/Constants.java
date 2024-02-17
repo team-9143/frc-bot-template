@@ -48,9 +48,11 @@ public class Constants {
 
   /** Data for each individual swerve module. */
   public static class SwerveConsts {
+    // Gains for module velocity error -> voltage
     public static final TunableNumber
       kDriveS = new TunableNumber("S", 0, "Module Drive"),
       kDriveP = new TunableNumber("P", 1.5e-2, "Module Drive");
+    // Gains for module azimuth error (degrees) -> voltage
     public static final TunableNumber
       kAzimuthS = new TunableNumber("S", 0, "Module Azimuth"),
       kAzimuthV = new TunableNumber("V", 0, "Module Azimuth"),
