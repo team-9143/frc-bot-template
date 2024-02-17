@@ -45,38 +45,40 @@ public class Constants {
   }
 
   /** Data for each individual swerve module. */
-  // TODO: Rename all things relating to swerve rotate modules to "azimuth"
   public static class SwerveConsts {
     public static final TunableNumber
+      kDriveS = new TunableNumber("S", 0, "Module Drive"),
       kDriveP = new TunableNumber("P", 1.5e-2, "Module Drive");
     public static final TunableNumber
-      kAngleP = new TunableNumber("P", 0.0065, "Module Angle"),
-      kAngleD = new TunableNumber("D", 0.00005, "Module Angle");
+      kAzimuthS = new TunableNumber("S", 0, "Module Azimuth"),
+      kAzimuthV = new TunableNumber("V", 0, "Module Azimuth"),
+      kAzimuthP = new TunableNumber("P", 0.0065, "Module Azimuth"),
+      kAzimuthD = new TunableNumber("D", 0.00005, "Module Azimuth");
 
     public static final SwerveModuleConstants
       kSwerve_fl = new SwerveModuleConstants(
         "/module-front-left/", 41, 42, 43, 31.465,
         new Translation2d(0.22225, 0.22225),
         new PIDController(kDriveP.getAsDouble(), 0, 0),
-        new PIDController(kAngleP.getAsDouble(), 0, kAngleD.getAsDouble())
+        new PIDController(kAzimuthP.getAsDouble(), 0, kAzimuthD.getAsDouble())
       ),
       kSwerve_fr = new SwerveModuleConstants(
         "/module-front-right/", 11, 12, 13, 28.037,
         new Translation2d(0.22225, -0.22225),
         new PIDController(kDriveP.getAsDouble(), 0, 0),
-        new PIDController(kAngleP.getAsDouble(), 0, kAngleD.getAsDouble())
+        new PIDController(kAzimuthP.getAsDouble(), 0, kAzimuthD.getAsDouble())
       ),
       kSwerve_bl = new SwerveModuleConstants(
         "/module-back-left/", 31, 32, 33, 86.748,
         new Translation2d(-0.22225, 0.22225),
         new PIDController(kDriveP.getAsDouble(), 0, 0),
-        new PIDController(kAngleP.getAsDouble(), 0, kAngleD.getAsDouble())
+        new PIDController(kAzimuthP.getAsDouble(), 0, kAzimuthD.getAsDouble())
       ),
       kSwerve_br = new SwerveModuleConstants(
         "/module-back-right/", 21, 22, 23, -96.943,
         new Translation2d(-0.22225, -0.22225),
         new PIDController(kDriveP.getAsDouble(), 0, 0),
-        new PIDController(kAngleP.getAsDouble(), 0, kAngleD.getAsDouble())
+        new PIDController(kAzimuthP.getAsDouble(), 0, kAzimuthD.getAsDouble())
       );
 
     // Bind Tunables
@@ -87,17 +89,17 @@ public class Constants {
         kSwerve_bl.speed_controller.setP(val);
         kSwerve_br.speed_controller.setP(val);
       });
-      kAngleP.addBinding(val -> {
-        kSwerve_fl.angle_controller.setP(val);
-        kSwerve_fr.angle_controller.setP(val);
-        kSwerve_bl.angle_controller.setP(val);
-        kSwerve_br.angle_controller.setP(val);
+      kAzimuthP.addBinding(val -> {
+        kSwerve_fl.azimuth_controller.setP(val);
+        kSwerve_fr.azimuth_controller.setP(val);
+        kSwerve_bl.azimuth_controller.setP(val);
+        kSwerve_br.azimuth_controller.setP(val);
       });
-      kAngleD.addBinding(val -> {
-        kSwerve_fl.angle_controller.setD(val);
-        kSwerve_fr.angle_controller.setD(val);
-        kSwerve_bl.angle_controller.setD(val);
-        kSwerve_br.angle_controller.setD(val);
+      kAzimuthD.addBinding(val -> {
+        kSwerve_fl.azimuth_controller.setD(val);
+        kSwerve_fr.azimuth_controller.setD(val);
+        kSwerve_bl.azimuth_controller.setD(val);
+        kSwerve_br.azimuth_controller.setD(val);
       });
     }
   }
