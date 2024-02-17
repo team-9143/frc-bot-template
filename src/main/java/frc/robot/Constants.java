@@ -85,19 +85,19 @@ public class Constants {
 
     // Bind Tunables
     static {
-      kDriveP.addBinding(val -> {
+      kDriveP.bind(val -> {
         kSwerve_fl.speed_controller.setP(val);
         kSwerve_fr.speed_controller.setP(val);
         kSwerve_bl.speed_controller.setP(val);
         kSwerve_br.speed_controller.setP(val);
       });
-      kAzimuthP.addBinding(val -> {
+      kAzimuthP.bind(val -> {
         kSwerve_fl.azimuth_controller.setP(val);
         kSwerve_fr.azimuth_controller.setP(val);
         kSwerve_bl.azimuth_controller.setP(val);
         kSwerve_br.azimuth_controller.setP(val);
       });
-      kAzimuthD.addBinding(val -> {
+      kAzimuthD.bind(val -> {
         kSwerve_fl.azimuth_controller.setD(val);
         kSwerve_fr.azimuth_controller.setD(val);
         kSwerve_bl.azimuth_controller.setD(val);

@@ -2,6 +2,7 @@ package frc.robot.util;
 
 import java.util.function.DoubleSupplier;
 import java.util.function.DoubleConsumer;
+import frc.robot.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,6 +13,8 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 
 /** Represents a double that can be changed during runtime. */
 public class TunableNumber implements DoubleSupplier, DoubleConsumer {
+  private static final String LOG_DIR = "/numbers/";
+
   /** List of instances. */
   private static final ArrayList<TunableNumber> s_instances = new ArrayList<TunableNumber>();
   /** List of groups. */
@@ -34,7 +37,7 @@ public class TunableNumber implements DoubleSupplier, DoubleConsumer {
   private boolean m_mutable = false;
 
   /** Function to run when the value is changed. */
-  private DoubleConsumer m_bindOnChange;
+  private DoubleConsumer m_onChange;
 
   /**
    * Create a new TunableNumber.
@@ -46,11 +49,13 @@ public class TunableNumber implements DoubleSupplier, DoubleConsumer {
   public TunableNumber(String name, double val, String group) {
     m_name = name;
     m_default = val;
-    m_value = m_default;
+    m_value = val;
+    m_group = group;
+
+    m_onChange = n -> Logger.recordOutput(LOG_DIR + m_group + "/" + m_name, n);
+    m_onChange.accept(val);
 
     s_instances.add(this);
-
-    m_group = group;
     s_groups.add(group);
   }
 
@@ -114,10 +119,10 @@ public class TunableNumber implements DoubleSupplier, DoubleConsumer {
   /**
    * Adds a consumer to be called when the value is changed.
    *
-   * @param bindOnChange {@link DoubleConsumer} to be called with the new value
+   * @param onChange {@link DoubleConsumer} to be called with the new value
    */
-  public void addBinding(DoubleConsumer bindOnChange) {
-    m_bindOnChange = (m_bindOnChange == null) ? bindOnChange : m_bindOnChange.andThen(bindOnChange);
+  public void bind(DoubleConsumer onChange) {
+    m_onChange = m_onChange.andThen(onChange);
   }
 
   /** Resets value to initialized value. */
@@ -146,9 +151,7 @@ public class TunableNumber implements DoubleSupplier, DoubleConsumer {
       if (m_entry != null) {
         m_entry.setDouble(val);
       }
-      if (m_bindOnChange != null) {
-        m_bindOnChange.accept(m_value);
-      }
+      m_onChange.accept(m_value);
     }
   }
 
