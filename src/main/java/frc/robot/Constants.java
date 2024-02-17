@@ -11,7 +11,7 @@ public class Constants {
   public static class Config {
     /** {@code true} to stream log file data to NetworkTables (takes up bandwith and processing time, but useful for concurrent running and visualization) */
     public static final boolean NTStream = false;
-    /** Directory for log file. Leave blank to store in project directory. */
+    /** Directory for log file. Leave blank to store in local /logs/ directory. */
     public static final String DATA_LOG_DIR = "";
   }
 

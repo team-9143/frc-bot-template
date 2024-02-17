@@ -61,8 +61,8 @@ public class SwerveModule {
     // Calculate and set drive motor speed
     drive_motor.setVoltage(
       Math.max(-PhysConsts.kSwerveDriveMaxVoltage, Math.min(PhysConsts.kSwerveDriveMaxVoltage, // Clamp to nominal voltage
-        (PhysConsts.kSwerveDriveMaxVoltage * speed/DriveConsts.kMaxLinearVelMetersPerSecond) // Simple velocity feedforward
-        + SwerveConsts.kDriveS.getAsDouble() // Simple static feedforward
+        SwerveConsts.kDriveS.getAsDouble() // Simple static feedforward
+        + (PhysConsts.kSwerveDriveMaxVoltage * speed/DriveConsts.kMaxLinearVelMetersPerSecond) // Simple velocity feedforward
         + speed_controller.calculate(getVelocity(), speed) // Velocity adjustment feedback controller
       )) * Math.abs(Math.cos(getAngleError() * Math.PI/180)) // Scale velocity down if not at proper angle
     );
