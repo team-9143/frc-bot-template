@@ -28,8 +28,10 @@ public class Constants {
 
   /** Physical parts of the robot, such as gearboxes or wheel diameters. */
   public static class PhysConsts {
+    public static final int kNEOMaxVoltage = 12; // NEO V1.1 nominal voltage
+    public static final int kNEOCurrentLimit = 40; // NEO V1.1 general current limit (40A-60A is advised)
+
     public static final double kSwerveDriveRPS = 5680d / 60d; // NEO V1.1 empirical free speed
-    public static final int kSwerveDriveMaxVoltage = 12; // NEO V1.1 nominal voltage
     public static final double kSwerveDriveGearbox = 1d/5.355; // SDS L3 modules with 16T drive pinion
     public static final double kSwerveWheelCircumferenceMeters = 0.099 * Math.PI; // Billet wheels
   }
@@ -39,7 +41,7 @@ public class Constants {
     // Upper bound drivetrain constraints
     public static final double kMaxLinearVelMetersPerSecond = PhysConsts.kSwerveDriveRPS * PhysConsts.kSwerveDriveGearbox * PhysConsts.kSwerveWheelCircumferenceMeters * 0.8; // 80% of theoretical max (motor RPS * gearbox * wheel circumfrence * 80%)
     public static final double kMaxTurnVelRadiansPerSecond = kMaxLinearVelMetersPerSecond / Constants.SwerveConsts.kSwerve_fl.location.getDistance(new Translation2d()); // ω = velocity / radius (assuming square swerve drivetrain)
-    public static final double kMaxModuleAzimuthVoltage = 0.65 * PhysConsts.kSwerveDriveMaxVoltage; // Maximum azimuth motor voltage
+    public static final double kMaxModuleAzimuthVoltage = 0.65 * PhysConsts.kNEOMaxVoltage; // Maximum azimuth motor voltage
 
     // Multipliers for all teleop driving
     public static final double kTeleopSpeedMult = 1;

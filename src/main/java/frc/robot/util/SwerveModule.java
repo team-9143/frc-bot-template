@@ -23,8 +23,8 @@ public class SwerveModule {
   private final PIDController azimuth_controller;
 
   protected SwerveModule(SwerveModuleConstants constants) {
-    drive_motor = new LoggedSparkMax(constants.drive_ID, MotorType.kBrushless, constants.directory + "/drive/");
-    azimuth_motor = new LoggedSparkMax(constants.azimuth_ID, MotorType.kBrushless, constants.directory + "/angle/");
+    drive_motor = new LoggedSparkMax(constants.drive_ID, MotorType.kBrushless, constants.directory + "/drive/", PhysConsts.kNEOMaxVoltage, PhysConsts.kNEOCurrentLimit);
+    azimuth_motor = new LoggedSparkMax(constants.azimuth_ID, MotorType.kBrushless, constants.directory + "/angle/", DriveConsts.kMaxModuleAzimuthVoltage, PhysConsts.kNEOCurrentLimit);
     cancoder = new LoggedCANcoder(constants.cancoder_ID, constants.directory, constants.cancoderOffset);
     speed_controller = constants.speed_controller;
     azimuth_controller = constants.azimuth_controller;
@@ -52,17 +52,15 @@ public class SwerveModule {
   protected void drive(double speed, double angle) {
     // Calculate and set azimuth motor speed
     azimuth_motor.setVoltage(
-      Math.max(-DriveConsts.kMaxModuleAzimuthVoltage, Math.min(DriveConsts.kMaxModuleAzimuthVoltage, // Clamp to nominal voltage
-        SwerveConsts.kAzimuthS.getAsDouble() // Simple static feedforward
-        + azimuth_controller.calculate(getAngle(), angle)) // Azimuth feedback controller
-      )
+      SwerveConsts.kAzimuthS.getAsDouble() // Simple static feedforward
+      + azimuth_controller.calculate(getAngle(), angle) // Azimuth feedback controller
     );
 
     // Calculate and set drive motor speed
     drive_motor.setVoltage(
-      Math.max(-PhysConsts.kSwerveDriveMaxVoltage, Math.min(PhysConsts.kSwerveDriveMaxVoltage, // Clamp to nominal voltage
+      Math.max(-PhysConsts.kNEOMaxVoltage, Math.min(PhysConsts.kNEOMaxVoltage, // Clamp to nominal voltage
         SwerveConsts.kDriveS.getAsDouble() // Simple static feedforward
-        + (PhysConsts.kSwerveDriveMaxVoltage * speed/DriveConsts.kMaxLinearVelMetersPerSecond) // Simple velocity feedforward
+        + (PhysConsts.kNEOMaxVoltage * speed/DriveConsts.kMaxLinearVelMetersPerSecond) // Simple velocity feedforward
         + speed_controller.calculate(getVelocity(), speed) // Velocity adjustment feedback controller
       )) * Math.abs(Math.cos(getAngleError() * Math.PI/180)) // Scale velocity down if not at proper angle
     );
