@@ -52,7 +52,7 @@ public class LoggedCANcoder implements Loggable {
     cancoder.optimizeBusUtilization();
 
     // Register for periodic logging
-    this.directory = directory;
+    this.directory = LOG_DIR+directory;
     Logger.registerLoggable(this);
   }
 
@@ -116,7 +116,7 @@ public class LoggedCANcoder implements Loggable {
 
   @Override
   public String getDirectory() {
-    return LOG_DIR+directory;
+    return directory;
   }
 
   @Override

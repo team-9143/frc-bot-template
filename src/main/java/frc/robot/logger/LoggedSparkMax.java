@@ -30,7 +30,7 @@ public class LoggedSparkMax extends CANSparkMax implements Loggable {
     encoder.setMeasurementPeriod(20); // Measurement period should be consistent with robot update period
 
     // Register for periodic logging
-    this.directory = directory;
+    this.directory = LOG_DIR+directory;
     Logger.registerLoggable(this);
   }
 
@@ -48,7 +48,7 @@ public class LoggedSparkMax extends CANSparkMax implements Loggable {
 
   @Override
   public String getDirectory() {
-    return LOG_DIR+directory;
+    return directory;
   }
 
   @Override
