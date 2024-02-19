@@ -52,6 +52,7 @@ public class Constants {
     public static final TunableNumber
       kDriveS = new TunableNumber("S", 0, "Module Drive"),
       kDriveP = new TunableNumber("P", 1.5e-2, "Module Drive");
+
     // Gains for module azimuth error (degrees) -> voltage
     public static final TunableNumber
       kAzimuthS = new TunableNumber("S", 0, "Module Azimuth"),
@@ -59,6 +60,7 @@ public class Constants {
       kAzimuthP = new TunableNumber("P", 0.0065, "Module Azimuth"),
       kAzimuthD = new TunableNumber("D", 0.00005, "Module Azimuth");
 
+    // TODO: Double check x/y values
     public static final SwerveModuleConstants
       kSwerve_fl = new SwerveModuleConstants(
         "/module-front-left/", 41, 42, 43, 31.465,
@@ -124,7 +126,6 @@ public class Constants {
       kRotateD = new TunableNumber("D", 0, "Robot Rotation");
 
     // TODO: Create and register named commands here
-    // TODO: Double check x/y values
     //static List<Pair<String, Command>> commands
   }
 }
