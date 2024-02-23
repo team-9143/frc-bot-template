@@ -122,7 +122,7 @@ public class LoggedCANcoder implements Loggable {
   @Override
   public void log() {
     Logger.recordOutput(getDirectory()+"offsetDegCCW", this.getOffsetPosition());
-    Logger.recordOutput(getDirectory()+"velocityDegPerSecondCCW", this.getVelocity());
+    // Logger.recordOutput(getDirectory()+"velocityDegPerSecondCCW", this.getVelocity());
     Logger.recordOutput(getDirectory()+"totalDegCCW", this.getTravel());
   }
 }

@@ -17,9 +17,6 @@ public class LoggedPowerDistribution extends PowerDistribution implements Loggab
 
     // Register for periodic logging
     Logger.registerLoggable(this);
-
-    // Initialize all faults in the log file
-    logAllFaults(new PowerDistributionFaults(0));
   }
 
   @Override
@@ -39,37 +36,6 @@ public class LoggedPowerDistribution extends PowerDistribution implements Loggab
 
     // Log any new faults
     logNewFaults();
-  }
-
-  private void logAllFaults(PowerDistributionFaults faults) {
-    Logger.recordOutput(getDirectory()+"brownout", faults.Brownout);
-    Logger.recordOutput(getDirectory()+"CANWarning", faults.CanWarning);
-    Logger.recordOutput(getDirectory()+"hardwareFault", faults.HardwareFault);
-
-    Logger.recordOutput(getDirectory()+"breakers/0", faults.Channel0BreakerFault);
-    Logger.recordOutput(getDirectory()+"breakers/1", faults.Channel1BreakerFault);
-    Logger.recordOutput(getDirectory()+"breakers/2", faults.Channel2BreakerFault);
-    Logger.recordOutput(getDirectory()+"breakers/3", faults.Channel3BreakerFault);
-    Logger.recordOutput(getDirectory()+"breakers/4", faults.Channel4BreakerFault);
-    Logger.recordOutput(getDirectory()+"breakers/5", faults.Channel5BreakerFault);
-    Logger.recordOutput(getDirectory()+"breakers/6", faults.Channel6BreakerFault);
-    Logger.recordOutput(getDirectory()+"breakers/7", faults.Channel7BreakerFault);
-    Logger.recordOutput(getDirectory()+"breakers/8", faults.Channel8BreakerFault);
-    Logger.recordOutput(getDirectory()+"breakers/9", faults.Channel9BreakerFault);
-    Logger.recordOutput(getDirectory()+"breakers/10", faults.Channel10BreakerFault);
-    Logger.recordOutput(getDirectory()+"breakers/11", faults.Channel11BreakerFault);
-    Logger.recordOutput(getDirectory()+"breakers/12", faults.Channel12BreakerFault);
-    Logger.recordOutput(getDirectory()+"breakers/13", faults.Channel13BreakerFault);
-    Logger.recordOutput(getDirectory()+"breakers/14", faults.Channel14BreakerFault);
-    Logger.recordOutput(getDirectory()+"breakers/15", faults.Channel15BreakerFault);
-    Logger.recordOutput(getDirectory()+"breakers/16", faults.Channel16BreakerFault);
-    Logger.recordOutput(getDirectory()+"breakers/17", faults.Channel17BreakerFault);
-    Logger.recordOutput(getDirectory()+"breakers/18", faults.Channel18BreakerFault);
-    Logger.recordOutput(getDirectory()+"breakers/19", faults.Channel19BreakerFault);
-    Logger.recordOutput(getDirectory()+"breakers/20", faults.Channel20BreakerFault);
-    Logger.recordOutput(getDirectory()+"breakers/21", faults.Channel21BreakerFault);
-    Logger.recordOutput(getDirectory()+"breakers/22", faults.Channel22BreakerFault);
-    Logger.recordOutput(getDirectory()+"breakers/23", faults.Channel23BreakerFault);
   }
 
   /** Log any changes in faults since the last call */
