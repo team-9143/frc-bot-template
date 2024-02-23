@@ -64,25 +64,25 @@ public class Constants {
 
     public static final SwerveModuleConstants
       kSwerve_fl = new SwerveModuleConstants(
-        "/module-front-left/", 11, 12, 13, 31.465,
+        "/module-front-left/", 11, 12, 13, -0.609619 * 360d,
         new Translation2d(0.14605, 0.24765),
         new PIDController(kDriveP.getAsDouble(), 0, 0),
         new PIDController(kAzimuthP.getAsDouble(), 0, kAzimuthD.getAsDouble())
       ),
       kSwerve_fr = new SwerveModuleConstants(
-        "/module-front-right/", 21, 22, 23, 28.037,
+        "/module-front-right/", 21, 22, 23, -0.666504 * 360d,
         new Translation2d(0.14605, -0.24765),
         new PIDController(kDriveP.getAsDouble(), 0, 0),
         new PIDController(kAzimuthP.getAsDouble(), 0, kAzimuthD.getAsDouble())
       ),
       kSwerve_bl = new SwerveModuleConstants(
-        "/module-back-left/", 31, 32, 33, 86.748,
+        "/module-back-left/", 31, 32, 33, -0.589355 * 360d,
         new Translation2d(-0.24765, 0.24765),
         new PIDController(kDriveP.getAsDouble(), 0, 0),
         new PIDController(kAzimuthP.getAsDouble(), 0, kAzimuthD.getAsDouble())
       ),
       kSwerve_br = new SwerveModuleConstants(
-        "/module-back-right/", 41, 42, 43, -943,
+        "/module-back-right/", 41, 42, 43, -0.687988 * 360d,
         new Translation2d(-0.24765, -0.24765),
         new PIDController(kDriveP.getAsDouble(), 0, 0),
         new PIDController(kAzimuthP.getAsDouble(), 0, kAzimuthD.getAsDouble())
