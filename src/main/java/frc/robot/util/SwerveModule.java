@@ -81,7 +81,7 @@ public class SwerveModule {
 
   /** @return the angle of the module (UNIT: ccw degrees) */
   public double getAngle() {
-    return cancoder.getAbsolutePosition();
+    return cancoder.getOffsetPosition();
   }
 
   /** @return the velocity of the module (UNIT: meters/s) */
