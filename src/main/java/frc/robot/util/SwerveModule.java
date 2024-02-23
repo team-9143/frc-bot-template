@@ -52,14 +52,14 @@ public class SwerveModule {
   protected void drive(double speed, double angle) {
     // Calculate and set azimuth motor speed
     azimuth_motor.setVoltage(
-      SwerveConsts.kAzimuthS.getAsDouble() // Simple static feedforward
+      SwerveConsts.kAzimuthS.getAsDouble() * Math.signum(angle - getAngle()) // Simple static feedforward
       + azimuth_controller.calculate(getAngle(), angle) // Azimuth feedback controller
     );
 
     // Calculate and set drive motor speed
     drive_motor.setVoltage(
       Math.max(-PhysConsts.kNEOMaxVoltage, Math.min(PhysConsts.kNEOMaxVoltage, // Clamp to nominal voltage
-        SwerveConsts.kDriveS.getAsDouble() // Simple static feedforward
+        SwerveConsts.kDriveS.getAsDouble() * Math.signum(speed) // Simple static feedforward
         + (PhysConsts.kNEOMaxVoltage * speed/DriveConsts.kMaxLinearVelMetersPerSecond) // Simple velocity feedforward
         + speed_controller.calculate(getVelocity(), speed) // Velocity adjustment feedback controller
       )) * Math.abs(Math.cos(getAngleError() * Math.PI/180)) // Scale velocity down if not at proper angle
