@@ -25,6 +25,7 @@ public class SwerveModule {
   protected SwerveModule(SwerveModuleConstants constants) {
     drive_motor = new LoggedSparkMax(constants.drive_ID, MotorType.kBrushless, constants.directory + "/drive/", PhysConsts.kNEOMaxVoltage, PhysConsts.kNEOCurrentLimit);
     azimuth_motor = new LoggedSparkMax(constants.azimuth_ID, MotorType.kBrushless, constants.directory + "/angle/", DriveConsts.kMaxModuleAzimuthVoltage, PhysConsts.kNEOCurrentLimit);
+    azimuth_motor.setInverted(constants.azimuthInverted);
     cancoder = new LoggedCANcoder(constants.cancoder_ID, constants.directory, constants.cancoderOffset);
     speed_controller = constants.speed_controller;
     azimuth_controller = constants.azimuth_controller;
@@ -110,9 +111,11 @@ public class SwerveModule {
   /** Basic constants for the construction of a {@link SwerveModule}. */
   public static class SwerveModuleConstants {
     public final String directory;
+
     public final byte drive_ID;
     public final byte azimuth_ID;
     public final byte cancoder_ID;
+    public final boolean azimuthInverted;
     public final double cancoderOffset;
     public final Translation2d location;
 
@@ -124,16 +127,18 @@ public class SwerveModule {
      * @param drive_ID driving motor ID (Spark Max with brushless motor)
      * @param azimuth_ID azimuth motor ID (Spark Max with brushless motor)
      * @param cancoder_ID cancoder ID
+     * @param azimuthInverted if the azimuth motor should be inverted (use on mk4i)
      * @param cancoderOffset additive cancoder offset (UNIT: ccw degrees)
      * @param location location of the wheel relative to the center of rotation of the robot (forward, left) (UNIT: meters)
      * @param speed_controller PID controller to calculate drive motor speed from velocity error
      * @param azimuth_controller PID controller to calculate azimuth motor speed from degree error
      */
-    public SwerveModuleConstants(String directory, int drive_ID, int azimuth_ID, int cancoder_ID, double cancoderOffset, Translation2d location, PIDController speed_controller, PIDController azimuth_controller) {
+    public SwerveModuleConstants(String directory, int drive_ID, int azimuth_ID, int cancoder_ID, boolean azimuthInverted, double cancoderOffset, Translation2d location, PIDController speed_controller, PIDController azimuth_controller) {
       this.directory = directory;
       this.drive_ID = (byte) drive_ID;
       this.azimuth_ID = (byte) azimuth_ID;
       this.cancoder_ID = (byte) cancoder_ID;
+      this.azimuthInverted = azimuthInverted;
       this.cancoderOffset = cancoderOffset;
       this.location = location;
       this.speed_controller = speed_controller;
