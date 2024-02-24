@@ -29,6 +29,16 @@ public class LoggedSparkMax extends CANSparkMax implements Loggable {
     setSmartCurrentLimit(currentLimit);
     encoder.setMeasurementPeriod(20); // Measurement period should be consistent with robot update period
 
+    // TODO: Do this on a case-by-case basis
+    this.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
+    this.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20);
+    this.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
+    this.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 1000);
+    this.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 1000);
+    this.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 1000);
+    this.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 1000);
+    this.setPeriodicFramePeriod(PeriodicFrame.kStatus7, 1000);
+
     // Register for periodic logging
     this.directory = LOG_DIR+directory;
     Logger.registerLoggable(this);
@@ -54,7 +64,7 @@ public class LoggedSparkMax extends CANSparkMax implements Loggable {
   @Override
   public void log() {
     Logger.recordOutput(getDirectory()+"currentAmps", this.getOutputCurrent());
-    Logger.recordOutput(getDirectory()+"percentOut", this.get());
+    Logger.recordOutput(getDirectory()+"voltageIn", this.getBusVoltage());
     Logger.recordOutput(getDirectory()+"speedRPM", encoder.getVelocity() / encoder.getVelocityConversionFactor());
     // Logger.recordOutput(getDirectory()+"totalRotations", encoder.getPosition() / encoder.getPositionConversionFactor());
     // Logger.recordOutput(getDirectory()+"motorTempCelsius", this.getMotorTemperature());

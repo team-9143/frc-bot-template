@@ -38,6 +38,7 @@ public class LoggedCANcoder implements Loggable {
     cancoder = new CANcoder(deviceId);
     cancoder.getConfigurator().apply(config);
 
+    // TODO: Do this on a case-by-case basis or simplify this object to only be used for swerve
     // Configure status signals
     var positionSignal = cancoder.getAbsolutePosition();
     positionSignal.setUpdateFrequency(50);
