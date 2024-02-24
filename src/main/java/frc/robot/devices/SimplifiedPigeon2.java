@@ -1,7 +1,7 @@
 package frc.robot.devices;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.ctre.phoenix6.StatusSignal;
+import java.util.function.Supplier;
 
 import com.ctre.phoenix6.configs.MountPoseConfigs;
 
@@ -12,11 +12,11 @@ import edu.wpi.first.math.geometry.Rotation3d;
  * <p> Roll should increase to robot-right, pitch to robot-front, and yaw counter-clockwise. </p>
 */
 public class SimplifiedPigeon2 {
-  private final StatusSignal<Double> yawSignal;
-  private final StatusSignal<Double> pitchSignal;
-  private final StatusSignal<Double> rollSignal;
-
   private final Pigeon2 pigeon2;
+
+  private final Supplier<Double> yawSupplier;
+  private final Supplier<Double> pitchSupplier;
+  private final Supplier<Double> rollSupplier;
 
   private final double invertPitch;
   private final double invertRoll;
@@ -46,14 +46,17 @@ public class SimplifiedPigeon2 {
     );
 
     // Configure status signals
-    yawSignal = pigeon2.getYaw();
+    var yawSignal = pigeon2.getYaw();
     yawSignal.setUpdateFrequency(50);
+    yawSupplier = yawSignal.asSupplier();
 
-    pitchSignal = pigeon2.getPitch();
+    var pitchSignal = pigeon2.getPitch();
     pitchSignal.setUpdateFrequency(50);
+    pitchSupplier = pitchSignal.asSupplier();
 
-    rollSignal = pigeon2.getRoll();
+    var rollSignal = pigeon2.getRoll();
     rollSignal.setUpdateFrequency(50);
+    rollSupplier = rollSignal.asSupplier();
 
     // Remove all other automatic updates
     pigeon2.optimizeBusUtilization();
@@ -72,23 +75,23 @@ public class SimplifiedPigeon2 {
 
   /** @return IMU yaw, counter-clockwise positive. If this IMU is being used for odometry, use the odometry heading instead of this method to avoid conflicting data due to odometry pose resets */
   public double getYaw() {
-    return yawSignal.getValue();
+    return yawSupplier.get();
   }
 
   /** @return IMU pitch, robot-front positive */
   public double getPitch() {
     if (swapPitchAndRoll) {
-      return rollSignal.getValue() * invertPitch; // Invert the role if needed
+      return rollSupplier.get() * invertPitch; // Invert the role if needed
     }
-    return pitchSignal.getValue() * invertPitch;
+    return pitchSupplier.get() * invertPitch;
   }
 
   /** @return IMU roll, robot-right positive */
   public double getRoll() {
     if (swapPitchAndRoll) {
-      return pitchSignal.getValue() * invertRoll;
+      return pitchSupplier.get() * invertRoll;
     }
-    return rollSignal.getValue() * invertRoll;
+    return rollSupplier.get() * invertRoll;
   }
 
   /** @return IMU orientation as a {@link Rotation3d}. */

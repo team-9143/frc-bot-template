@@ -1,7 +1,7 @@
 package frc.robot.logger;
 
 import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.StatusSignal;
+import java.util.function.Supplier;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
@@ -21,9 +21,9 @@ public class LoggedCANcoder implements Loggable {
 
   private final CANcoder cancoder;
 
-  private final StatusSignal<Double> positionSignal;
-  private final StatusSignal<Double> velocitySignal;
-  private final StatusSignal<Double> totalPositionSignal;
+  private final Supplier<Double> positionSupplier;
+  private final Supplier<Double> velocitySupplier;
+  private final Supplier<Double> travelSupplier;
 
   private double offset;
 
@@ -39,14 +39,17 @@ public class LoggedCANcoder implements Loggable {
     cancoder.getConfigurator().apply(config);
 
     // Configure status signals
-    positionSignal = cancoder.getAbsolutePosition();
+    var positionSignal = cancoder.getAbsolutePosition();
     positionSignal.setUpdateFrequency(50);
+    positionSupplier = positionSignal.asSupplier();
 
-    velocitySignal = cancoder.getVelocity();
+    var velocitySignal = cancoder.getVelocity();
     velocitySignal.setUpdateFrequency(50);
+    velocitySupplier = velocitySignal.asSupplier();
 
-    totalPositionSignal = cancoder.getPositionSinceBoot();
-    totalPositionSignal.setUpdateFrequency(50);
+    var travelSignal = cancoder.getPositionSinceBoot();
+    travelSignal.setUpdateFrequency(50);
+    travelSupplier = travelSignal.asSupplier();
 
     // Remove all other automatic updates
     cancoder.optimizeBusUtilization();
@@ -74,7 +77,7 @@ public class LoggedCANcoder implements Loggable {
    * @return The position of the sensor.
    */
   public double getAbsolutePosition() {
-    return positionSignal.getValue() * 360d;
+    return positionSupplier.get() * 360d;
   }
 
   /**
@@ -102,7 +105,7 @@ public class LoggedCANcoder implements Loggable {
    * @return The distance of the sensor.
    */
   public double getTravel() {
-    return totalPositionSignal.getValue() * 360d;
+    return travelSupplier.get() * 360d;
   }
 
   /**
@@ -111,7 +114,7 @@ public class LoggedCANcoder implements Loggable {
    * @return The velocity of the sensor.
    */
   public double getVelocity() {
-    return velocitySignal.getValue() * 360d;
+    return velocitySupplier.get() * 360d;
   }
 
   @Override
