@@ -19,7 +19,7 @@ public class Constants {
   public static class DeviceConsts {
     public static final byte kDriverPort = 0;
     public static final byte kOperatorPort = 1;
-    public static final byte kPigeonID = 2;
+    public static final byte kPigeonID = 5;
 
     // Pitch and roll offsets - REMEMBER TO UPDATE
     public static final double kPigeonPitchOffset = 0;
