@@ -4,7 +4,7 @@ import frc.robot.logger.Logger;
 import frc.robot.util.SwerveDrive;
 
 import frc.robot.devices.OI;
-import frc.robot.devices.SimplifiedPigeon2;
+import frc.robot.devices.CustomPigeon2;
 import frc.robot.Constants.DeviceConsts;
 import frc.robot.Constants.DriveConsts;
 import frc.robot.Constants.SwerveConsts;
@@ -27,7 +27,7 @@ public class Drivetrain extends SafeSubsystem {
     return m_instance;
   }
 
-  private static SimplifiedPigeon2 m_gyro = new SimplifiedPigeon2(DeviceConsts.kPigeonID, DeviceConsts.kPigeonPitchOffset, DeviceConsts.kPigeonRollOffset);
+  private static CustomPigeon2 m_gyro = new CustomPigeon2(DeviceConsts.kPigeonID, DeviceConsts.kPigeonPitchOffset, DeviceConsts.kPigeonRollOffset);
 
   public static final SwerveModuleState[] xStanceStates = new SwerveModuleState[] {
     new SwerveModuleState(0, Rotation2d.fromDegrees(45)),

@@ -11,7 +11,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
  * This class implements configuration and angle measurement functionality of a Pigeon 2. It is meant mainly to be used to stop unauthorized resetting of this data, as it should only be changed by the odometry.
  * <p> Roll should increase to robot-right, pitch to robot-front, and yaw counter-clockwise. </p>
 */
-public class SimplifiedPigeon2 {
+public class CustomPigeon2 {
   private final Pigeon2 pigeon2;
 
   private final Supplier<Double> yawSupplier;
@@ -32,12 +32,11 @@ public class SimplifiedPigeon2 {
    * @param invertRoll Whether to invert the roll to reach the proper positive direction (robot-right)
    * @param swapPitchAndRoll Whether to swap the pitch (should be forward/backward) and the roll (should be right/left) to align the axes
    */
-  public SimplifiedPigeon2(int deviceNumber, double pitchOffset, double rollOffset, boolean invertPitch, boolean invertRoll, boolean swapPitchAndRoll) {
+  public CustomPigeon2(int deviceNumber, double pitchOffset, double rollOffset, boolean invertPitch, boolean invertRoll, boolean swapPitchAndRoll) {
     pigeon2 = new Pigeon2(deviceNumber);
     this.invertPitch = invertPitch ? -1 : 1;
     this.invertRoll = invertRoll ? -1 : 1;
     this.swapPitchAndRoll = swapPitchAndRoll;
-
     // Set up the mount pose and reset the yaw
     pigeon2.getConfigurator().apply(new MountPoseConfigs()
       .withMountPoseYaw(0)
@@ -69,7 +68,7 @@ public class SimplifiedPigeon2 {
    * @param pitchOffset Additive pitch offset, best found by calibrating through PhoenixTuner
    * @param rollOffset Additive roll offset, best found by calibrating through PhoenixTuner
    */
-  public SimplifiedPigeon2(int deviceNumber, double pitchOffset, double rollOffset) {
+  public CustomPigeon2(int deviceNumber, double pitchOffset, double rollOffset) {
     this(deviceNumber, pitchOffset, rollOffset, false, false, false);
   }
 
