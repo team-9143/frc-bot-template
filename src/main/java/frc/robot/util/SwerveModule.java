@@ -55,10 +55,13 @@ public class SwerveModule {
 
     // Configure speed PID controller
     speed_controller = new PIDController(SwerveConsts.kDriveP.getAsDouble(), 0, 0);
+    SwerveConsts.kDriveP.bind(speed_controller::setP);
     speed_controller.setSetpoint(0);
 
     // Configure azimuth PID controller
     azimuth_controller = new PIDController(SwerveConsts.kAzimuthP.getAsDouble(), 0, SwerveConsts.kAzimuthD.getAsDouble());
+    SwerveConsts.kAzimuthP.bind(azimuth_controller::setP);
+    SwerveConsts.kAzimuthD.bind(azimuth_controller::setD);
     azimuth_controller.enableContinuousInput(-180, 180);
     azimuth_controller.setSetpoint(0);
   }
