@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 
 /** Represents a double that can be changed during runtime. */
-public class TunableNumber implements DoubleSupplier, DoubleConsumer {
+public class TunableNumber implements DoubleSupplier {
   private static final String LOG_DIR = "/numbers/";
 
   /** List of instances. */
@@ -102,7 +102,7 @@ public class TunableNumber implements DoubleSupplier, DoubleConsumer {
   /** Update number with value from NetworkTables entry, if provided. */
   public void update() {
     if (m_entry != null) {
-      accept(m_entry.getDouble(m_value));
+      set(m_entry.getDouble(m_value));
     }
   }
 
@@ -127,7 +127,7 @@ public class TunableNumber implements DoubleSupplier, DoubleConsumer {
 
   /** Resets value to initialized value. */
   public void reset() {
-    accept(m_default);
+    set(m_default);
   }
 
   /** @return the current value */
@@ -144,8 +144,7 @@ public class TunableNumber implements DoubleSupplier, DoubleConsumer {
    * @see TunableNumber#getMutable
    * @see TunableNumber#setMutable
    */
-  @Override
-  public void accept(double val) {
+  public void set(double val) {
     if (m_mutable && m_value != val) {
       m_value = val;
       if (m_entry != null) {
