@@ -3,7 +3,6 @@ package frc.robot;
 import frc.robot.util.TunableNumber;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.util.SwerveModule.SwerveModuleConstants;
-import edu.wpi.first.math.controller.PIDController;
 
 /** Global constants. Should not include functional code. */
 public class Constants {
@@ -58,57 +57,33 @@ public class Constants {
     // Gains for module azimuth error (degrees) -> voltage
     public static final TunableNumber
       kAzimuthS = new TunableNumber("S", 0, "Module Azimuth"),
-      kAzimuthV = new TunableNumber("V", 0, "Module Azimuth"),
       kAzimuthP = new TunableNumber("P", 0.0065, "Module Azimuth"),
       kAzimuthD = new TunableNumber("D", 0.00005, "Module Azimuth");
 
+    // Whether azimuth motor is inverted, use for mk4i's
+    public static final boolean kAzimuthInverted = true;
+
     public static final SwerveModuleConstants
       kSwerve_fl = new SwerveModuleConstants(
-        "/module-front-left/", 11, 12, 13, true, -0.609619 * 360d,
-        new Translation2d(0.14605, 0.24765),
-        new PIDController(kDriveP.getAsDouble(), 0, 0),
-        new PIDController(kAzimuthP.getAsDouble(), 0, kAzimuthD.getAsDouble())
+        11, 12, 13,
+        -0.609619 * 360d,
+        new Translation2d(0.14605, 0.24765)
       ),
       kSwerve_fr = new SwerveModuleConstants(
-        "/module-front-right/", 21, 22, 23, true, -0.666504 * 360d,
-        new Translation2d(0.14605, -0.24765),
-        new PIDController(kDriveP.getAsDouble(), 0, 0),
-        new PIDController(kAzimuthP.getAsDouble(), 0, kAzimuthD.getAsDouble())
+        21, 22, 23,
+        -0.666504 * 360d,
+        new Translation2d(0.14605, -0.24765)
       ),
       kSwerve_bl = new SwerveModuleConstants(
-        "/module-back-left/", 31, 32, 33, true, -0.589355 * 360d,
-        new Translation2d(-0.24765, 0.24765),
-        new PIDController(kDriveP.getAsDouble(), 0, 0),
-        new PIDController(kAzimuthP.getAsDouble(), 0, kAzimuthD.getAsDouble())
+        31, 32, 33,
+        -0.589355 * 360d,
+        new Translation2d(-0.24765, 0.24765)
       ),
       kSwerve_br = new SwerveModuleConstants(
-        "/module-back-right/", 41, 42, 43, true, -0.687988 * 360d,
-        new Translation2d(-0.24765, -0.24765),
-        new PIDController(kDriveP.getAsDouble(), 0, 0),
-        new PIDController(kAzimuthP.getAsDouble(), 0, kAzimuthD.getAsDouble())
+        41, 42, 43,
+        -0.687988 * 360d,
+        new Translation2d(-0.24765, -0.24765)
       );
-
-    // Bind Tunables
-    static {
-      kDriveP.bind(val -> {
-        kSwerve_fl.speed_controller.setP(val);
-        kSwerve_fr.speed_controller.setP(val);
-        kSwerve_bl.speed_controller.setP(val);
-        kSwerve_br.speed_controller.setP(val);
-      });
-      kAzimuthP.bind(val -> {
-        kSwerve_fl.azimuth_controller.setP(val);
-        kSwerve_fr.azimuth_controller.setP(val);
-        kSwerve_bl.azimuth_controller.setP(val);
-        kSwerve_br.azimuth_controller.setP(val);
-      });
-      kAzimuthD.bind(val -> {
-        kSwerve_fl.azimuth_controller.setD(val);
-        kSwerve_fr.azimuth_controller.setD(val);
-        kSwerve_bl.azimuth_controller.setD(val);
-        kSwerve_br.azimuth_controller.setD(val);
-      });
-    }
   }
 
   public static class AutoConsts {
