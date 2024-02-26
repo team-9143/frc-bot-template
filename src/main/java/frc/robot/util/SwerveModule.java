@@ -51,7 +51,7 @@ public class SwerveModule {
     cancoder.getConfigurator().apply(cancoder_config.withMagnetOffset(constants.cancoderOffset));
     var positionSignal = cancoder.getAbsolutePosition();
     positionSignal.setUpdateFrequency(50);
-    rotationSupplier = positionSignal.asSupplier();
+    rotationSupplier = () -> positionSignal.refresh().getValue() * 360d; // UNIT: ccw degrees
 
     // Configure speed PID controller
     speed_controller = new PIDController(SwerveConsts.kDriveP.getAsDouble(), 0, 0);
@@ -106,7 +106,7 @@ public class SwerveModule {
 
   /** @return the angle of the module (UNIT: ccw degrees) */
   public double getAngle() {
-    return rotationSupplier.get() * 360d;
+    return rotationSupplier.get();
   }
 
   /** @return the velocity of the module (UNIT: meters/s) */
