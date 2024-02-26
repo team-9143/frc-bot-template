@@ -4,28 +4,32 @@ import frc.robot.util.TunableNumber;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.util.SwerveModule.SwerveModuleConstants;
 
+// TODO(user): Tune all TunableNumbers for better robot control
 /** Global constants. Should not include functional code. */
 public class Constants {
   /** Non-functional information for software testing and metadata. */
   public static class Config {
     /** {@code true} to stream log file data to NetworkTables (takes up bandwith and processing time, but useful for concurrent running and visualization) */
     public static final boolean NTStream = false;
+    // TODO(dev): Figure out how to store in local computer directory
     /** Directory for log file. Leave blank to store in USB or roboRIO. */
-    public static final String DATA_LOG_DIR = "";
-    // public static final String DATA_LOG_DIR = "C:/Users/Robotics/Desktop/logs/";
+    public static final String DATA_LOG_DIR = ""; // "C:/Users/Robotics/Desktop/logs/";
   }
 
   /** Ports and properties of non-motor devices. */
   public static class DeviceConsts {
+    // TODO(user): Update ID's
     public static final byte kDriverPort = 0;
     public static final byte kOperatorPort = 1;
     public static final byte kPigeonID = 5;
 
+    // TODO(user): Update pigeon offsets
     // Pitch and roll offsets - REMEMBER TO UPDATE
     public static final double kPigeonPitchOffset = 0;
     public static final double kPigeonRollOffset = 0;
   }
 
+  // TODO(user): Fix all physical robot constraints as design dictates
   /** Physical parts of the robot, such as gearboxes or wheel diameters. */
   public static class PhysConsts {
     public static final int kNEOMaxVoltage = 12; // NEO V1.1 nominal voltage
@@ -36,6 +40,7 @@ public class Constants {
     public static final double kSwerveWheelCircumferenceMeters = 0.099 * Math.PI; // Billet wheels
   }
 
+  // TODO(user): Check all drivetrain measurements and limits and ensure accuracy
   /** Data relating to the entire drivetrain. */
   public static class DriveConsts {
     // Upper bound drivetrain constraints
@@ -64,6 +69,7 @@ public class Constants {
     // Whether azimuth motor is inverted, use for mk4i's
     public static final boolean kAzimuthInverted = true;
 
+    // TODO(user): Update swerve module ID's, locations, and cancoder offsets
     public static final SwerveModuleConstants
       kSwerve_fl = new SwerveModuleConstants(
         11, 12, 13,
@@ -88,6 +94,7 @@ public class Constants {
   }
 
   public static class AutoConsts {
+    // TODO(dev/user): Ensure that drivetrain acceleration limits are strong
     // Upper bound drivetrain accelerations for path following and pose targeting
     public static final double kMaxLinearAccelMetersPerSecondSquared = DriveConsts.kMaxLinearVelMetersPerSecond  / 0.5; // Reaches max speed in 0.5 seconds
     public static final double kMaxTurnAccelRadiansPerSecondSquared = DriveConsts.kMaxTurnVelRadiansPerSecond / 0.5; // Reaches max speed in 0.5 seconds

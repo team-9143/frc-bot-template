@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+// TODO(user): Remove if unnecessary
 /**
  * Subsystem with state-based control and a stop method for safety.
  *

@@ -27,6 +27,7 @@ public class Drivetrain extends SafeSubsystem {
     return m_instance;
   }
 
+  // TODO(user): Set pigeon inversions as needed
   private static CustomPigeon2 m_gyro = new CustomPigeon2(DeviceConsts.kPigeonID, DeviceConsts.kPigeonPitchOffset, DeviceConsts.kPigeonRollOffset);
 
   public static final SwerveModuleState[] xStanceStates = new SwerveModuleState[] {

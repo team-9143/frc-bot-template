@@ -82,7 +82,7 @@ public class Pathing {
     return PathPlannerPath.fromChoreoTrajectory(name);
   }
 
-  // TODO: Path gen obstacles in Constants? (stage)
+  // TODO(dev): Add path gen obstacles in Constants? (podiums, stage)
   /**
    * Create a pathplanner path to move directly from one position to another
    *
@@ -91,7 +91,7 @@ public class Pathing {
    */
   public static PathPlannerPath generateDirectPath(Pose2d startPoseMetersCCW, Pose2d endPoseMetersCCW) {
     return new PathPlannerPath(
-      // TODO: Test this path generation, start post/end pose rotations may need to be changed to match with bezier curve
+      // TODO(dev): Test this path generation, start post/end pose rotations may need to be changed to match with bezier curve
       PathPlannerPath.bezierFromPoses(startPoseMetersCCW, endPoseMetersCCW), // Create bezier points from waypoints
       DEFAULT_CONSTRAINTS, // Default constraints
       new GoalEndState(0, endPoseMetersCCW.getRotation()) // End with 0 velocity at specified rotation

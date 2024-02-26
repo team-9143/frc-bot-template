@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+// TODO(user): Remove
 /** An example subsystem that serves no purpose whatsoever. */
 public class ExampleSubsystem extends SafeSubsystem {
   private static ExampleSubsystem m_instance;

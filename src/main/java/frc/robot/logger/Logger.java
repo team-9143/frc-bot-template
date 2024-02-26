@@ -123,7 +123,6 @@ public class Logger {
   }
 
   /** Update all registered loggables. Should be called every period. */
-  // TODO: Check performance on this
   public static void updateLogs() {
     loggables.forEach(e -> e.log());
   }
