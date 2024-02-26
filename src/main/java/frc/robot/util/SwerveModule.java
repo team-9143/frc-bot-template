@@ -145,14 +145,14 @@ public class SwerveModule {
      * @param drive_ID driving motor ID (Spark Max with brushless motor)
      * @param azimuth_ID azimuth motor ID (Spark Max with brushless motor)
      * @param cancoder_ID cancoder ID
-     * @param cancoderOffset additive cancoder offset (UNIT: ccw degrees)
+     * @param cancoderOffsetRotations additive cancoder offset (UNIT: ccw rotations)
      * @param location location of the wheel relative to the center of rotation of the robot (forward, left) (UNIT: meters)
      */
-    public SwerveModuleConstants(int drive_ID, int azimuth_ID, int cancoder_ID, double cancoderOffset, Translation2d location) {
+    public SwerveModuleConstants(int drive_ID, int azimuth_ID, int cancoder_ID, double cancoderOffsetRotations, Translation2d location) {
       this.drive_ID = drive_ID;
       this.azimuth_ID = azimuth_ID;
       this.cancoder_ID = cancoder_ID;
-      this.cancoderOffset = cancoderOffset;
+      this.cancoderOffset = cancoderOffsetRotations;
       this.location = location;
     }
   }
