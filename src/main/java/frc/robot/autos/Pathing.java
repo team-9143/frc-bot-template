@@ -1,38 +1,60 @@
 package frc.robot.autos;
 
 import frc.robot.subsystems.Drivetrain;
-import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.logger.Logger;
 
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.commands.PPSwerveControllerCommand;
-import com.pathplanner.lib.auto.SwerveAutoBuilder;
-
 import frc.robot.Constants.DriveConsts;
-import java.util.Map;
-import com.pathplanner.lib.auto.PIDConstants;
-import edu.wpi.first.math.controller.PIDController;
+import frc.robot.Constants.AutoConsts;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPoint;
-import java.util.List;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
+
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.GoalEndState;
+
+import com.pathplanner.lib.commands.FollowPathHolonomic;
+import com.pathplanner.lib.auto.AutoBuilder;
+
+import com.pathplanner.lib.util.PathPlannerLogging;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.ReplanningConfig;
+import com.pathplanner.lib.util.PIDConstants;
 
 /** Utility class for loading, generating, following, and logging paths through PathPlanner. PID controllers are initialized at runtime so that TunableNumbers can take effect. */
 public class Pathing {
   private static final String PATH_LOG_DIR = "/pathplanner/";
 
   /** Default constraints for accurately generating and following paths */
-  private static final PathConstraints default_constraints = new PathConstraints(DriveConsts.kMaxWheelVelMetersPerSecond, DriveConsts.kMaxLinearAccelMetersPerSecondSquared);
+  private static final PathConstraints DEFAULT_CONSTRAINTS = new PathConstraints(DriveConsts.kMaxLinearVelMetersPerSecond, AutoConsts.kMaxLinearAccelMetersPerSecondSquared, DriveConsts.kMaxTurnVelRadiansPerSecond, AutoConsts.kMaxTurnAccelRadiansPerSecondSquared);
 
   // Set up logging for basic path following
   static {
-    PPSwerveControllerCommand.setLoggingCallbacks(
-      traj -> Logger.recordOutput(PATH_LOG_DIR+"trajectory", traj.getStates().stream().map(state -> state.poseMeters).toArray(Pose2d[]::new)), // Log trajectory on command initialization
-      pose -> Logger.recordOutput(PATH_LOG_DIR+"referencePose", pose), // Log reference pose during command run
-      speeds -> Logger.recordOutput(PATH_LOG_DIR+"setpointSpeeds", speeds), // Log setpoint velocities during command run
-      null // Don't need to log error
+    // Log trajectory on command initialization
+    PathPlannerLogging.setLogActivePathCallback(poses ->
+      Logger.recordOutput(PATH_LOG_DIR+"activePath", poses.toArray(Pose2d[]::new))
+    );
+
+    // No need to log current robot pose, drivetrain will do that
+    PathPlannerLogging.setLogCurrentPoseCallback(null);
+
+    // Log reference pose during command run
+    PathPlannerLogging.setLogTargetPoseCallback(pose ->
+      Logger.recordOutput(PATH_LOG_DIR+"referencePose", pose)
+    );
+  }
+
+  // Configure AutoBuilder
+  static {
+    AutoBuilder.configureHolonomic(
+      Drivetrain.getInstance()::getPose, // Pose supplier
+      Drivetrain.getInstance()::resetOdometry, // Reset pose consumer
+      Drivetrain.getInstance()::getDesiredSpeeds, // Current measured speeds
+      Drivetrain.getInstance()::driveFieldRelativeVelocity, // Drives field relative from ChassisSpeeds
+      getHolonomicConfig(new ReplanningConfig(false, false)), // Config
+      Pathing::isRedAlliance, // Flip if alliance is red
+      Drivetrain.getInstance() // Subsystem
     );
   }
 
@@ -43,74 +65,37 @@ public class Pathing {
    ******/
 
   /**
-   * Load a pathplanner path, constrained by given maximum velocity and acceleration.
+   * Load a pathplanner path from RIO local storage
    *
-   * @param name name of the path file under [deploy/pathplanner/], omitting ".path"
-   * @param maxVelMetersPerSecond max velocity along the path. Paths will not exceed the maximum velocity of the robot.
-   * @param maxAccelMetersPerSecondPerSecond max acceleration along the path. Use {@code Double.POSITIVE_INFINITY} for immediate starts and stops.
+   * @param name name of the path file under [deploy/pathplanner/paths/], omitting ".path"
    */
-  public static PathPlannerTrajectory loadPath(String name, double maxVelMetersPerSecond, double maxAccelMetersPerSecondPerSecond) {
-    return PathPlanner.loadPath(name, Math.min(maxVelMetersPerSecond, default_constraints.maxVelocity), maxAccelMetersPerSecondPerSecond);
+  public static PathPlannerPath loadPath(String name) {
+    return PathPlannerPath.fromPathFile(name);
   }
 
   /**
-   * Load a pathplanner path, constrained by the default maximum velocity and acceleration.
+   * Load a choreo trajectory from RIO local storage
    *
-   * @param name name of the path file under [deploy/pathplanner/], omitting ".path"
+   * @param name name of the path file under [deploy/choreo/], omitting ".traj"
    */
-  public static PathPlannerTrajectory loadPath(String name) {
-    return loadPath(name, default_constraints.maxVelocity, default_constraints.maxAcceleration);
+  public static PathPlannerPath loadChoreoTraj(String name) {
+    return PathPlannerPath.fromChoreoTrajectory(name);
   }
 
+  // TODO(dev): Add path gen obstacles in Constants? (podiums, stage)
   /**
-   * Load a pathplanner path, separated into a list by stop events, constrained by the default maximum velocity and acceleration.
-   *
-   * @param name name of the path file under [deploy/pathplanner/], omitting ".path"
-   * @param maxVelMetersPerSecond max velocity along the path. Paths will not exceed the maximum velocity of the robot.
-   * @param maxAccelMetersPerSecondPerSecond max acceleration along the path. Use {@code Double.POSITIVE_INFINITY} for immediate starts and stops.
-   */
-  public static List<PathPlannerTrajectory> loadPathGroup(String name, double maxVelMetersPerSecond, double maxAccelMetersPerSecondPerSecond) {
-    return PathPlanner.loadPathGroup(name, Math.min(maxVelMetersPerSecond, default_constraints.maxVelocity), maxAccelMetersPerSecondPerSecond);
-  }
-
-  /**
-   * Load a pathplanner path, separated into a list by stop events, constrained by the default maximum velocity and acceleration.
-   *
-   * @param name name of the path file under [deploy/pathplanner/], omitting ".path"
-   */
-  public static List<PathPlannerTrajectory> loadPathGroup(String name) {
-    return loadPathGroup(name, default_constraints.maxVelocity, default_constraints.maxAcceleration);
-  }
-
-  /**
-   * Create a pathplanner path, constrained by given maximum velocity and acceleration.
-   *
-   * @param startPoseMetersCCW starting position for the command
-   * @param endPoseMetersCCW ending position for the command
-   * @param maxVelMetersPerSecond max velocity along the path. Paths will not exceed the maximum velocity of the robot.
-   * @param maxAccelMetersPerSecondPerSecond max acceleration along the path. Use {@code Double.POSITIVE_INFINITY} for immediate starts and stops.
-   */
-  public static PathPlannerTrajectory generateDirectPath(Pose2d startPoseMetersCCW, Pose2d endPoseMetersCCW, double maxVelMetersPerSecond, double maxAccelMetersPerSecondPerSecond) {
-    // Find the angle between the poses for heading calculation
-    Pose2d relativePose = endPoseMetersCCW.relativeTo(startPoseMetersCCW);
-    Rotation2d relativeAngle = new Rotation2d(relativePose.getX(), relativePose.getY());
-
-    // Create the path points from the given poses and the calculated heading
-    PathPoint first = new PathPoint(startPoseMetersCCW.getTranslation(), relativeAngle, startPoseMetersCCW.getRotation());
-    PathPoint last = new PathPoint(endPoseMetersCCW.getTranslation(), relativeAngle, endPoseMetersCCW.getRotation());
-
-    // Generate the path with the constraints provided (velocity cannot exceed maximum robot velocity)
-    return PathPlanner.generatePath(new PathConstraints(Math.min(maxVelMetersPerSecond, default_constraints.maxVelocity), maxAccelMetersPerSecondPerSecond), first, last);
-  }
-
-  /**
-   * Create a pathplanner path, constrained by the default maximum velocity and acceleration.
+   * Create a pathplanner path to move directly from one position to another
    *
    * @param startPoseMetersCCW starting position for the command
    * @param endPoseMetersCCW ending position for the command
    */
-  public static PathPlannerTrajectory generateDirectPath(Pose2d startPoseMetersCCW, Pose2d endPoseMetersCCW) {
-    return generateDirectPath(startPoseMetersCCW, endPoseMetersCCW, default_constraints.maxVelocity, default_constraints.maxAcceleration);
+  public static PathPlannerPath generateDirectPath(Pose2d startPoseMetersCCW, Pose2d endPoseMetersCCW) {
+    return new PathPlannerPath(
+      // TODO(dev): Test this path generation, start post/end pose rotations may need to be changed to match with bezier curve
+      PathPlannerPath.bezierFromPoses(startPoseMetersCCW, endPoseMetersCCW), // Create bezier points from waypoints
+      DEFAULT_CONSTRAINTS, // Default constraints
+      new GoalEndState(0, endPoseMetersCCW.getRotation()) // End with 0 velocity at specified rotation
+    );
   }
 
   /******
@@ -120,43 +105,87 @@ public class Pathing {
    ******/
 
   /**
-   * Create a command to follow a pathplanner path. Logs everything through the Logger during the command run.
+   * Create a command to follow a pathplanner path. Does not replan the path under any circumstances.
    *
    * @param path the pathplanner path to follow
    */
-  public static Command getFollowPathplannerCommand(PathPlannerTrajectory path) {
-    return new PPSwerveControllerCommand(
+  public static Command getHolonomicFollowPathCommand(PathPlannerPath path) {
+    return AutoBuilder.followPath(path);
+  }
+
+  /**
+   * Create a command to follow a pathplanner path. Allows for customized replanning settings.
+   *
+   * @param path the pathplanner path to follow
+   * @param replanningConfig replanning configuration to use
+   */
+  public static Command getHolonomicFollowPathCommand(PathPlannerPath path, ReplanningConfig replanningConfig) {
+    return new FollowPathHolonomic(
       path, // Path to follow
       Drivetrain.getInstance()::getPose, // Pose supplier
-      new PIDController(DriveConsts.kTranslateP.getAsDouble(), DriveConsts.kTranslateI.getAsDouble(), DriveConsts.kTranslateD.getAsDouble()), // Translation controller for position error -> velocity
-      new PIDController(DriveConsts.kTranslateP.getAsDouble(), DriveConsts.kTranslateI.getAsDouble(), DriveConsts.kTranslateD.getAsDouble()), // Translation controller for position error -> velocity
-      new PIDController(DriveConsts.kRotateP.getAsDouble(), DriveConsts.kRotateI.getAsDouble(), DriveConsts.kRotateD.getAsDouble()), // Rotation controller for angle error -> angular velocity
-      speeds -> Drivetrain.getInstance().driveFieldRelativeVelocity(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond), // Field-relative velocities consumer
-      true, // Whether to mirror path to match alliance
+      Drivetrain.getInstance()::getMeasuredSpeeds, // Chassis speeds supplier
+      Drivetrain.getInstance()::driveRobotRelativeVelocity, // Robot-relative velocities consumer
+      getHolonomicConfig(replanningConfig), // Follower configuration
+      Pathing::isRedAlliance, // Flip the path if alliance is red
       Drivetrain.getInstance() // Subsystem requirements
     );
   }
 
   /**
-   * Create a complete autonomous PathPlanner-based command group. This will reset the odometry at the begininng of the first path, follow paths, trigger events during path following, and run commands between paths with stop events.
+   * Create a command to follow a pathplanner auto. Only replans the path if the initial error is too large.
    *
-   * <p> Inserting disconnected paths in the list allows for stop events that move the position of the robot separately from the pathplanner control. </p>
-   *
-   * @param paths PathPlanner paths to follow
-   * @param events String-Command map of named commands to run at events. Names may be reused for multiple events. Commands that run at stop events may require the drivetrain, but no others should.
+   * @param name name of the path file under [deploy/pathplanner/autos/], omitting ".auto"
    */
-  public static Command getFollowPathplannerWithEventsCommand(List<PathPlannerTrajectory> paths, Map<String, Command> events) {
-    var builder = new SwerveAutoBuilder(
-      Drivetrain.getInstance()::getPose, // Pose supplier
-      Drivetrain.getInstance()::resetOdometry, // Pose consumer to set the odometry to the start of the path
-      new PIDConstants(DriveConsts.kTranslateP.getAsDouble(), DriveConsts.kTranslateI.getAsDouble(), DriveConsts.kTranslateD.getAsDouble()), // Translation controller for position error -> velocity
-      new PIDConstants(DriveConsts.kRotateP.getAsDouble(), DriveConsts.kRotateI.getAsDouble(), DriveConsts.kRotateD.getAsDouble()), // Rotation controller for angle error -> angular velocity
-      speeds -> Drivetrain.getInstance().driveFieldRelativeVelocity(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond), // Field-relative velocities consumer
-      events, // Commands to run at named events
-      true, // Whether to mirror path to match alliance
-      Drivetrain.getInstance() // Subsystem requirements
-    );
+  public static Command getHolonomicFullAutoCommand(String name) {
+    return AutoBuilder.buildAuto(name);
+  }
 
-    return builder.fullAuto(paths);
+  /**
+   * Create a command that pathfinds to the target pose and stops.
+   *
+   * @param targetPoseMetersCCW target position for the command
+   */
+  public static Command getHolonomicTargetPoseCommand(Pose2d targetPoseMetersCCW) {
+    return AutoBuilder.pathfindToPose(targetPoseMetersCCW, DEFAULT_CONSTRAINTS);
+  }
+
+  /**
+   * Create a command that pathfinds to a path and then follows that path.
+   *
+   * @param path the pathplanner path to target and follow
+   */
+  public static Command getHolonomicTargetPathCommand(PathPlannerPath path) {
+    return AutoBuilder.pathfindThenFollowPath(path, DEFAULT_CONSTRAINTS);
+  }
+
+  /******
+   *
+   * Utility
+   *
+   ******/
+
+  /**
+   * Utility method to get a path follower config for the swerve drivetrain
+   *
+   * @param replanningConfig replanning configuration to use
+   * @return the configuration
+   */
+  private static HolonomicPathFollowerConfig getHolonomicConfig(ReplanningConfig replanningConfig) {
+    return new HolonomicPathFollowerConfig(
+      new PIDConstants(AutoConsts.kTranslateP.getAsDouble(), AutoConsts.kTranslateI.getAsDouble(), AutoConsts.kTranslateD.getAsDouble()), // Translation controller for position error -> velocity
+      new PIDConstants(AutoConsts.kRotateP.getAsDouble(), AutoConsts.kRotateI.getAsDouble(), AutoConsts.kRotateD.getAsDouble()), // Rotation controller for angle error -> angular velocity
+      DriveConsts.kMaxLinearVelMetersPerSecond, // Maximum module speed
+      frc.robot.Constants.SwerveConsts.kSwerve_fl.location.getDistance(new Translation2d()), // Radius of drive base
+      replanningConfig // When to replan the path
+    );
+  }
+
+  /**
+   * Utility method to check driver station alliance
+   *
+   * @return {@code true} if alliance is red and not null
+   */
+  private static boolean isRedAlliance() {
+    return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red;
   }
 }

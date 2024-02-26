@@ -2,45 +2,68 @@ package frc.robot.util;
 
 import frc.robot.Constants.PhysConsts;
 import frc.robot.Constants.DriveConsts;
+import frc.robot.Constants.SwerveConsts;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 import edu.wpi.first.math.controller.PIDController;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.ctre.phoenix6.hardware.CANcoder;
+import java.util.function.Supplier;
 
-import frc.robot.logger.LoggedSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
-import frc.robot.logger.LoggedCANCoder;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
+import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 
 /** Controls a single swerve module. */
 public class SwerveModule {
-  private final LoggedSparkMax drive_motor;
-  private final LoggedSparkMax angle_motor;
-  private final LoggedCANCoder cancoder;
+  private static final MagnetSensorConfigs cancoder_config = new MagnetSensorConfigs()
+    .withAbsoluteSensorRange(AbsoluteSensorRangeValue.Unsigned_0To1)
+    .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive);
+
+  private final CANSparkMax drive_motor;
+  private final CANSparkMax azimuth_motor;
+
+  private final RelativeEncoder drive_encoder;
+  private final CANcoder cancoder;
+  private final Supplier<Double> rotationSupplier;
 
   private final PIDController speed_controller;
-  private final PIDController angle_controller;
+  private final PIDController azimuth_controller;
 
   protected SwerveModule(SwerveModuleConstants constants) {
-    drive_motor = new LoggedSparkMax(constants.drive_ID, MotorType.kBrushless, constants.directory + "/drive/");
-    angle_motor = new LoggedSparkMax(constants.angle_ID, MotorType.kBrushless, constants.directory + "/angle/");
-    cancoder = new LoggedCANCoder(constants.cancoder_ID, constants.directory, constants.cancoderOffset);
-    speed_controller = constants.speed_controller;
-    angle_controller = constants.angle_controller;
+    drive_motor = new CANSparkMax(constants.drive_ID, MotorType.kBrushless);
+    azimuth_motor = new CANSparkMax(constants.azimuth_ID, MotorType.kBrushless);
+    azimuth_motor.setInverted(SwerveConsts.kAzimuthInverted);
 
-    // Set up drive encoder units
-    drive_motor.encoder.setPositionConversionFactor(PhysConsts.kSwerveWheelGearbox * PhysConsts.kSwerveWheelCircumferenceMeters); // UNIT: meters
-    drive_motor.encoder.setVelocityConversionFactor(PhysConsts.kSwerveWheelGearbox * PhysConsts.kSwerveWheelCircumferenceMeters / 60); // UNIT: meters/s
-    drive_motor.encoder.setMeasurementPeriod(20);
-    drive_motor.encoder.setPosition(0);
+    // Configure drive encoder
+    drive_encoder = drive_motor.getEncoder();
+    drive_encoder.setPositionConversionFactor(PhysConsts.kSwerveDriveGearbox * PhysConsts.kSwerveWheelCircumferenceMeters); // UNIT: meters
+    drive_encoder.setVelocityConversionFactor(PhysConsts.kSwerveDriveGearbox * PhysConsts.kSwerveWheelCircumferenceMeters / 60); // UNIT: meters/s
+    drive_encoder.setMeasurementPeriod(20);
+    drive_encoder.setPosition(0);
 
-    // Set up speed PID controller
+    // Configure CANcoder
+    cancoder = new CANcoder(constants.cancoder_ID);
+    cancoder.getConfigurator().apply(cancoder_config.withMagnetOffset(constants.cancoderOffset));
+    var positionSignal = cancoder.getAbsolutePosition();
+    positionSignal.setUpdateFrequency(50);
+    rotationSupplier = () -> positionSignal.refresh().getValue() * 360d; // UNIT: ccw degrees
+
+    // Configure speed PID controller
+    speed_controller = new PIDController(SwerveConsts.kDriveP.getAsDouble(), 0, 0);
+    SwerveConsts.kDriveP.bind(speed_controller::setP);
     speed_controller.setSetpoint(0);
 
-    // Set up rotational PID controller
-    angle_controller.enableContinuousInput(-180, 180);
-    angle_controller.setSetpoint(0);
+    // Configure azimuth PID controller
+    azimuth_controller = new PIDController(SwerveConsts.kAzimuthP.getAsDouble(), 0, SwerveConsts.kAzimuthD.getAsDouble());
+    SwerveConsts.kAzimuthP.bind(azimuth_controller::setP);
+    SwerveConsts.kAzimuthD.bind(azimuth_controller::setD);
+    azimuth_controller.enableContinuousInput(-180, 180);
+    azimuth_controller.setSetpoint(0);
   }
 
   /**
@@ -50,16 +73,20 @@ public class SwerveModule {
    * @param angle module angle (UNIT: ccw degrees)
    */
   protected void drive(double speed, double angle) {
-    // Calculate and set angle motor speed
-    angle_motor.set(Math.max(-DriveConsts.kMaxModuleRotateSpeedPercentage, Math.min(DriveConsts.kMaxModuleRotateSpeedPercentage, // Clamp to maximum speed
-      angle_controller.calculate(getAngle(), angle)
-    )));
+    // Calculate and set azimuth motor speed
+    azimuth_motor.setVoltage(
+      Math.max(-DriveConsts.kMaxModuleAzimuthVoltage, Math.min(DriveConsts.kMaxModuleAzimuthVoltage, // Clamp to nominal voltage
+        SwerveConsts.kAzimuthS.getAsDouble() * Math.signum(angle - getAngle()) // Simple static feedforward
+        + azimuth_controller.calculate(getAngle(), angle) // Azimuth feedback controller
+      ))
+    );
 
     // Calculate and set drive motor speed
-    drive_motor.set(
-      Math.max(-1, Math.min(1, // Clamp to maximum speed
-        speed_controller.calculate(getVelocity(), speed) // Velocity adjustment feedback controller
-        + (speed/DriveConsts.kMaxWheelVelMetersPerSecond) // Simple velocity feedforward
+    drive_motor.setVoltage(
+      Math.max(-PhysConsts.kNEOMaxVoltage, Math.min(PhysConsts.kNEOMaxVoltage, // Clamp to nominal voltage
+        SwerveConsts.kDriveS.getAsDouble() * Math.signum(speed) // Simple static feedforward
+        + (PhysConsts.kNEOMaxVoltage * speed/DriveConsts.kMaxLinearVelMetersPerSecond) // Simple velocity feedforward
+        + speed_controller.calculate(getVelocity(), speed) // Velocity adjustment feedback controller
       )) * Math.abs(Math.cos(getAngleError() * Math.PI/180)) // Scale velocity down if not at proper angle
     );
   }
@@ -79,63 +106,54 @@ public class SwerveModule {
 
   /** @return the angle of the module (UNIT: ccw degrees) */
   public double getAngle() {
-    return cancoder.getPosition();
+    return rotationSupplier.get();
   }
 
   /** @return the velocity of the module (UNIT: meters/s) */
   public double getVelocity() {
-    return drive_motor.encoder.getVelocity();
+    return drive_encoder.getVelocity();
   }
 
   /** @return the current error in the angle of the module (UNIT: ccw degrees) */
   public double getAngleError() {
-    return angle_controller.getPositionError();
+    return azimuth_controller.getPositionError();
   }
 
   /** @return the distance traveled by the module (UNIT: meters) */
   public double getDistance() {
-    return drive_motor.encoder.getPosition();
+    return drive_encoder.getPosition();
   }
 
   public void stopMotor() {
     drive_motor.stopMotor();
-    angle_motor.stopMotor();
+    azimuth_motor.stopMotor();
 
-    angle_controller.reset();
+    azimuth_controller.reset();
     speed_controller.reset();
   }
 
   /** Basic constants for the construction of a {@link SwerveModule}. */
   public static class SwerveModuleConstants {
-    public final String directory;
-    public final byte drive_ID;
-    public final byte angle_ID;
-    public final byte cancoder_ID;
+    public final int drive_ID;
+    public final int azimuth_ID;
+    public final int cancoder_ID;
+
     public final double cancoderOffset;
     public final Translation2d location;
 
-    public final PIDController speed_controller;
-    public final PIDController angle_controller;
-
     /**
-     * @param directory sub-directory for logging (with trailing slash)
      * @param drive_ID driving motor ID (Spark Max with brushless motor)
-     * @param angle_ID angular motor ID (Spark Max with brushless motor)
+     * @param azimuth_ID azimuth motor ID (Spark Max with brushless motor)
      * @param cancoder_ID cancoder ID
-     * @param cancoderOffset additive cancoder offset (UNIT: ccw degrees)
-     * @param location location of the wheel relative to the physical center of the robot (forward, left) (UNIT: meters)
-     * @param speed_controller PID controller to calculate drive motor speed from velocity error
-     * @param angle_controller PID controller to calculate angular motor speed from degree error
+     * @param cancoderOffsetRotations additive cancoder offset (UNIT: ccw rotations)
+     * @param location location of the wheel relative to the center of rotation of the robot (forward, left) (UNIT: meters)
      */
-    public SwerveModuleConstants(String directory, int drive_ID, int angle_ID, int cancoder_ID, double cancoderOffset, Translation2d location, PIDController speed_controller, PIDController angle_controller) {
-      this.directory = directory;
-      this.drive_ID = (byte) drive_ID;
-      this.angle_ID = (byte) angle_ID;
-      this.cancoder_ID = (byte) cancoder_ID;
-      this.cancoderOffset = cancoderOffset;
+    public SwerveModuleConstants(int drive_ID, int azimuth_ID, int cancoder_ID, double cancoderOffsetRotations, Translation2d location) {
+      this.drive_ID = drive_ID;
+      this.azimuth_ID = azimuth_ID;
+      this.cancoder_ID = cancoder_ID;
+      this.cancoderOffset = cancoderOffsetRotations;
       this.location = location;
-      this.speed_controller = speed_controller;
-      this.angle_controller = angle_controller;
     }
   }
 }

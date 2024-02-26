@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import frc.robot.logger.Logger;
 
+// TODO(user): Remove
 /** And example state-based subsystem that serves no purpose whatsoever. */
 public class ExampleStateSubsystem extends StateSubsystem<ExampleStateSubsystem.States> {
   private static ExampleStateSubsystem m_instance;
@@ -20,18 +21,7 @@ public class ExampleStateSubsystem extends StateSubsystem<ExampleStateSubsystem.
 
   /** Main logic method to run methods based on current state. */
   @Override
-  public void periodic() {
-    switch (getState()) {
-      case FAST:
-        Logger.log(getName() + " is fast");
-        break;
-      case SLOW:
-        Logger.log(getName() + " is slow");
-        break;
-      default:
-        stop();
-    }
-  }
+  public void periodic() {}
 
   @Override
   public void log() {

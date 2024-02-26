@@ -4,6 +4,8 @@ import frc.robot.logger.Logger;
 import frc.robot.util.SwerveDrive;
 
 import frc.robot.devices.OI;
+import frc.robot.devices.CustomPigeon2;
+import frc.robot.Constants.DeviceConsts;
 import frc.robot.Constants.DriveConsts;
 import frc.robot.Constants.SwerveConsts;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -11,7 +13,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 
 /** Controls the robot drivetrain. */
 public class Drivetrain extends SafeSubsystem {
@@ -26,6 +27,9 @@ public class Drivetrain extends SafeSubsystem {
     return m_instance;
   }
 
+  // TODO(user): Set pigeon inversions as needed
+  private static CustomPigeon2 m_gyro = new CustomPigeon2(DeviceConsts.kPigeonID, DeviceConsts.kPigeonPitchOffset, DeviceConsts.kPigeonRollOffset);
+
   public static final SwerveModuleState[] xStanceStates = new SwerveModuleState[] {
     new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
     new SwerveModuleState(0, Rotation2d.fromDegrees(135)),
@@ -34,6 +38,7 @@ public class Drivetrain extends SafeSubsystem {
   };
 
   private static final SwerveDrive m_swerve = new SwerveDrive(
+    () -> Rotation2d.fromDegrees(m_gyro.getYaw()),
     SwerveConsts.kSwerve_fl,
     SwerveConsts.kSwerve_fr,
     SwerveConsts.kSwerve_bl,
@@ -48,9 +53,9 @@ public class Drivetrain extends SafeSubsystem {
       double ccw = -OI.DRIVER_CONTROLLER.getRightX(); // Right joystick horizontal for rotation
 
       // Field relative control, exponentially scaling inputs to increase sensitivity
-      m_swerve.setDesiredVelocityFieldRelative(
-        Math.copySign(forward*forward, forward) * DriveConsts.kMaxWheelVelMetersPerSecond * DriveConsts.kTeleopSpeedMult,
-        Math.copySign(left*left, left) * DriveConsts.kMaxWheelVelMetersPerSecond * DriveConsts.kTeleopSpeedMult,
+      this.driveFieldRelativeVelocity(
+        Math.copySign(forward*forward, forward) * DriveConsts.kMaxLinearVelMetersPerSecond * DriveConsts.kTeleopSpeedMult,
+        Math.copySign(left*left, left) * DriveConsts.kMaxLinearVelMetersPerSecond * DriveConsts.kTeleopSpeedMult,
         Math.copySign(ccw*ccw*ccw, ccw) * DriveConsts.kMaxTurnVelRadiansPerSecond * DriveConsts.kTeleopTurnMult // Extra sensitivity for fine rotation control
       );
     }));
@@ -64,25 +69,32 @@ public class Drivetrain extends SafeSubsystem {
   }
 
   /**
-   * Drive with field relative velocities. Must be continuously called.
+   * Drive with field relative velocities. Must be continuously called. This method is intended for general teleop drive use.
    *
    * @param forward forward speed (UNIT: meters/s)
    * @param left left speed (UNIT: meters/s)
    * @param ccw counter-clockwise speed (UNIT: ccw radians/s)
    */
   public void driveFieldRelativeVelocity(double forward, double left, double ccw) {
-    m_swerve.setDesiredVelocityFieldRelative(forward, left, ccw);
+    m_swerve.setDesiredVelocityRobotRelative(ChassisSpeeds.fromFieldRelativeSpeeds(forward, left, ccw, getPose().getRotation()));
+  }
+
+  /**
+   * Drive with field relative velocities. Must be continuously called.
+   *
+   * @param speeds {@link ChassisSpeeds} object in meters/s
+   */
+  public void driveFieldRelativeVelocity(ChassisSpeeds speeds) {
+    m_swerve.setDesiredVelocityRobotRelative(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getPose().getRotation()));
   }
 
   /**
    * Drive with robot relative velocities. Must be continuously called.
    *
-   * @param forward forward speed (UNIT: meters/s)
-   * @param left left speed (UNIT: meters/s)
-   * @param ccw counter-clockwise speed (UNIT: ccw radians/s)
+   * @param speeds {@link ChassisSpeeds} object in meters/s
    */
-  public void driveRobotRelativeVelocity(double forward, double left, double ccw) {
-    m_swerve.setDesiredVelocity(forward, left, ccw);
+  public void driveRobotRelativeVelocity(ChassisSpeeds speeds) {
+    m_swerve.setDesiredVelocityRobotRelative(speeds);
   }
 
   /** Set the drivetrain to x-stance for traction. Must be continuously called. */
@@ -130,8 +142,7 @@ public class Drivetrain extends SafeSubsystem {
     Logger.recordOutput(getDirectory()+"desiredSpeeds", getDesiredSpeeds());
 
     Logger.recordOutput(getDirectory()+"3dPosition",
-      new Pose3d(getPose().getX(), getPose().getY(), 0, // Height always set to 0
-      new Rotation3d(Math.toRadians(OI.IMU.getRoll()), Math.toRadians(OI.IMU.getPitch()), getPose().getRotation().getRadians())));
+      new Pose3d(getPose().getX(), getPose().getY(), 0, m_gyro.getRotation3d())); // Height always set to 0
   }
 
   @Override
