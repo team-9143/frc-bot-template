@@ -164,7 +164,7 @@ public class TunableNumber implements DoubleSupplier {
 
       for (var elem : instances) {
         // Add tunables to shuffleboard if not already added
-        if (elem.m_entry != null) {
+        if (elem.m_entry == null) {
           // Make unadded tunables mutable
           elem.setMutable(true);
 
