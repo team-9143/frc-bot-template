@@ -20,7 +20,7 @@ public class Constants {
     // TODO(user): Update ID's
     public static final byte kDriverPort = 0;
     public static final byte kOperatorPort = 1;
-    public static final byte kPigeonID = 5;
+    public static final byte kPigeonID = 2;
 
     // TODO(user): Update pigeon offsets
     // Pitch and roll offsets - REMEMBER TO UPDATE
