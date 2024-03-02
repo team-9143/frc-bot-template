@@ -47,6 +47,7 @@ public class Constants {
     public static final double kMaxTurnVelRadiansPerSecond = kMaxLinearVelMetersPerSecond / Constants.SwerveConsts.kSwerve_bl.location.getDistance(new Translation2d()); // ω = velocity / radius (use swerve module farthest from center of rotation)
 
     public static final double kModuleAzimuthMaxVoltage = 0.65 * PhysConsts.kNEOMaxVoltage; // Maximum azimuth motor voltage
+    public static final double kModuleDriveMaxVoltage = 0.95 * PhysConsts.kNEOMaxVoltage; // Maximum drive motor voltage (to avoid brownouts)
     public static final int kModuleAzimuthCurrentLimit = 30;
 
     // Multipliers for all teleop driving
