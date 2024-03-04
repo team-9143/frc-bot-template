@@ -8,12 +8,20 @@ import frc.robot.util.SwerveModule.SwerveModuleConstants;
 // TODO(user): Tune all TunableNumbers for better robot control
 /** Global constants. Should not include functional code. */
 public class Constants {
-  /** Non-functional information for software testing and metadata. */
+  /** Information for testing and robot configuration that must be updated consistenly. */
   public static class Config {
+    /** Directory for log file. Leave blank to store in default directory on roboRIO or RIO-attached USB. */
+    public static final String DATA_LOG_DIR = "";
+
     /** {@code true} to stream log file data to NetworkTables (takes up bandwith and processing time, but useful for concurrent running and visualization) */
     public static final boolean NTStream = false;
-    /** Directory for log file. Leave blank to store in roboRIO or RIO-attached USB. */
-    public static final String DATA_LOG_DIR = "";
+
+    // TODO(user): Update pigeon offsets
+    // Pigeon mount offsets - REMEMBER TO UPDATE, or configure through PhoenixTuner
+    public static final MountPoseConfigs kPigeonMountPose = new MountPoseConfigs()
+      .withMountPoseYaw(0)
+      .withMountPosePitch(0)
+      .withMountPoseRoll(0);
   }
 
   /** Ports and properties of non-motor devices. */
@@ -22,13 +30,6 @@ public class Constants {
     public static final byte kDriverPort = 0;
     public static final byte kOperatorPort = 1;
     public static final byte kPigeonID = 2;
-
-    // TODO(user): Update pigeon offsets
-    // Pigeon mount offsets - REMEMBER TO UPDATE, or configure through PhoenixTuner
-    public static final MountPoseConfigs kPigeonMountPose = new MountPoseConfigs()
-      .withMountPoseYaw(0)
-      .withMountPosePitch(0)
-      .withMountPoseRoll(0);
   }
 
   // TODO(user): Fix all physical robot constraints as design dictates
