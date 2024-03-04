@@ -13,6 +13,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import java.util.function.Supplier;
 
+// TODO(dev): Update to 10ms loop time, offset 5ms off of main periodic loop
 /** Controls a set of four {@link SwerveModule SwerveModules}. Protected by {@link MotorSafety}, and speeds must be set every iteration. */
 public class SwerveDrive extends MotorSafety {
   public final SwerveModule[] modules;
