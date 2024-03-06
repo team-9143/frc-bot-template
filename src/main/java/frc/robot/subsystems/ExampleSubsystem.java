@@ -5,7 +5,9 @@ package frc.robot.subsystems;
 public class ExampleSubsystem extends SafeSubsystem {
   private static ExampleSubsystem m_instance;
 
-  /** @return the singleton instance */
+  /**
+   * @return the singleton instance
+   */
   public static synchronized ExampleSubsystem getInstance() {
     if (m_instance == null) {
       m_instance = new ExampleSubsystem();

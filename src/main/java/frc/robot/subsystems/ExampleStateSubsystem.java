@@ -7,7 +7,9 @@ import frc.robot.logger.Logger;
 public class ExampleStateSubsystem extends StateSubsystem<ExampleStateSubsystem.States> {
   private static ExampleStateSubsystem m_instance;
 
-  /** @return the singleton instance */
+  /**
+   * @return the singleton instance
+   */
   public static synchronized ExampleStateSubsystem getInstance() {
     if (m_instance == null) {
       m_instance = new ExampleStateSubsystem();
@@ -25,7 +27,7 @@ public class ExampleStateSubsystem extends StateSubsystem<ExampleStateSubsystem.
 
   @Override
   public void log() {
-    Logger.recordOutput(getDirectory()+"state", getState().name());
+    Logger.recordOutput(getDirectory() + "state", getState().name());
   }
 
   @Override
