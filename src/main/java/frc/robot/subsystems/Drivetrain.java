@@ -85,10 +85,10 @@ public class Drivetrain extends SafeSubsystem {
                   Math.copySign(left * left, left)
                       * DriveConsts.kMaxLinearVelMetersPerSecond
                       * DriveConsts.kTeleopSpeedMult,
+                  // Extra sensitivity for fine rotation control
                   Math.copySign(ccw * ccw * ccw, ccw)
                       * DriveConsts.kMaxTurnVelRadiansPerSecond
-                      * DriveConsts.kTeleopTurnMult // Extra sensitivity for fine rotation control
-                  );
+                      * DriveConsts.kTeleopTurnMult);
             }));
   }
 
@@ -203,10 +203,10 @@ public class Drivetrain extends SafeSubsystem {
     Logger.recordOutput(getDirectory() + "measuredSpeeds", getMeasuredSpeeds());
     Logger.recordOutput(getDirectory() + "desiredSpeeds", getDesiredSpeeds());
 
+    // 3d pose with height always set to 0
     Logger.recordOutput(
         getDirectory() + "3dPosition",
-        new Pose3d(
-            getPose().getX(), getPose().getY(), 0, getOrientation())); // Height always set to 0
+        new Pose3d(getPose().getX(), getPose().getY(), 0, getOrientation()));
 
     // Uncoment to log azimuth errors
     // Logger.recordOutput(getDirectory()+"AngleErrorFL", m_swerve.modules[0].getAngleError());
@@ -215,14 +215,18 @@ public class Drivetrain extends SafeSubsystem {
     // Logger.recordOutput(getDirectory()+"AngleErrorBR", m_swerve.modules[3].getAngleError());
 
     // Uncomment to log velocity errors
-    // Logger.recordOutput(getDirectory()+"VelErrorFL", getDesiredStates()[0].speedMetersPerSecond -
-    // m_swerve.modules[0].getVelocity());
-    // Logger.recordOutput(getDirectory()+"VelErrorFR", getDesiredStates()[1].speedMetersPerSecond -
-    // m_swerve.modules[1].getVelocity());
-    // Logger.recordOutput(getDirectory()+"VelErrorBL", getDesiredStates()[2].speedMetersPerSecond -
-    // m_swerve.modules[2].getVelocity());
-    // Logger.recordOutput(getDirectory()+"VelErrorBR", getDesiredStates()[3].speedMetersPerSecond -
-    // m_swerve.modules[3].getVelocity());
+    // Logger.recordOutput(
+    //     getDirectory() + "VelErrorFL",
+    //     getDesiredStates()[0].speedMetersPerSecond - m_swerve.modules[0].getVelocity());
+    // Logger.recordOutput(
+    //     getDirectory() + "VelErrorFR",
+    //     getDesiredStates()[1].speedMetersPerSecond - m_swerve.modules[1].getVelocity());
+    // Logger.recordOutput(
+    //     getDirectory() + "VelErrorBL",
+    //     getDesiredStates()[2].speedMetersPerSecond - m_swerve.modules[2].getVelocity());
+    // Logger.recordOutput(
+    //     getDirectory() + "VelErrorBR",
+    //     getDesiredStates()[3].speedMetersPerSecond - m_swerve.modules[3].getVelocity());
   }
 
   @Override
