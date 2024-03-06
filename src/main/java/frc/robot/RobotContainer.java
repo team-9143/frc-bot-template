@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import frc.robot.subsystems.*;
 
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 /** Robot structure declaration. Initializes trigger mappings, OI devices, and main stop mechanism. */
@@ -85,16 +84,7 @@ public class RobotContainer {
     OI.DRIVER_CONTROLLER.onFalse(btn.Y, cXStance::cancel);
   }
 
-  private static void configureOperator() {
-    // Button 'A' (hold) sets subsystem to fast
-    final var cFast = new StartEndCommand(
-      () -> ExampleStateSubsystem.getInstance().setState(ExampleStateSubsystem.States.FAST),
-      () -> ExampleStateSubsystem.getInstance().setState(ExampleStateSubsystem.States.STOP),
-      ExampleStateSubsystem.getInstance()
-    );
-    OI.OPERATOR_CONTROLLER.onTrue(btn.A, cFast::schedule);
-    OI.OPERATOR_CONTROLLER.onFalse(btn.A, cFast::cancel);
-  }
+  private static void configureOperator() {}
 
   /** Calls all subsystem stop methods. Does not stop commands. */
   public static void stop() {

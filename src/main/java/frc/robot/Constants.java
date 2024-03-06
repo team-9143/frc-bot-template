@@ -26,7 +26,7 @@ public class Constants {
 
   /** Ports and properties of non-motor devices. */
   public static class DeviceConsts {
-    // TODO(user): Update ID's
+    // TODO(user): Update device ID's
     public static final byte kDriverPort = 0;
     public static final byte kOperatorPort = 1;
     public static final byte kPigeonID = 2;
@@ -57,6 +57,9 @@ public class Constants {
     // Multipliers for all teleop driving
     public static final double kTeleopSpeedMult = 1;
     public static final double kTeleopTurnMult = 9.5 / kMaxTurnVelRadiansPerSecond; // Set maximum teleop turn speed to 1.5 rotations/s
+
+    // Update rate for drivetrain, default period is 20 ms. Stay between 8-64 ms to make best use of NEO hall sensor. (UNIT: milliseconds)
+    public static final int kPeriodMs = 10;
   }
 
   /** Data for each individual swerve module. */
@@ -64,7 +67,7 @@ public class Constants {
     // Gains for module velocity error -> voltage
     public static final TunableNumber
       kDriveS = new TunableNumber("S", 0.1, "Module Drive"),
-      kDriveP = new TunableNumber("P", 0.015, "Module Drive");
+      kDriveP = new TunableNumber("P", 2, "Module Drive");
 
     // Whether azimuth motor is inverted, use for mk4i's
     public static final boolean kAzimuthInverted = true;
@@ -80,7 +83,7 @@ public class Constants {
       ),
       kSwerve_fr = new SwerveModuleConstants(
         "SwerveFR",
-        0.095, 0.1, 0.00065, // Gains
+        0.092, 0.1, 0.00065, // Gains
         -0.673096, // Offset
         21, 22, 23,
         new Translation2d(0.14605, -0.24765)

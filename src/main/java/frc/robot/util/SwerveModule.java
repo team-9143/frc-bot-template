@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 
 import edu.wpi.first.math.controller.PIDController;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.RelativeEncoder;
 import com.ctre.phoenix6.hardware.CANcoder;
 import java.util.function.Supplier;
@@ -31,44 +32,53 @@ public class SwerveModule {
   private final CANcoder cancoder;
   private final Supplier<Double> rotationSupplier;
 
-  private final PIDController drive_controller;
   private final PIDController azimuth_controller;
 
   private final TunableNumber kS;
   private final TunableNumber kP;
   private final TunableNumber kD;
 
-  protected SwerveModule(SwerveModuleConstants constants) {
+  /**
+   * Creates a swerve module controlled by NEO V1.1 motors, Spark MAX's, and a CANcoder.
+   *
+   * @param constants module configuration
+   * @param period_ms update rate in milliseconds (limit to [8...64] to fully interface with NEO hall sensor)
+   */
+  protected SwerveModule(SwerveModuleConstants constants, int period_ms) {
+    // Configure drive motor and encoder
     drive_motor = new CANSparkMax(constants.drive_ID, MotorType.kBrushless);
-    drive_motor.setSmartCurrentLimit(PhysConsts.kNEOCurrentLimit);
-    azimuth_motor = new CANSparkMax(constants.azimuth_ID, MotorType.kBrushless);
-    azimuth_motor.setInverted(SwerveConsts.kAzimuthInverted);
-    azimuth_motor.setSmartCurrentLimit(DriveConsts.kModuleAzimuthCurrentLimit);
-
-    // Configure drive encoder
     drive_encoder = drive_motor.getEncoder();
-    drive_encoder.setPositionConversionFactor(PhysConsts.kSwerveDriveGearbox * PhysConsts.kSwerveWheelCircumferenceMeters); // UNIT: meters
-    drive_encoder.setVelocityConversionFactor(PhysConsts.kSwerveDriveGearbox * PhysConsts.kSwerveWheelCircumferenceMeters / 60); // UNIT: meters/s
-    drive_encoder.setMeasurementPeriod(20);
-    drive_encoder.setPosition(0);
+    SparkUtils.configure(drive_motor,
+      () -> drive_motor.setIdleMode(IdleMode.kBrake),
+      () -> drive_motor.setSmartCurrentLimit(PhysConsts.kNEOCurrentLimit),
+      () -> drive_encoder.setPositionConversionFactor(PhysConsts.kSwerveDriveGearbox * PhysConsts.kSwerveWheelCircumferenceMeters), // UNIT: meters
+      () -> drive_encoder.setVelocityConversionFactor(PhysConsts.kSwerveDriveGearbox * PhysConsts.kSwerveWheelCircumferenceMeters / 60), // UNIT: meters/s
+      () -> drive_encoder.setMeasurementPeriod(Math.max(8, Math.min(period_ms, 64))), // Limit to hall sensor boundaries
+      () -> drive_encoder.setPosition(0),
+      () -> SparkUtils.setPeriodicFrames(drive_motor, 10, period_ms, period_ms, 0, 0, 0, 0)
+    );
+
+    // Configure azimuth motor
+    azimuth_motor = new CANSparkMax(constants.azimuth_ID, MotorType.kBrushless);
+    SparkUtils.configure(azimuth_motor,
+      () -> azimuth_motor.setIdleMode(IdleMode.kBrake),
+      () -> SparkUtils.setInverted(azimuth_motor, SwerveConsts.kAzimuthInverted),
+      () -> azimuth_motor.setSmartCurrentLimit(DriveConsts.kModuleAzimuthCurrentLimit),
+      () -> SparkUtils.setPeriodicFrames(azimuth_motor, 10, 0, 0, 0, 0, 0, 0)
+    );
 
     // Configure CANcoder
     cancoder = new CANcoder(constants.cancoder_ID);
     cancoder.getConfigurator().apply(cancoder_config.withMagnetOffset(constants.cancoderOffset));
     var positionSignal = cancoder.getAbsolutePosition();
-    positionSignal.setUpdateFrequency(50);
+    positionSignal.setUpdateFrequency(1000d / period_ms);
     rotationSupplier = () -> positionSignal.refresh().getValue() * 360d; // UNIT: ccw degrees
-
-    // Configure drive PID controller
-    drive_controller = new PIDController(SwerveConsts.kDriveP.getAsDouble(), 0, 0);
-    SwerveConsts.kDriveP.bind(drive_controller::setP);
-    drive_controller.setSetpoint(0);
 
     // Configure azimuth PID controller
     kS = new TunableNumber("S", constants.kS, constants.name);
     kP = new TunableNumber("P", constants.kP, constants.name);
     kD = new TunableNumber("D", constants.kD, constants.name);
-    azimuth_controller = new PIDController(kP.getAsDouble(), 0, kD.getAsDouble());
+    azimuth_controller = new PIDController(kP.getAsDouble(), 0, kD.getAsDouble(), period_ms / 1000d);
     kP.bind(azimuth_controller::setP);
     kD.bind(azimuth_controller::setD);
     azimuth_controller.enableContinuousInput(-180, 180);
@@ -85,7 +95,7 @@ public class SwerveModule {
     // Calculate and set azimuth motor speed
     azimuth_motor.setVoltage(
       Math.max(-DriveConsts.kModuleAzimuthMaxVoltage, Math.min(DriveConsts.kModuleAzimuthMaxVoltage, // Clamp to nominal voltage
-        kS.getAsDouble() * Math.signum(angle - getAngle()) // Simple static feedforward
+        Math.copySign(kS.getAsDouble(), angle - getAngle()) // Simple static feedforward
         + azimuth_controller.calculate(getAngle(), angle) // Azimuth feedback controller
       ))
     );
@@ -93,11 +103,9 @@ public class SwerveModule {
     // Calculate and set drive motor speed
     drive_motor.setVoltage(
       Math.max(-PhysConsts.kNEOMaxVoltage, Math.min(PhysConsts.kNEOMaxVoltage, // Clamp to nominal voltage
-        Math.max(
-          SwerveConsts.kDriveS.getAsDouble(), // Static feedforward
-          DriveConsts.kModuleDriveMaxVoltage/DriveConsts.kMaxLinearVelMetersPerSecond * Math.abs(speed) // Velocity feedforward
-        ) * Math.signum(speed) // Ensures minimum voltage scaling linearly with velocity
-        + drive_controller.calculate(getVelocity(), speed) // Feedback controller for velocity adjustment (helpful for following auton paths)
+        Math.copySign(SwerveConsts.kDriveS.getAsDouble(), speed) // Simple static feedforward
+        + DriveConsts.kModuleDriveMaxVoltage/DriveConsts.kMaxLinearVelMetersPerSecond * speed // Simple velocity feedforward
+        + SwerveConsts.kDriveP.getAsDouble() * (speed - getVelocity()) // Feedback controller for velocity adjustment (helpful for following velocity-reliant pathing)
       )) * Math.abs(Math.cos(getAngleError() * Math.PI/180)) // Scale velocity down if not at proper angle to reduce drag/unintended movement
     );
   }
@@ -130,11 +138,6 @@ public class SwerveModule {
     return azimuth_controller.getPositionError();
   }
 
-  /** @return the current error in the velocity of the module (UNIT: meters/s) */
-  public double getVelocityError() {
-    return drive_controller.getPositionError();
-  }
-
   /** @return the distance traveled by the module (UNIT: meters) */
   public double getDistance() {
     return drive_encoder.getPosition();
@@ -145,7 +148,6 @@ public class SwerveModule {
     azimuth_motor.stopMotor();
 
     azimuth_controller.reset();
-    drive_controller.reset();
   }
 
   /** Basic constants for the construction of a {@link SwerveModule}. */
@@ -168,8 +170,8 @@ public class SwerveModule {
      * @param kP azimuth P gain
      * @param kD azimuth D gain
      * @param cancoderOffsetRotations additive cancoder offset (UNIT: ccw rotations)
-     * @param drive_ID driving motor ID (Spark Max with brushless motor)
-     * @param azimuth_ID azimuth motor ID (Spark Max with brushless motor)
+     * @param drive_ID driving motor ID (Spark MAX with NEO V1.1)
+     * @param azimuth_ID azimuth motor ID (Spark MAX with NEO V1.1)
      * @param cancoder_ID cancoder ID
      * @param location location of the wheel relative to the center of rotation of the robot (forward, left) (UNIT: meters)
      */
