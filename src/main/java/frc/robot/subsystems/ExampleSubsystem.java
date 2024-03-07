@@ -13,7 +13,7 @@ public class ExampleSubsystem extends SafeSubsystem {
   /** Initialization (e.g. motors and default command). */
   private ExampleSubsystem() {}
 
-  /** Update and calculate methods that should be run every robot loop. */
+  /** Methods that should be run every robot loop (e.g. updates and calculations). */
   @Override
   public void periodic() {}
 

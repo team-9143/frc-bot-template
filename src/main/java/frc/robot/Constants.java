@@ -61,9 +61,7 @@ public class Constants {
     // ω = velocity / radius (use swerve module farthest from COR
     public static final double kMaxTurnVelRadiansPerSecond =
         kMaxLinearVelMetersPerSecond
-            / Constants.SwerveConsts.kSwerve_bl.location.getDistance(
-                new Translation2d()); // ω = velocity / radius (use swerve module farthest from
-    // center of rotation)
+            / Constants.SwerveConsts.kSwerve_bl.location.getDistance(new Translation2d());
 
     public static final double kModuleAzimuthMaxVoltage =
         0.65 * PhysConsts.kNEOMaxVoltage; // Maximum azimuth motor voltage
@@ -98,8 +96,9 @@ public class Constants {
                 // Azimuth gains (kS, kP, kD)
                 0.1,
                 0.095,
-                0.0006, // Gains
-                -0.100341, // Offset
+                0.0006,
+                // CANcoder offset
+                -0.100341,
                 11,
                 12,
                 13,
@@ -107,10 +106,12 @@ public class Constants {
         kSwerve_fr =
             new SwerveModuleConstants(
                 "SwerveFR",
+                // Azimuth gains (kS, kP, kD)
                 0.092,
                 0.1,
-                0.00065, // Gains
-                -0.673096, // Offset
+                0.00065,
+                // CANcoder offset
+                -0.673096,
                 21,
                 22,
                 23,
@@ -118,10 +119,12 @@ public class Constants {
         kSwerve_bl =
             new SwerveModuleConstants(
                 "SwerveBL",
+                // Azimuth gains (kS, kP, kD)
                 0.08,
                 0.105,
-                0.0004, // Gains
-                -0.086670, // Offset
+                0.0004,
+                // CANcoder offset
+                -0.086670,
                 31,
                 32,
                 33,
@@ -129,10 +132,12 @@ public class Constants {
         kSwerve_br =
             new SwerveModuleConstants(
                 "SwerveBR",
+                // Azimuth gains (kS, kP, kD)
                 0.092,
                 0.09,
-                0.00065, // Gains
-                -0.687012, // Offset
+                0.00065,
+                // CANcoder offset
+                -0.687012,
                 41,
                 42,
                 43,
