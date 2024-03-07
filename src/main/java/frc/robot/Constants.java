@@ -58,6 +58,7 @@ public class Constants {
             * PhysConsts.kSwerveDriveGearbox
             * PhysConsts.kSwerveWheelCircumferenceMeters
             * 0.75; // 75% of theoretical max (motor RPS * gearbox * wheel circumfrence * 80%)
+    // ω = velocity / radius (use swerve module farthest from COR
     public static final double kMaxTurnVelRadiansPerSecond =
         kMaxLinearVelMetersPerSecond
             / Constants.SwerveConsts.kSwerve_bl.location.getDistance(
@@ -94,6 +95,7 @@ public class Constants {
         kSwerve_fl =
             new SwerveModuleConstants(
                 "SwerveFL",
+                // Azimuth gains (kS, kP, kD)
                 0.1,
                 0.095,
                 0.0006, // Gains
