@@ -17,6 +17,8 @@ import frc.robot.Constants.AutoConsts;
 import frc.robot.Constants.DriveConsts;
 import frc.robot.logger.Logger;
 import frc.robot.subsystems.Drivetrain;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Utility class for loading, generating, following, and logging paths through PathPlanner. PID
@@ -39,22 +41,21 @@ public class Pathing {
     PathPlannerLogging.setLogActivePathCallback(
         poses -> Logger.recordOutput(PATH_LOG_DIR + "activePath", poses.toArray(Pose2d[]::new)));
 
+    // Log target pose during command run
+    PathPlannerLogging.setLogTargetPoseCallback(
+        pose -> Logger.recordOutput(PATH_LOG_DIR + "targetPose", pose));
+
     // No need to log current robot pose, drivetrain will do that
     PathPlannerLogging.setLogCurrentPoseCallback(null);
-
-    // Log reference pose during command run
-    PathPlannerLogging.setLogTargetPoseCallback(
-        pose -> Logger.recordOutput(PATH_LOG_DIR + "referencePose", pose));
   }
 
   // Configure AutoBuilder
   static {
     AutoBuilder.configureHolonomic(
-        Drivetrain.getInstance()::getPose, // Pose supplier
-        Drivetrain.getInstance()::resetOdometry, // Reset pose consumer
-        Drivetrain.getInstance()::getDesiredSpeeds, // Current measured speeds
-        Drivetrain.getInstance()
-            ::driveFieldRelativeVelocity, // Drives field relative from ChassisSpeeds
+        Drivetrain::getPose, // Pose supplier
+        Drivetrain::resetOdometry, // Reset pose consumer
+        Drivetrain::getDesiredSpeeds, // Current measured speeds
+        Drivetrain::driveFieldRelativeVelocity, // Drives field relative from ChassisSpeeds
         getHolonomicConfig(new ReplanningConfig(false, false)), // Config
         Pathing::isRedAlliance, // Flip if alliance is red
         Drivetrain.getInstance() // Subsystem
@@ -94,14 +95,17 @@ public class Pathing {
   public static PathPlannerPath generateDirectPath(
       Pose2d startPoseMetersCCW, Pose2d endPoseMetersCCW) {
     return new PathPlannerPath(
-        // TODO(dev): Test this path generation, start post/end pose rotations may need to be
-        // changed to match with bezier curve
-        PathPlannerPath.bezierFromPoses(
-            startPoseMetersCCW, endPoseMetersCCW), // Create bezier points from waypoints
-        DEFAULT_CONSTRAINTS, // Default constraints
-        new GoalEndState(
-            0, endPoseMetersCCW.getRotation()) // End with 0 velocity at specified rotation
-        );
+        List.of(
+            startPoseMetersCCW.getTranslation(),
+            startPoseMetersCCW.getTranslation(),
+            endPoseMetersCCW.getTranslation(),
+            endPoseMetersCCW.getTranslation()),
+        Collections.emptyList(),
+        Collections.emptyList(),
+        Collections.emptyList(),
+        DEFAULT_CONSTRAINTS,
+        new GoalEndState(0, endPoseMetersCCW.getRotation()),
+        false);
   }
 
   /******
@@ -130,9 +134,9 @@ public class Pathing {
       PathPlannerPath path, ReplanningConfig replanningConfig) {
     return new FollowPathHolonomic(
         path, // Path to follow
-        Drivetrain.getInstance()::getPose, // Pose supplier
-        Drivetrain.getInstance()::getMeasuredSpeeds, // Chassis speeds supplier
-        Drivetrain.getInstance()::driveRobotRelativeVelocity, // Robot-relative velocities consumer
+        Drivetrain::getPose, // Pose supplier
+        Drivetrain::getMeasuredSpeeds, // Chassis speeds supplier
+        Drivetrain::driveRobotRelativeVelocity, // Robot-relative velocities consumer
         getHolonomicConfig(replanningConfig), // Follower configuration
         Pathing::isRedAlliance, // Flip the path if alliance is red
         Drivetrain.getInstance() // Subsystem requirements
@@ -150,16 +154,22 @@ public class Pathing {
   }
 
   /**
-   * Create a command that pathfinds to the target pose and stops.
+   * Create a command that follows a path directly to the target pose and stops. Command should be
+   * scheduled before any other movement happens.
    *
    * @param targetPoseMetersCCW target position for the command
    */
   public static Command getHolonomicTargetPoseCommand(Pose2d targetPoseMetersCCW) {
-    return AutoBuilder.pathfindToPose(targetPoseMetersCCW, DEFAULT_CONSTRAINTS);
+    var path = generateDirectPath(Drivetrain.getPose(), targetPoseMetersCCW);
+    path.preventFlipping = true;
+    return getHolonomicFollowPathCommand(path);
   }
 
   /**
    * Create a command that pathfinds to a path and then follows that path.
+   *
+   * <p>Pathfinding may take excessive processing, prefer running a path follower command in
+   * sequence after {@link Pathing#getHolonomicTargetPoseCommand(Pose2d)}.
    *
    * @param path the pathplanner path to target and follow
    */
