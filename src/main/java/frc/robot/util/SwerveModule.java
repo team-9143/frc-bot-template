@@ -150,30 +150,22 @@ public class SwerveModule {
     drive(desired.speedMetersPerSecond, desired.angle.getDegrees());
   }
 
-  /**
-   * @return the angle of the module (UNIT: ccw degrees)
-   */
+  /** Returns the angle of the module (UNIT: ccw degrees) */
   public double getAngle() {
     return rotationSupplier.get();
   }
 
-  /**
-   * @return the velocity of the module (UNIT: meters/s)
-   */
+  /** Returns the velocity of the module (UNIT: meters/s) */
   public double getVelocity() {
     return drive_encoder.getVelocity();
   }
 
-  /**
-   * @return the current error in the angle of the module (UNIT: ccw degrees)
-   */
+  /** Returns the current error in the angle of the module (UNIT: ccw degrees) */
   public double getAngleError() {
     return azimuth_controller.getPositionError();
   }
 
-  /**
-   * @return the distance traveled by the module (UNIT: meters)
-   */
+  /** Returns the distance traveled by the module (UNIT: meters) */
   public double getDistance() {
     return drive_encoder.getPosition();
   }

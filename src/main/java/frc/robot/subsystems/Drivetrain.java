@@ -20,9 +20,7 @@ import frc.robot.util.SwerveDrive;
 public class Drivetrain extends SafeSubsystem {
   private static Drivetrain m_instance;
 
-  /**
-   * @return the singleton instance
-   */
+  /** Returns the singleton instance */
   public static synchronized Drivetrain getInstance() {
     if (m_instance == null) {
       m_instance = new Drivetrain();
@@ -151,45 +149,33 @@ public class Drivetrain extends SafeSubsystem {
     m_swerve.resetOdometry(positionMetersCCW, gyroAngle);
   }
 
-  /**
-   * @return the robot's estimated location
-   */
   public Pose2d getPose() {
+  /** Returns the robot's estimated location */
     return m_swerve.getPose();
   }
 
-  /**
-   * @return the gyro's orientation
-   */
   public Rotation3d getOrientation() {
+  /** Returns the gyro's orientation */
     return m_pigeon2.getRotation3d().plus(gyroOffset);
   }
 
-  /**
-   * @return the drivetrain's desired velocities
-   */
   public ChassisSpeeds getDesiredSpeeds() {
+  /** Returns the drivetrain's desired velocities */
     return m_swerve.getDesiredSpeeds();
   }
 
-  /**
-   * @return the drivetrain's actual velocities, as measured by encoders
-   */
   public ChassisSpeeds getMeasuredSpeeds() {
+  /** Returns the drivetrain's actual velocities, as measured by encoders */
     return m_swerve.getMeasuredSpeeds();
   }
 
-  /**
-   * @return individual desired module states
-   */
   public SwerveModuleState[] getDesiredStates() {
+  /** Returns individual desired module states */
     return m_swerve.getDesiredStates();
   }
 
-  /**
-   * @return individual measured module states
-   */
   public SwerveModuleState[] getMeasuredStates() {
+  /** Returns individual measured module states */
     return m_swerve.getMeasuredStates();
   }
 
