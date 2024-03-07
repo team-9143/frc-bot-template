@@ -6,7 +6,7 @@ public class ExampleSubsystem extends SafeSubsystem {
   private static final ExampleSubsystem m_instance = new ExampleSubsystem();
 
   /** Returns the singleton instance */
-  public static synchronized ExampleSubsystem getInstance() {
+  public static ExampleSubsystem getInstance() {
     return m_instance;
   }
 
