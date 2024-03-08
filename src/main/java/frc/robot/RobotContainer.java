@@ -52,8 +52,8 @@ public class RobotContainer {
   /** Initialize OI devices. */
   private static void configureOI() {
     powerDist = new LoggedPowerDistribution();
-    DriverStation.silenceJoystickConnectionWarning(
-        true); // Stop those ridiculously persistent messages
+    // Stop those ridiculously persistent messages
+    DriverStation.silenceJoystickConnectionWarning(true);
   }
 
   /** Create button bindings. */
@@ -62,13 +62,9 @@ public class RobotContainer {
     new Trigger(
             () -> OI.DRIVER_CONTROLLER.getButton(btn.B) || OI.OPERATOR_CONTROLLER.getButton(btn.B))
         .whileTrue(
-            new RunCommand(
-                    RobotContainer::stop, SafeSubsystem.getAll() // Requires all subsystems
-                    )
-                .withInterruptBehavior(
-                    InterruptionBehavior
-                        .kCancelIncoming)); // Interrupt incoming commands to ensure stop command
-    // takes precedence
+            new RunCommand(RobotContainer::stop, SafeSubsystem.getAll())
+                // Interrupt incoming commands to ensure stop command takes precedence
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
 
     configureDriver();
     configureOperator();
@@ -85,7 +81,8 @@ public class RobotContainer {
                   // Reset odometry so that forward is away from the driver station
                   Drivetrain.resetOdometry(
                       new Pose2d(Drivetrain.getPose().getTranslation(), new Rotation2d(0)));
-                  cRumble.schedule(); // Rumble to indicate odometry has been reset
+                  // Rumble to indicate odometry has been reset
+                  cRumble.schedule();
                 }));
 
     // Button 'Y' (hold) will set drivetrain to x-stance (for stability)
