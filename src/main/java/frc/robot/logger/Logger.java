@@ -132,12 +132,32 @@ public class Logger {
   }
 
   /**
-   * Log a message to the "messages" entry. The message is also printed to standard output.
+   * Logs a message to the "messages" entry and prints to standard output.
    *
    * @param msg message
    */
   public static void log(String msg) {
     DataLogManager.log(msg);
+  }
+
+  /**
+   * Reports an warning to the DriverStation (without a stack trace) and the "messages" entry.
+   *
+   * @param err warning message
+   */
+  public static void reportWarning(String err) {
+    log("WARNING: " + err);
+    DriverStation.reportWarning(err, false);
+  }
+
+  /**
+   * Reports an error to the DriverStation (without a stack trace) and the "messages" entry.
+   *
+   * @param err error message
+   */
+  public static void reportError(String err) {
+    log("ERROR: " + err);
+    DriverStation.reportError(err, false);
   }
 
   @SuppressWarnings("resource")
