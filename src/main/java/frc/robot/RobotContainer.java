@@ -4,10 +4,12 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.autos.Starter;
 import frc.robot.devices.Controller.btn;
 import frc.robot.devices.OI;
 import frc.robot.logger.LoggedPowerDistribution;
@@ -33,20 +35,38 @@ public class RobotContainer {
     m_initialized = true;
 
     configureOI();
-    configureMetadata();
+    logMetadata();
     configureBindings();
   }
 
+  /** Initialize driver station specific data. */
+  public static void initDS() {
+    Logger.recordMetadata("Station", DriverStation.getRawAllianceStation().toString());
+
+    Logger.recordMetadata(
+        "Match",
+        DriverStation.getEventName()
+            + " "
+            + DriverStation.getMatchType().toString()
+            + " "
+            + DriverStation.getMatchNumber());
+
+    Logger.initFilename();
+  }
+
   /** Send metadata to logger. */
-  private static void configureMetadata() {
+  private static void logMetadata() {
     Logger.recordMetadata(
-        "RoborioSerialNum", RobotBase.isReal() ? System.getenv("serialnum") : "Simulation");
-    Logger.recordMetadata(
-        "BuildDate",
+        "Time",
         LocalDateTime.now(ZoneId.of("UTC-8"))
             .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+
+    Logger.recordMetadata("NT Streaming", String.valueOf(Constants.Config.NTStream));
+
+    Logger.recordMetadata(
+        "RoborioSerialNum", RobotBase.isReal() ? System.getenv("serialnum") : "Simulation");
+
     Logger.recordMetadata("PowerDistributionType", powerDist.getType().name());
-    Logger.recordMetadata("NT Streaming", Constants.Config.NTStream ? "true" : "false");
   }
 
   /** Initialize OI devices. */
