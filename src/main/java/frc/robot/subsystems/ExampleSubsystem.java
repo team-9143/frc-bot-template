@@ -3,21 +3,17 @@ package frc.robot.subsystems;
 // TODO(user): Remove
 /** An example subsystem that serves no purpose whatsoever. */
 public class ExampleSubsystem extends SafeSubsystem {
-  private static ExampleSubsystem m_instance;
+  private static final ExampleSubsystem m_instance = new ExampleSubsystem();
 
-  /** @return the singleton instance */
-  public static synchronized ExampleSubsystem getInstance() {
-    if (m_instance == null) {
-      m_instance = new ExampleSubsystem();
-      m_instance.stop();
-    }
+  /** Returns the singleton instance */
+  public static ExampleSubsystem getInstance() {
     return m_instance;
   }
 
   /** Initialization (e.g. motors and default command). */
   private ExampleSubsystem() {}
 
-  /** Update and calculate methods that should be run every robot loop. */
+  /** Methods that should be run every robot loop (e.g. updates and calculations). */
   @Override
   public void periodic() {}
 
