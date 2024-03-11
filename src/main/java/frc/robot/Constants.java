@@ -5,7 +5,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.util.SwerveModule.SwerveModuleConstants;
 import frc.robot.util.TunableNumber;
 
-// TODO(user): Tune all TunableNumbers for better robot control
 /** Global constants. Should not include functional code. */
 public class Constants {
   /** Information for testing and robot configuration that must be updated consistenly. */
@@ -80,6 +79,7 @@ public class Constants {
 
   /** Data for each individual swerve module. */
   public static class SwerveConsts {
+    // TODO(user): Tune swerve propulsion gains
     // Gains for module velocity error -> voltage
     public static final TunableNumber kDriveS = new TunableNumber("S", 0.1, "Module Drive");
     public static final TunableNumber kDriveP = new TunableNumber("P", 2, "Module Drive");
@@ -87,7 +87,7 @@ public class Constants {
     // Whether azimuth motor is inverted, use for mk4i's
     public static final boolean kAzimuthInverted = true;
 
-    // TODO(user): Update swerve module ID's, locations, and cancoder offsets
+    // TODO(user): Update swerve module locations, ID's, cancoder offsets, and gains
     public static final SwerveModuleConstants
         kSwerve_fl =
             new SwerveModuleConstants(
@@ -155,6 +155,7 @@ public class Constants {
     public static final double kMaxTurnAccelRadiansPerSecondSquared =
         DriveConsts.kMaxTurnVelRadiansPerSecond;
 
+    // TODO(user): Tune pathfinding PID gains (currently at default gains)
     // Gains for drivetrain position error -> velocity
     public static final TunableNumber kTranslateP = new TunableNumber("P", 5, "Robot Translation");
     public static final TunableNumber kTranslateD = new TunableNumber("D", 0, "Robot Translation");
