@@ -55,8 +55,8 @@ public class Pathing {
     AutoBuilder.configureHolonomic(
         Drivetrain::getPose, // Pose supplier
         Drivetrain::resetOdometry, // Reset pose consumer
-        Drivetrain::getDesiredSpeeds, // Current measured speeds
-        Drivetrain::driveFieldRelativeVelocity, // Drives field relative from ChassisSpeeds
+        Drivetrain::getMeasuredSpeeds, // Current measured speeds
+        Drivetrain::driveRobotRelativeVelocity, // Robot-relative velocities consumer
         getHolonomicConfig(new ReplanningConfig(false, false)), // Config
         Pathing::isRedAlliance, // Flip if alliance is red
         Drivetrain.getInstance() // Subsystem
@@ -215,7 +215,7 @@ public class Pathing {
    *
    * @return {@code true} if alliance is red and not null
    */
-  private static boolean isRedAlliance() {
+  public static boolean isRedAlliance() {
     return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue)
         == DriverStation.Alliance.Red;
   }
