@@ -32,11 +32,11 @@ public class Constants {
   // TODO(user): Fix all physical robot constraints as design dictates
   /** Physical parts of the robot, such as gearboxes or wheel diameters. */
   public static class PhysConsts {
-    /** NEO V1.1 nominal voltage */
-    public static final int kNEOMaxVoltage = 12;
+    /** General nominal motor voltage */
+    public static final int kMaxVoltage = 12;
 
-    /** NEO V1.1 general current limit (40A-60A is advised) */
-    public static final int kNEOCurrentLimit = 40;
+    /** General current limit (40A-60A is advised for NEO V1.1's) */
+    public static final int kDefaultCurrentLimit = 40;
 
     /** NEO V1.1 empirical free speed */
     public static final double kSwerveDriveMaxRPS = 5680d / 60d;
@@ -64,8 +64,8 @@ public class Constants {
         kMaxLinearVelMetersPerSecond / Constants.SwerveConsts.kDriveBaseRadius;
 
     // To avoid brownouts and overpowering
-    public static final double kModuleAzimuthMaxVoltage = 0.65 * PhysConsts.kNEOMaxVoltage;
-    public static final double kModuleDriveMaxVoltage = 0.95 * PhysConsts.kNEOMaxVoltage;
+    public static final double kModuleAzimuthMaxVoltage = 0.65 * PhysConsts.kMaxVoltage;
+    public static final double kModuleDriveMaxVoltage = 0.95 * PhysConsts.kMaxVoltage;
     public static final int kModuleAzimuthCurrentLimit = 30;
 
     // Multipliers for all teleop driving

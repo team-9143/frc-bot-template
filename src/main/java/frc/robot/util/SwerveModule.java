@@ -51,7 +51,7 @@ public class SwerveModule {
     SparkUtils.configure(
         drive_motor,
         () -> drive_motor.setIdleMode(IdleMode.kBrake),
-        () -> drive_motor.setSmartCurrentLimit(PhysConsts.kNEOCurrentLimit),
+        () -> drive_motor.setSmartCurrentLimit(PhysConsts.kDefaultCurrentLimit),
         () ->
             drive_encoder.setPositionConversionFactor(
                 PhysConsts.kSwerveDriveMechToSens
